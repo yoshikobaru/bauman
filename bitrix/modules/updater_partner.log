@@ -1,0 +1,369 @@
+2026-03-25 13:20:40 -  - exec CUpdateClientPartner::__CollectRequestData
+2026-03-25 13:20:40 -  - exec CUpdateClientPartner::GetHTTPPage
+2026-03-25 13:20:40 -  - exec CUpdateClientPartner::ParseServerData
+2026-03-25 13:20:40 -  - exec CUpdateClientPartner::GetUpdatesList
+2026-03-25 13:20:40 -  - exec CUpdateClientPartner::__CollectRequestData
+2026-03-25 13:20:40 -  - utf=Y&lang=ru&stable=Y&CANGZIP=Y&SUPD_DBS=MYSQL&XE=N&CLIENT_SITE=bauman-polytech.ru&LICENSE_KEY=X&SUPD_STS=1&SUPD_URS=0&TYPENC=E&CLIENT_PHPVER=8.2.29&NGINX=Y&dbv=8.0.25&instm=main%2C25.100.500%2CN%3Bsearch%2C25.0.0%2CN%3Babtest%2C24.100.0%2CN%3Bforum%2C25.200.0%2CN%3Bsale%2C25.0.200%2CN%3Bseo%2C24.700.100%2CN%3Bcatalog%2C25.0.100%2CN%3Btranslate%2C25.0.0%2CN%3Bmessageservice%2C24.900.100%2CN%3Bsender%2C24.400.100%2CN%3Bsocialservices%2C24.200.100%2CN%3Bb24connector%2C24.0.100%2CN%3Bsecurity%2C24.0.300%2CN%3Bsubscribe%2C24.0.0%2CN%3Bmobileapp%2C24.200.0%2CN%3Bstoreassist%2C24.0.0%2CN%3Bfileman%2C25.0.0%2CN%3Biblock%2C25.0.100%2CN%3Bvote%2C25.0.0%2CN%3Bphotogallery%2C25.0.0%2CN%3Brest%2C25.300.100%2CN%3Bblog%2C24.300.100%2CN%3Bconversion%2C24.0.0%2CN%3Blanding%2C24.800.300%2CN%3Breport%2C24.100.100%2CN%3Bcurrency%2C24.100.0%2CN%3Bbitrix.eshop%2C24.100.0%2CN%3Bbitrixcloud%2C25.0.0%2CN%3Bpull%2C25.200.100%2CN%3Bbitrix.sitecorporate%2C24.0.0%2CN%3Blocation%2C25.100.0%2CN%3Bclouds%2C25.100.0%2CN%3Bperfmon%2C24.200.0%2CN%3Bhighloadblock%2C24.100.0%2CN%3Bform%2C25.0.0%2CN%3Bui%2C25.50.200%2CN&reqm=bitrix.eshop%2Cbitrix.sitecorporate&fullmoduleinfo=Y&SUPD_SRS=RU&SUPD_CMP=N
+2026-03-25 13:20:40 -  - exec CUpdateClientPartner::GetHTTPPage
+2026-03-25 13:20:40 -  - TIME GetUpdatesList(request) 0.218 sec
+2026-03-25 13:20:40 -  - exec CUpdateClientPartner::ParseServerData
+2026-03-25 13:20:40 -  - exec CUpdateClientPartner::__CollectRequestData
+2026-03-25 13:20:40 -  - exec CUpdateClientPartner::GetHTTPPage
+2026-03-25 13:20:40 -  - exec CUpdateClientPartner::ParseServerData
+2026-03-25 13:21:51 -  - exec CUpdateClientPartner::GetUpdatesList
+2026-03-25 13:21:51 -  - exec CUpdateClientPartner::__CollectRequestData
+2026-03-25 13:21:51 -  - utf=Y&lang=ru&stable=Y&CANGZIP=Y&SUPD_DBS=MYSQL&XE=N&CLIENT_SITE=bauman-polytech.ru&LICENSE_KEY=X&SUPD_STS=1&SUPD_URS=0&TYPENC=E&CLIENT_PHPVER=8.2.29&NGINX=Y&dbv=8.0.25&instm=main%2C25.100.500%2CN%3Bsearch%2C25.0.0%2CN%3Babtest%2C24.100.0%2CN%3Bforum%2C25.200.0%2CN%3Bsale%2C25.0.200%2CN%3Bseo%2C24.700.100%2CN%3Bcatalog%2C25.0.100%2CN%3Btranslate%2C25.0.0%2CN%3Bmessageservice%2C24.900.100%2CN%3Bsender%2C24.400.100%2CN%3Bsocialservices%2C24.200.100%2CN%3Bb24connector%2C24.0.100%2CN%3Bsecurity%2C24.0.300%2CN%3Bsubscribe%2C24.0.0%2CN%3Bmobileapp%2C24.200.0%2CN%3Bstoreassist%2C24.0.0%2CN%3Bfileman%2C25.0.0%2CN%3Biblock%2C25.0.100%2CN%3Bvote%2C25.0.0%2CN%3Bphotogallery%2C25.0.0%2CN%3Brest%2C25.300.100%2CN%3Bblog%2C24.300.100%2CN%3Bconversion%2C24.0.0%2CN%3Blanding%2C24.800.300%2CN%3Breport%2C24.100.100%2CN%3Bcurrency%2C24.100.0%2CN%3Bbitrix.eshop%2C24.100.0%2CN%3Bbitrixcloud%2C25.0.0%2CN%3Bpull%2C25.200.100%2CN%3Bbitrix.sitecorporate%2C24.0.0%2CN%3Blocation%2C25.100.0%2CN%3Bclouds%2C25.100.0%2CN%3Bperfmon%2C24.200.0%2CN%3Bhighloadblock%2C24.100.0%2CN%3Bform%2C25.0.0%2CN%3Bui%2C25.50.200%2CN&reqm=bitrix.eshop%2Cbitrix.sitecorporate%2Cartamonov.rest&SUPD_SRS=RU&SUPD_CMP=N
+2026-03-25 13:21:51 -  - exec CUpdateClientPartner::GetHTTPPage
+2026-03-25 13:21:51 -  - TIME GetUpdatesList(request) 0.184 sec
+2026-03-25 13:21:51 -  - exec CUpdateClientPartner::ParseServerData
+2026-03-25 13:22:08 -  - exec CUpdateClientPartner::LoadModulesUpdates
+2026-03-25 13:22:08 -  - exec CUpdateClientPartner::__CollectRequestData
+2026-03-25 13:22:08 -  - utf=Y&lang=ru&stable=Y&CANGZIP=Y&SUPD_DBS=MYSQL&XE=N&CLIENT_SITE=bauman-polytech.ru&LICENSE_KEY=X&SUPD_STS=1&SUPD_URS=0&TYPENC=E&CLIENT_PHPVER=8.2.29&NGINX=Y&dbv=8.0.25&instm=main%2C25.100.500%2CN%3Bsearch%2C25.0.0%2CN%3Babtest%2C24.100.0%2CN%3Bforum%2C25.200.0%2CN%3Bsale%2C25.0.200%2CN%3Bseo%2C24.700.100%2CN%3Bcatalog%2C25.0.100%2CN%3Btranslate%2C25.0.0%2CN%3Bmessageservice%2C24.900.100%2CN%3Bsender%2C24.400.100%2CN%3Bsocialservices%2C24.200.100%2CN%3Bb24connector%2C24.0.100%2CN%3Bsecurity%2C24.0.300%2CN%3Bsubscribe%2C24.0.0%2CN%3Bmobileapp%2C24.200.0%2CN%3Bstoreassist%2C24.0.0%2CN%3Bfileman%2C25.0.0%2CN%3Biblock%2C25.0.100%2CN%3Bvote%2C25.0.0%2CN%3Bphotogallery%2C25.0.0%2CN%3Brest%2C25.300.100%2CN%3Bblog%2C24.300.100%2CN%3Bconversion%2C24.0.0%2CN%3Blanding%2C24.800.300%2CN%3Breport%2C24.100.100%2CN%3Bcurrency%2C24.100.0%2CN%3Bbitrix.eshop%2C24.100.0%2CN%3Bbitrixcloud%2C25.0.0%2CN%3Bpull%2C25.200.100%2CN%3Bbitrix.sitecorporate%2C24.0.0%2CN%3Blocation%2C25.100.0%2CN%3Bclouds%2C25.100.0%2CN%3Bperfmon%2C24.200.0%2CN%3Bhighloadblock%2C24.100.0%2CN%3Bform%2C25.0.0%2CN%3Bui%2C25.50.200%2CN&reqm=artamonov.rest&lim=Y&SUPD_SRS=RU&SUPD_CMP=N
+2026-03-25 13:22:08 -  - exec CUpdateClientPartner::GetHTTPPage
+2026-03-25 13:22:08 -  - TIME LoadModulesUpdates(request) 0.187 sec
+2026-03-25 13:22:08 -  - exec CUpdateClientPartner::ParseServerData
+2026-03-25 13:22:08 - S - STEP
+2026-03-25 13:22:08 - LMU01 - LoadModulesUpdates-Step
+2026-03-25 13:22:08 -  - exec CUpdateClientPartner::LoadModulesUpdates
+2026-03-25 13:22:08 -  - exec CUpdateClientPartner::ParseServerData
+2026-03-25 13:22:08 -  - loadFile
+2026-03-25 13:22:08 - U - RETURN
+2026-03-25 13:22:08 -  - exec CUpdateClientPartner::UnGzipArchive
+2026-03-25 13:22:08 -  - TIME UnGzipArchive 0.012 sec
+2026-03-25 13:22:08 -  - TIME UpdateStepModules 0.013 sec
+2026-03-25 13:22:08 - UPD_SUCCESS - Updated: artamonov.rest
+2026-03-25 13:22:08 -  - exec CUpdateClientPartner::LoadModulesUpdates
+2026-03-25 13:22:08 -  - exec CUpdateClientPartner::__CollectRequestData
+2026-03-25 13:22:08 -  - utf=Y&lang=ru&stable=Y&CANGZIP=Y&SUPD_DBS=MYSQL&XE=N&CLIENT_SITE=bauman-polytech.ru&LICENSE_KEY=X&SUPD_STS=1&SUPD_URS=0&TYPENC=E&CLIENT_PHPVER=8.2.29&NGINX=Y&dbv=8.0.25&instm=main%2C25.100.500%2CN%3Bsearch%2C25.0.0%2CN%3Babtest%2C24.100.0%2CN%3Bforum%2C25.200.0%2CN%3Bsale%2C25.0.200%2CN%3Bseo%2C24.700.100%2CN%3Bcatalog%2C25.0.100%2CN%3Btranslate%2C25.0.0%2CN%3Bmessageservice%2C24.900.100%2CN%3Bsender%2C24.400.100%2CN%3Bsocialservices%2C24.200.100%2CN%3Bb24connector%2C24.0.100%2CN%3Bsecurity%2C24.0.300%2CN%3Bsubscribe%2C24.0.0%2CN%3Bmobileapp%2C24.200.0%2CN%3Bstoreassist%2C24.0.0%2CN%3Bfileman%2C25.0.0%2CN%3Biblock%2C25.0.100%2CN%3Bvote%2C25.0.0%2CN%3Bphotogallery%2C25.0.0%2CN%3Bartamonov.rest%2C4.3.1%2CY%3Brest%2C25.300.100%2CN%3Bblog%2C24.300.100%2CN%3Bconversion%2C24.0.0%2CN%3Blanding%2C24.800.300%2CN%3Breport%2C24.100.100%2CN%3Bcurrency%2C24.100.0%2CN%3Bbitrix.eshop%2C24.100.0%2CN%3Bbitrixcloud%2C25.0.0%2CN%3Bpull%2C25.200.100%2CN%3Bbitrix.sitecorporate%2C24.0.0%2CN%3Blocation%2C25.100.0%2CN%3Bclouds%2C25.100.0%2CN%3Bperfmon%2C24.200.0%2CN%3Bhighloadblock%2C24.100.0%2CN%3Bform%2C25.0.0%2CN%3Bui%2C25.50.200%2CN&reqm=artamonov.rest&lim=Y&SUPD_SRS=RU&SUPD_CMP=N
+2026-03-25 13:22:08 -  - exec CUpdateClientPartner::GetHTTPPage
+2026-03-25 13:22:08 -  - TIME LoadModulesUpdates(request) 0.188 sec
+2026-03-25 13:22:08 -  - exec CUpdateClientPartner::ParseServerData
+2026-03-25 13:22:08 - S - STEP
+2026-03-25 13:22:08 - LMU01 - LoadModulesUpdates-Step
+2026-03-25 13:22:08 -  - exec CUpdateClientPartner::LoadModulesUpdates
+2026-03-25 13:22:08 -  - exec CUpdateClientPartner::ParseServerData
+2026-03-25 13:22:08 -  - loadFile
+2026-03-25 13:22:08 - U - RETURN
+2026-03-25 13:22:08 -  - exec CUpdateClientPartner::UnGzipArchive
+2026-03-25 13:22:08 -  - TIME UnGzipArchive 0.009 sec
+2026-03-25 13:22:09 -  - TIME UpdateStepModules 0.015 sec
+2026-03-25 13:22:09 - UPD_SUCCESS - Updated: artamonov.rest (4.4.0)<br><ul> <li><b>Доработано</b>: авторизация по логину и паролю.</li> <li><b>Доработано</b>: функция возврата ответа клиенту: response()->json(). Теперь в данную функцию можно передавать значения заголовков не только в виде строки, но и в виде массива. В котором могут быть указаны дополнительные параметры для заголовка (в соответствии с функцией header($header, $replace, $http_response_code)). Подробнее смотрите в роуте-примере (example).</li> <li><b>Добавлено</b>: класс Artamonov\\Rest\\Foundation\\Token. Теперь можно генерировать токены пользователей с помощью данного класса, при любой необходимости. Класс поддерживает как генерацию токенов, так и другие действия. Генерация токенов возможна для списка пользователей, плюс поддерживаются параметры ($parameters) от метода UserTable::getList(). Для удобства добавлена функция token(). Подробнее смотрите в документации.</li> <li><b>Добавлено</b>: в разделе Безопасность, пошаговое создание и обновление токенов для пользователей. Полезная функция, если в базе сайта зарегистрировано большое количество пользователей.</li> <li><b>Доработано</b>: незначительные технические изменения.</li> </ul>
+2026-03-25 13:22:09 -  - exec CUpdateClientPartner::LoadModulesUpdates
+2026-03-25 13:22:09 -  - exec CUpdateClientPartner::__CollectRequestData
+2026-03-25 13:22:09 -  - utf=Y&lang=ru&stable=Y&CANGZIP=Y&SUPD_DBS=MYSQL&XE=N&CLIENT_SITE=bauman-polytech.ru&LICENSE_KEY=X&SUPD_STS=1&SUPD_URS=0&TYPENC=E&CLIENT_PHPVER=8.2.29&NGINX=Y&dbv=8.0.25&instm=main%2C25.100.500%2CN%3Bsearch%2C25.0.0%2CN%3Babtest%2C24.100.0%2CN%3Bforum%2C25.200.0%2CN%3Bsale%2C25.0.200%2CN%3Bseo%2C24.700.100%2CN%3Bcatalog%2C25.0.100%2CN%3Btranslate%2C25.0.0%2CN%3Bmessageservice%2C24.900.100%2CN%3Bsender%2C24.400.100%2CN%3Bsocialservices%2C24.200.100%2CN%3Bb24connector%2C24.0.100%2CN%3Bsecurity%2C24.0.300%2CN%3Bsubscribe%2C24.0.0%2CN%3Bmobileapp%2C24.200.0%2CN%3Bstoreassist%2C24.0.0%2CN%3Bfileman%2C25.0.0%2CN%3Biblock%2C25.0.100%2CN%3Bvote%2C25.0.0%2CN%3Bphotogallery%2C25.0.0%2CN%3Bartamonov.rest%2C4.4.0%2CY%3Brest%2C25.300.100%2CN%3Bblog%2C24.300.100%2CN%3Bconversion%2C24.0.0%2CN%3Blanding%2C24.800.300%2CN%3Breport%2C24.100.100%2CN%3Bcurrency%2C24.100.0%2CN%3Bbitrix.eshop%2C24.100.0%2CN%3Bbitrixcloud%2C25.0.0%2CN%3Bpull%2C25.200.100%2CN%3Bbitrix.sitecorporate%2C24.0.0%2CN%3Blocation%2C25.100.0%2CN%3Bclouds%2C25.100.0%2CN%3Bperfmon%2C24.200.0%2CN%3Bhighloadblock%2C24.100.0%2CN%3Bform%2C25.0.0%2CN%3Bui%2C25.50.200%2CN&reqm=artamonov.rest&lim=Y&SUPD_SRS=RU&SUPD_CMP=N
+2026-03-25 13:22:09 -  - exec CUpdateClientPartner::GetHTTPPage
+2026-03-25 13:22:09 -  - TIME LoadModulesUpdates(request) 0.2 sec
+2026-03-25 13:22:09 -  - exec CUpdateClientPartner::ParseServerData
+2026-03-25 13:22:09 - S - STEP
+2026-03-25 13:22:09 - LMU01 - LoadModulesUpdates-Step
+2026-03-25 13:22:09 -  - exec CUpdateClientPartner::LoadModulesUpdates
+2026-03-25 13:22:09 -  - exec CUpdateClientPartner::ParseServerData
+2026-03-25 13:22:09 -  - loadFile
+2026-03-25 13:22:09 - U - RETURN
+2026-03-25 13:22:09 -  - exec CUpdateClientPartner::UnGzipArchive
+2026-03-25 13:22:09 -  - TIME UnGzipArchive 0.009 sec
+2026-03-25 13:22:09 -  - TIME UpdateStepModules 0.014 sec
+2026-03-25 13:22:09 - UPD_SUCCESS - Updated: artamonov.rest (4.5.0)<br><ul> <li><b>Доработано</b>: авторизация по логину и паролю. Теперь проверка пароля выполняется с помощью метода Bitrix\\Main\\Security\\Password::equals().</li> <li><b>Доработано</b>: в связи с устаревшим, начиная с версии PHP 7.2.0, функционалом механизма перегрузки функций (mbstring.func_overload), и отказом от использования его в платформе, строковые функции модуля были переведны в многобайтовый режим работы.</li> <li><b>Исправлено</b>: проблема при подключении модуля в файле init.php, в случае, если файл имелся в директории, но был абсолютно пустым.</li> <li><b>Доработано</b>: теперь резервная копия файла init.php создаётся до установки и до удаления модуля. Ранее копия создавалась лишь при установке модуля.</li> <li><b>Доработано</b>: незначительные технические изменения.</li> </ul>
+2026-03-25 13:22:09 -  - exec CUpdateClientPartner::LoadModulesUpdates
+2026-03-25 13:22:09 -  - exec CUpdateClientPartner::__CollectRequestData
+2026-03-25 13:22:09 -  - utf=Y&lang=ru&stable=Y&CANGZIP=Y&SUPD_DBS=MYSQL&XE=N&CLIENT_SITE=bauman-polytech.ru&LICENSE_KEY=X&SUPD_STS=1&SUPD_URS=0&TYPENC=E&CLIENT_PHPVER=8.2.29&NGINX=Y&dbv=8.0.25&instm=main%2C25.100.500%2CN%3Bsearch%2C25.0.0%2CN%3Babtest%2C24.100.0%2CN%3Bforum%2C25.200.0%2CN%3Bsale%2C25.0.200%2CN%3Bseo%2C24.700.100%2CN%3Bcatalog%2C25.0.100%2CN%3Btranslate%2C25.0.0%2CN%3Bmessageservice%2C24.900.100%2CN%3Bsender%2C24.400.100%2CN%3Bsocialservices%2C24.200.100%2CN%3Bb24connector%2C24.0.100%2CN%3Bsecurity%2C24.0.300%2CN%3Bsubscribe%2C24.0.0%2CN%3Bmobileapp%2C24.200.0%2CN%3Bstoreassist%2C24.0.0%2CN%3Bfileman%2C25.0.0%2CN%3Biblock%2C25.0.100%2CN%3Bvote%2C25.0.0%2CN%3Bphotogallery%2C25.0.0%2CN%3Bartamonov.rest%2C4.5.0%2CY%3Brest%2C25.300.100%2CN%3Bblog%2C24.300.100%2CN%3Bconversion%2C24.0.0%2CN%3Blanding%2C24.800.300%2CN%3Breport%2C24.100.100%2CN%3Bcurrency%2C24.100.0%2CN%3Bbitrix.eshop%2C24.100.0%2CN%3Bbitrixcloud%2C25.0.0%2CN%3Bpull%2C25.200.100%2CN%3Bbitrix.sitecorporate%2C24.0.0%2CN%3Blocation%2C25.100.0%2CN%3Bclouds%2C25.100.0%2CN%3Bperfmon%2C24.200.0%2CN%3Bhighloadblock%2C24.100.0%2CN%3Bform%2C25.0.0%2CN%3Bui%2C25.50.200%2CN&reqm=artamonov.rest&lim=Y&SUPD_SRS=RU&SUPD_CMP=N
+2026-03-25 13:22:09 -  - exec CUpdateClientPartner::GetHTTPPage
+2026-03-25 13:22:09 -  - TIME LoadModulesUpdates(request) 0.203 sec
+2026-03-25 13:22:09 -  - exec CUpdateClientPartner::ParseServerData
+2026-03-25 13:22:09 - S - STEP
+2026-03-25 13:22:09 - LMU01 - LoadModulesUpdates-Step
+2026-03-25 13:22:09 -  - exec CUpdateClientPartner::LoadModulesUpdates
+2026-03-25 13:22:09 -  - exec CUpdateClientPartner::ParseServerData
+2026-03-25 13:22:09 -  - loadFile
+2026-03-25 13:22:10 - U - RETURN
+2026-03-25 13:22:10 -  - exec CUpdateClientPartner::UnGzipArchive
+2026-03-25 13:22:10 -  - TIME UnGzipArchive 0.013 sec
+2026-03-25 13:22:10 -  - TIME UpdateStepModules 0.017 sec
+2026-03-25 13:22:10 - UPD_SUCCESS - Updated: artamonov.rest (4.6.0)<br><ul> <li><b>Доработано</b>: добавлена возможность выбора сайтов, на которых необходимо запускать модуль.</li> <li><b>Доработано</b>: улучшена работа модуля в режиме многосайтовости.</li> <li><b>Доработано</b>: добавлено игнорирование всех запросов, которые выполняются на адрес /bitrix/.</li> </ul> 
+2026-03-25 13:22:10 -  - exec CUpdateClientPartner::LoadModulesUpdates
+2026-03-25 13:22:10 -  - exec CUpdateClientPartner::__CollectRequestData
+2026-03-25 13:22:10 -  - utf=Y&lang=ru&stable=Y&CANGZIP=Y&SUPD_DBS=MYSQL&XE=N&CLIENT_SITE=bauman-polytech.ru&LICENSE_KEY=X&SUPD_STS=1&SUPD_URS=0&TYPENC=E&CLIENT_PHPVER=8.2.29&NGINX=Y&dbv=8.0.25&instm=main%2C25.100.500%2CN%3Bsearch%2C25.0.0%2CN%3Babtest%2C24.100.0%2CN%3Bforum%2C25.200.0%2CN%3Bsale%2C25.0.200%2CN%3Bseo%2C24.700.100%2CN%3Bcatalog%2C25.0.100%2CN%3Btranslate%2C25.0.0%2CN%3Bmessageservice%2C24.900.100%2CN%3Bsender%2C24.400.100%2CN%3Bsocialservices%2C24.200.100%2CN%3Bb24connector%2C24.0.100%2CN%3Bsecurity%2C24.0.300%2CN%3Bsubscribe%2C24.0.0%2CN%3Bmobileapp%2C24.200.0%2CN%3Bstoreassist%2C24.0.0%2CN%3Bfileman%2C25.0.0%2CN%3Biblock%2C25.0.100%2CN%3Bvote%2C25.0.0%2CN%3Bphotogallery%2C25.0.0%2CN%3Bartamonov.rest%2C4.6.0%2CY%3Brest%2C25.300.100%2CN%3Bblog%2C24.300.100%2CN%3Bconversion%2C24.0.0%2CN%3Blanding%2C24.800.300%2CN%3Breport%2C24.100.100%2CN%3Bcurrency%2C24.100.0%2CN%3Bbitrix.eshop%2C24.100.0%2CN%3Bbitrixcloud%2C25.0.0%2CN%3Bpull%2C25.200.100%2CN%3Bbitrix.sitecorporate%2C24.0.0%2CN%3Blocation%2C25.100.0%2CN%3Bclouds%2C25.100.0%2CN%3Bperfmon%2C24.200.0%2CN%3Bhighloadblock%2C24.100.0%2CN%3Bform%2C25.0.0%2CN%3Bui%2C25.50.200%2CN&reqm=artamonov.rest&lim=Y&SUPD_SRS=RU&SUPD_CMP=N
+2026-03-25 13:22:10 -  - exec CUpdateClientPartner::GetHTTPPage
+2026-03-25 13:22:10 -  - TIME LoadModulesUpdates(request) 0.173 sec
+2026-03-25 13:22:10 -  - exec CUpdateClientPartner::ParseServerData
+2026-03-25 13:22:10 - S - STEP
+2026-03-25 13:22:10 - LMU01 - LoadModulesUpdates-Step
+2026-03-25 13:22:10 -  - exec CUpdateClientPartner::LoadModulesUpdates
+2026-03-25 13:22:10 -  - exec CUpdateClientPartner::ParseServerData
+2026-03-25 13:22:10 -  - loadFile
+2026-03-25 13:22:10 - U - RETURN
+2026-03-25 13:22:10 -  - exec CUpdateClientPartner::UnGzipArchive
+2026-03-25 13:22:10 -  - TIME UnGzipArchive 0.011 sec
+2026-03-25 13:22:10 -  - TIME UpdateStepModules 0.015 sec
+2026-03-25 13:22:10 - UPD_SUCCESS - Updated: artamonov.rest (4.7.0)<br><ul> <li><b>Доработано</b>: теперь учитывается формат даты и времени для не RU локализаций.</li> <li><b>Исправлено</b>: кодировка копирайта в заголовке ответа.</li> <li><b>Доработано</b>: мелкие правки и рефакторинг.</li> </ul> 
+2026-03-25 13:22:10 -  - exec CUpdateClientPartner::LoadModulesUpdates
+2026-03-25 13:22:10 -  - exec CUpdateClientPartner::__CollectRequestData
+2026-03-25 13:22:10 -  - utf=Y&lang=ru&stable=Y&CANGZIP=Y&SUPD_DBS=MYSQL&XE=N&CLIENT_SITE=bauman-polytech.ru&LICENSE_KEY=X&SUPD_STS=1&SUPD_URS=0&TYPENC=E&CLIENT_PHPVER=8.2.29&NGINX=Y&dbv=8.0.25&instm=main%2C25.100.500%2CN%3Bsearch%2C25.0.0%2CN%3Babtest%2C24.100.0%2CN%3Bforum%2C25.200.0%2CN%3Bsale%2C25.0.200%2CN%3Bseo%2C24.700.100%2CN%3Bcatalog%2C25.0.100%2CN%3Btranslate%2C25.0.0%2CN%3Bmessageservice%2C24.900.100%2CN%3Bsender%2C24.400.100%2CN%3Bsocialservices%2C24.200.100%2CN%3Bb24connector%2C24.0.100%2CN%3Bsecurity%2C24.0.300%2CN%3Bsubscribe%2C24.0.0%2CN%3Bmobileapp%2C24.200.0%2CN%3Bstoreassist%2C24.0.0%2CN%3Bfileman%2C25.0.0%2CN%3Biblock%2C25.0.100%2CN%3Bvote%2C25.0.0%2CN%3Bphotogallery%2C25.0.0%2CN%3Bartamonov.rest%2C4.7.0%2CY%3Brest%2C25.300.100%2CN%3Bblog%2C24.300.100%2CN%3Bconversion%2C24.0.0%2CN%3Blanding%2C24.800.300%2CN%3Breport%2C24.100.100%2CN%3Bcurrency%2C24.100.0%2CN%3Bbitrix.eshop%2C24.100.0%2CN%3Bbitrixcloud%2C25.0.0%2CN%3Bpull%2C25.200.100%2CN%3Bbitrix.sitecorporate%2C24.0.0%2CN%3Blocation%2C25.100.0%2CN%3Bclouds%2C25.100.0%2CN%3Bperfmon%2C24.200.0%2CN%3Bhighloadblock%2C24.100.0%2CN%3Bform%2C25.0.0%2CN%3Bui%2C25.50.200%2CN&reqm=artamonov.rest&lim=Y&SUPD_SRS=RU&SUPD_CMP=N
+2026-03-25 13:22:10 -  - exec CUpdateClientPartner::GetHTTPPage
+2026-03-25 13:22:10 -  - TIME LoadModulesUpdates(request) 0.182 sec
+2026-03-25 13:22:10 -  - exec CUpdateClientPartner::ParseServerData
+2026-03-25 13:22:10 - S - STEP
+2026-03-25 13:22:10 - LMU01 - LoadModulesUpdates-Step
+2026-03-25 13:22:10 -  - exec CUpdateClientPartner::LoadModulesUpdates
+2026-03-25 13:22:10 -  - exec CUpdateClientPartner::ParseServerData
+2026-03-25 13:22:10 -  - loadFile
+2026-03-25 13:22:11 - U - RETURN
+2026-03-25 13:22:11 -  - exec CUpdateClientPartner::UnGzipArchive
+2026-03-25 13:22:11 -  - TIME UnGzipArchive 0.01 sec
+2026-03-25 13:22:11 -  - TIME UpdateStepModules 0.017 sec
+2026-03-25 13:22:11 - UPD_SUCCESS - Updated: artamonov.rest (4.8.0)<br><ul> <li><b>Доработано</b>: в новых версиях главного модуля, поле PASSWORD объявлено приватным. Поэтому, при авторизаци по логину и паролю, могли наблюдаться проблемы.</li> <li><b>Исправления</b>: незначительные улучшения.</li> </ul> 
+2026-03-25 13:22:11 -  - exec CUpdateClientPartner::LoadModulesUpdates
+2026-03-25 13:22:11 -  - exec CUpdateClientPartner::__CollectRequestData
+2026-03-25 13:22:11 -  - utf=Y&lang=ru&stable=Y&CANGZIP=Y&SUPD_DBS=MYSQL&XE=N&CLIENT_SITE=bauman-polytech.ru&LICENSE_KEY=X&SUPD_STS=1&SUPD_URS=0&TYPENC=E&CLIENT_PHPVER=8.2.29&NGINX=Y&dbv=8.0.25&instm=main%2C25.100.500%2CN%3Bsearch%2C25.0.0%2CN%3Babtest%2C24.100.0%2CN%3Bforum%2C25.200.0%2CN%3Bsale%2C25.0.200%2CN%3Bseo%2C24.700.100%2CN%3Bcatalog%2C25.0.100%2CN%3Btranslate%2C25.0.0%2CN%3Bmessageservice%2C24.900.100%2CN%3Bsender%2C24.400.100%2CN%3Bsocialservices%2C24.200.100%2CN%3Bb24connector%2C24.0.100%2CN%3Bsecurity%2C24.0.300%2CN%3Bsubscribe%2C24.0.0%2CN%3Bmobileapp%2C24.200.0%2CN%3Bstoreassist%2C24.0.0%2CN%3Bfileman%2C25.0.0%2CN%3Biblock%2C25.0.100%2CN%3Bvote%2C25.0.0%2CN%3Bphotogallery%2C25.0.0%2CN%3Bartamonov.rest%2C4.8.0%2CY%3Brest%2C25.300.100%2CN%3Bblog%2C24.300.100%2CN%3Bconversion%2C24.0.0%2CN%3Blanding%2C24.800.300%2CN%3Breport%2C24.100.100%2CN%3Bcurrency%2C24.100.0%2CN%3Bbitrix.eshop%2C24.100.0%2CN%3Bbitrixcloud%2C25.0.0%2CN%3Bpull%2C25.200.100%2CN%3Bbitrix.sitecorporate%2C24.0.0%2CN%3Blocation%2C25.100.0%2CN%3Bclouds%2C25.100.0%2CN%3Bperfmon%2C24.200.0%2CN%3Bhighloadblock%2C24.100.0%2CN%3Bform%2C25.0.0%2CN%3Bui%2C25.50.200%2CN&reqm=artamonov.rest&lim=Y&SUPD_SRS=RU&SUPD_CMP=N
+2026-03-25 13:22:11 -  - exec CUpdateClientPartner::GetHTTPPage
+2026-03-25 13:22:11 -  - TIME LoadModulesUpdates(request) 0.168 sec
+2026-03-25 13:22:11 -  - exec CUpdateClientPartner::ParseServerData
+2026-03-25 13:22:11 - S - STEP
+2026-03-25 13:22:11 - LMU01 - LoadModulesUpdates-Step
+2026-03-25 13:22:11 -  - exec CUpdateClientPartner::LoadModulesUpdates
+2026-03-25 13:22:11 -  - exec CUpdateClientPartner::ParseServerData
+2026-03-25 13:22:11 -  - loadFile
+2026-03-25 13:22:11 - U - RETURN
+2026-03-25 13:22:11 -  - exec CUpdateClientPartner::UnGzipArchive
+2026-03-25 13:22:11 -  - TIME UnGzipArchive 0.011 sec
+2026-03-25 13:22:11 -  - TIME UpdateStepModules 0.018 sec
+2026-03-25 13:22:11 - UPD_SUCCESS - Updated: artamonov.rest (4.8.1)<br><ul> <li><b>Доработано</b>: добавлена обратная совместимость для старых версий модуля, где еще отсутствует класс Password с методом equals().</li> <li><b>Исправления</b>: мелкие правки.</li> </ul>
+2026-03-25 13:22:12 -  - exec CUpdateClientPartner::LoadModulesUpdates
+2026-03-25 13:22:12 -  - exec CUpdateClientPartner::__CollectRequestData
+2026-03-25 13:22:12 -  - utf=Y&lang=ru&stable=Y&CANGZIP=Y&SUPD_DBS=MYSQL&XE=N&CLIENT_SITE=bauman-polytech.ru&LICENSE_KEY=X&SUPD_STS=1&SUPD_URS=0&TYPENC=E&CLIENT_PHPVER=8.2.29&NGINX=Y&dbv=8.0.25&instm=main%2C25.100.500%2CN%3Bsearch%2C25.0.0%2CN%3Babtest%2C24.100.0%2CN%3Bforum%2C25.200.0%2CN%3Bsale%2C25.0.200%2CN%3Bseo%2C24.700.100%2CN%3Bcatalog%2C25.0.100%2CN%3Btranslate%2C25.0.0%2CN%3Bmessageservice%2C24.900.100%2CN%3Bsender%2C24.400.100%2CN%3Bsocialservices%2C24.200.100%2CN%3Bb24connector%2C24.0.100%2CN%3Bsecurity%2C24.0.300%2CN%3Bsubscribe%2C24.0.0%2CN%3Bmobileapp%2C24.200.0%2CN%3Bstoreassist%2C24.0.0%2CN%3Bfileman%2C25.0.0%2CN%3Biblock%2C25.0.100%2CN%3Bvote%2C25.0.0%2CN%3Bphotogallery%2C25.0.0%2CN%3Bartamonov.rest%2C4.8.1%2CY%3Brest%2C25.300.100%2CN%3Bblog%2C24.300.100%2CN%3Bconversion%2C24.0.0%2CN%3Blanding%2C24.800.300%2CN%3Breport%2C24.100.100%2CN%3Bcurrency%2C24.100.0%2CN%3Bbitrix.eshop%2C24.100.0%2CN%3Bbitrixcloud%2C25.0.0%2CN%3Bpull%2C25.200.100%2CN%3Bbitrix.sitecorporate%2C24.0.0%2CN%3Blocation%2C25.100.0%2CN%3Bclouds%2C25.100.0%2CN%3Bperfmon%2C24.200.0%2CN%3Bhighloadblock%2C24.100.0%2CN%3Bform%2C25.0.0%2CN%3Bui%2C25.50.200%2CN&reqm=artamonov.rest&lim=Y&SUPD_SRS=RU&SUPD_CMP=N
+2026-03-25 13:22:12 -  - exec CUpdateClientPartner::GetHTTPPage
+2026-03-25 13:22:12 -  - TIME LoadModulesUpdates(request) 0.181 sec
+2026-03-25 13:22:12 -  - exec CUpdateClientPartner::ParseServerData
+2026-03-25 13:22:12 - S - STEP
+2026-03-25 13:22:12 - LMU01 - LoadModulesUpdates-Step
+2026-03-25 13:22:12 -  - exec CUpdateClientPartner::LoadModulesUpdates
+2026-03-25 13:22:12 -  - exec CUpdateClientPartner::ParseServerData
+2026-03-25 13:22:12 -  - loadFile
+2026-03-25 13:22:12 - U - RETURN
+2026-03-25 13:22:12 -  - exec CUpdateClientPartner::UnGzipArchive
+2026-03-25 13:22:12 -  - TIME UnGzipArchive 0.01 sec
+2026-03-25 13:22:12 - CSURUS1 - Run updater '/bitrix/updates/update_m1774434132/artamonov.rest/updater4.9.0.php'
+2026-03-25 13:22:12 -  - TIME UpdateStepModules 0.02 sec
+2026-03-25 13:22:12 - UPD_SUCCESS - Updated: artamonov.rest (4.9.0)<br><ul> <li><b>Улучшено</b>: работа с журналом Входящие запросы - переведено на штатное ORM.</li> <li><b>Улучшено</b>: повышена производительность Монитора поддержки.</li> <li><b>Доработано</b>: доработана вёрстка Монитора поддержки.</li> <li><b>Исправления</b>: рефакторинг и оптимизация.</li> </ul> 
+2026-03-25 13:22:12 -  - exec CUpdateClientPartner::LoadModulesUpdates
+2026-03-25 13:22:12 -  - exec CUpdateClientPartner::__CollectRequestData
+2026-03-25 13:22:12 -  - utf=Y&lang=ru&stable=Y&CANGZIP=Y&SUPD_DBS=MYSQL&XE=N&CLIENT_SITE=bauman-polytech.ru&LICENSE_KEY=X&SUPD_STS=1&SUPD_URS=0&TYPENC=E&CLIENT_PHPVER=8.2.29&NGINX=Y&dbv=8.0.25&instm=main%2C25.100.500%2CN%3Bsearch%2C25.0.0%2CN%3Babtest%2C24.100.0%2CN%3Bforum%2C25.200.0%2CN%3Bsale%2C25.0.200%2CN%3Bseo%2C24.700.100%2CN%3Bcatalog%2C25.0.100%2CN%3Btranslate%2C25.0.0%2CN%3Bmessageservice%2C24.900.100%2CN%3Bsender%2C24.400.100%2CN%3Bsocialservices%2C24.200.100%2CN%3Bb24connector%2C24.0.100%2CN%3Bsecurity%2C24.0.300%2CN%3Bsubscribe%2C24.0.0%2CN%3Bmobileapp%2C24.200.0%2CN%3Bstoreassist%2C24.0.0%2CN%3Bfileman%2C25.0.0%2CN%3Biblock%2C25.0.100%2CN%3Bvote%2C25.0.0%2CN%3Bphotogallery%2C25.0.0%2CN%3Bartamonov.rest%2C4.9.0%2CY%3Brest%2C25.300.100%2CN%3Bblog%2C24.300.100%2CN%3Bconversion%2C24.0.0%2CN%3Blanding%2C24.800.300%2CN%3Breport%2C24.100.100%2CN%3Bcurrency%2C24.100.0%2CN%3Bbitrix.eshop%2C24.100.0%2CN%3Bbitrixcloud%2C25.0.0%2CN%3Bpull%2C25.200.100%2CN%3Bbitrix.sitecorporate%2C24.0.0%2CN%3Blocation%2C25.100.0%2CN%3Bclouds%2C25.100.0%2CN%3Bperfmon%2C24.200.0%2CN%3Bhighloadblock%2C24.100.0%2CN%3Bform%2C25.0.0%2CN%3Bui%2C25.50.200%2CN&reqm=artamonov.rest&lim=Y&SUPD_SRS=RU&SUPD_CMP=N
+2026-03-25 13:22:12 -  - exec CUpdateClientPartner::GetHTTPPage
+2026-03-25 13:22:12 -  - TIME LoadModulesUpdates(request) 0.194 sec
+2026-03-25 13:22:12 -  - exec CUpdateClientPartner::ParseServerData
+2026-03-25 13:22:12 - S - STEP
+2026-03-25 13:22:12 - LMU01 - LoadModulesUpdates-Step
+2026-03-25 13:22:12 -  - exec CUpdateClientPartner::LoadModulesUpdates
+2026-03-25 13:22:12 -  - exec CUpdateClientPartner::ParseServerData
+2026-03-25 13:22:12 -  - loadFile
+2026-03-25 13:22:13 - U - RETURN
+2026-03-25 13:22:13 -  - exec CUpdateClientPartner::UnGzipArchive
+2026-03-25 13:22:13 -  - TIME UnGzipArchive 0.01 sec
+2026-03-25 13:22:13 -  - TIME UpdateStepModules 0.016 sec
+2026-03-25 13:22:13 - UPD_SUCCESS - Updated: artamonov.rest (4.10.0)<br><ul> <li><b>Доработано</b>: на уровне ядра добавлен заголовок Access-Control-Allow-Credentials со значением true.</li> <li><b>Доработано</b>: отключена проверка модуля безопасности на фишинг при редиректе на страницу документации из административного раздела.</li> </ul> 
+2026-03-25 13:22:13 -  - exec CUpdateClientPartner::LoadModulesUpdates
+2026-03-25 13:22:13 -  - exec CUpdateClientPartner::__CollectRequestData
+2026-03-25 13:22:13 -  - utf=Y&lang=ru&stable=Y&CANGZIP=Y&SUPD_DBS=MYSQL&XE=N&CLIENT_SITE=bauman-polytech.ru&LICENSE_KEY=X&SUPD_STS=1&SUPD_URS=0&TYPENC=E&CLIENT_PHPVER=8.2.29&NGINX=Y&dbv=8.0.25&instm=main%2C25.100.500%2CN%3Bsearch%2C25.0.0%2CN%3Babtest%2C24.100.0%2CN%3Bforum%2C25.200.0%2CN%3Bsale%2C25.0.200%2CN%3Bseo%2C24.700.100%2CN%3Bcatalog%2C25.0.100%2CN%3Btranslate%2C25.0.0%2CN%3Bmessageservice%2C24.900.100%2CN%3Bsender%2C24.400.100%2CN%3Bsocialservices%2C24.200.100%2CN%3Bb24connector%2C24.0.100%2CN%3Bsecurity%2C24.0.300%2CN%3Bsubscribe%2C24.0.0%2CN%3Bmobileapp%2C24.200.0%2CN%3Bstoreassist%2C24.0.0%2CN%3Bfileman%2C25.0.0%2CN%3Biblock%2C25.0.100%2CN%3Bvote%2C25.0.0%2CN%3Bphotogallery%2C25.0.0%2CN%3Bartamonov.rest%2C4.10.0%2CY%3Brest%2C25.300.100%2CN%3Bblog%2C24.300.100%2CN%3Bconversion%2C24.0.0%2CN%3Blanding%2C24.800.300%2CN%3Breport%2C24.100.100%2CN%3Bcurrency%2C24.100.0%2CN%3Bbitrix.eshop%2C24.100.0%2CN%3Bbitrixcloud%2C25.0.0%2CN%3Bpull%2C25.200.100%2CN%3Bbitrix.sitecorporate%2C24.0.0%2CN%3Blocation%2C25.100.0%2CN%3Bclouds%2C25.100.0%2CN%3Bperfmon%2C24.200.0%2CN%3Bhighloadblock%2C24.100.0%2CN%3Bform%2C25.0.0%2CN%3Bui%2C25.50.200%2CN&reqm=artamonov.rest&lim=Y&SUPD_SRS=RU&SUPD_CMP=N
+2026-03-25 13:22:13 -  - exec CUpdateClientPartner::GetHTTPPage
+2026-03-25 13:22:13 -  - TIME LoadModulesUpdates(request) 0.193 sec
+2026-03-25 13:22:13 -  - exec CUpdateClientPartner::ParseServerData
+2026-03-25 13:22:13 - S - STEP
+2026-03-25 13:22:13 - LMU01 - LoadModulesUpdates-Step
+2026-03-25 13:22:13 -  - exec CUpdateClientPartner::LoadModulesUpdates
+2026-03-25 13:22:13 -  - exec CUpdateClientPartner::ParseServerData
+2026-03-25 13:22:13 -  - loadFile
+2026-03-25 13:22:13 - U - RETURN
+2026-03-25 13:22:13 -  - exec CUpdateClientPartner::UnGzipArchive
+2026-03-25 13:22:13 -  - TIME UnGzipArchive 0.008 sec
+2026-03-25 13:22:13 -  - TIME UpdateStepModules 0.012 sec
+2026-03-25 13:22:13 - UPD_SUCCESS - Updated: artamonov.rest (4.11.0)<br><ul> <li><b>Доработано</b>: улучшена совместимость с PHP 8 и выше.</li> </ul> 
+2026-03-25 13:22:13 -  - exec CUpdateClientPartner::LoadModulesUpdates
+2026-03-25 13:22:13 -  - exec CUpdateClientPartner::__CollectRequestData
+2026-03-25 13:22:13 -  - utf=Y&lang=ru&stable=Y&CANGZIP=Y&SUPD_DBS=MYSQL&XE=N&CLIENT_SITE=bauman-polytech.ru&LICENSE_KEY=X&SUPD_STS=1&SUPD_URS=0&TYPENC=E&CLIENT_PHPVER=8.2.29&NGINX=Y&dbv=8.0.25&instm=main%2C25.100.500%2CN%3Bsearch%2C25.0.0%2CN%3Babtest%2C24.100.0%2CN%3Bforum%2C25.200.0%2CN%3Bsale%2C25.0.200%2CN%3Bseo%2C24.700.100%2CN%3Bcatalog%2C25.0.100%2CN%3Btranslate%2C25.0.0%2CN%3Bmessageservice%2C24.900.100%2CN%3Bsender%2C24.400.100%2CN%3Bsocialservices%2C24.200.100%2CN%3Bb24connector%2C24.0.100%2CN%3Bsecurity%2C24.0.300%2CN%3Bsubscribe%2C24.0.0%2CN%3Bmobileapp%2C24.200.0%2CN%3Bstoreassist%2C24.0.0%2CN%3Bfileman%2C25.0.0%2CN%3Biblock%2C25.0.100%2CN%3Bvote%2C25.0.0%2CN%3Bphotogallery%2C25.0.0%2CN%3Bartamonov.rest%2C4.11.0%2CY%3Brest%2C25.300.100%2CN%3Bblog%2C24.300.100%2CN%3Bconversion%2C24.0.0%2CN%3Blanding%2C24.800.300%2CN%3Breport%2C24.100.100%2CN%3Bcurrency%2C24.100.0%2CN%3Bbitrix.eshop%2C24.100.0%2CN%3Bbitrixcloud%2C25.0.0%2CN%3Bpull%2C25.200.100%2CN%3Bbitrix.sitecorporate%2C24.0.0%2CN%3Blocation%2C25.100.0%2CN%3Bclouds%2C25.100.0%2CN%3Bperfmon%2C24.200.0%2CN%3Bhighloadblock%2C24.100.0%2CN%3Bform%2C25.0.0%2CN%3Bui%2C25.50.200%2CN&reqm=artamonov.rest&lim=Y&SUPD_SRS=RU&SUPD_CMP=N
+2026-03-25 13:22:13 -  - exec CUpdateClientPartner::GetHTTPPage
+2026-03-25 13:22:13 -  - TIME LoadModulesUpdates(request) 0.174 sec
+2026-03-25 13:22:13 -  - exec CUpdateClientPartner::ParseServerData
+2026-03-25 13:22:13 - S - STEP
+2026-03-25 13:22:13 - LMU01 - LoadModulesUpdates-Step
+2026-03-25 13:22:13 -  - exec CUpdateClientPartner::LoadModulesUpdates
+2026-03-25 13:22:13 -  - exec CUpdateClientPartner::ParseServerData
+2026-03-25 13:22:13 -  - loadFile
+2026-03-25 13:22:14 - U - RETURN
+2026-03-25 13:22:14 -  - exec CUpdateClientPartner::UnGzipArchive
+2026-03-25 13:22:14 -  - TIME UnGzipArchive 0.01 sec
+2026-03-25 13:22:14 -  - TIME UpdateStepModules 0.017 sec
+2026-03-25 13:22:14 - UPD_SUCCESS - Updated: artamonov.rest (4.12.0)<br><ul> <li><b>Доработано</b>: улучшена совместимость с PHP 8 и выше.</li> </ul> 
+2026-03-25 13:22:14 -  - exec CUpdateClientPartner::LoadModulesUpdates
+2026-03-25 13:22:14 -  - exec CUpdateClientPartner::__CollectRequestData
+2026-03-25 13:22:14 -  - utf=Y&lang=ru&stable=Y&CANGZIP=Y&SUPD_DBS=MYSQL&XE=N&CLIENT_SITE=bauman-polytech.ru&LICENSE_KEY=X&SUPD_STS=1&SUPD_URS=0&TYPENC=E&CLIENT_PHPVER=8.2.29&NGINX=Y&dbv=8.0.25&instm=main%2C25.100.500%2CN%3Bsearch%2C25.0.0%2CN%3Babtest%2C24.100.0%2CN%3Bforum%2C25.200.0%2CN%3Bsale%2C25.0.200%2CN%3Bseo%2C24.700.100%2CN%3Bcatalog%2C25.0.100%2CN%3Btranslate%2C25.0.0%2CN%3Bmessageservice%2C24.900.100%2CN%3Bsender%2C24.400.100%2CN%3Bsocialservices%2C24.200.100%2CN%3Bb24connector%2C24.0.100%2CN%3Bsecurity%2C24.0.300%2CN%3Bsubscribe%2C24.0.0%2CN%3Bmobileapp%2C24.200.0%2CN%3Bstoreassist%2C24.0.0%2CN%3Bfileman%2C25.0.0%2CN%3Biblock%2C25.0.100%2CN%3Bvote%2C25.0.0%2CN%3Bphotogallery%2C25.0.0%2CN%3Bartamonov.rest%2C4.12.0%2CY%3Brest%2C25.300.100%2CN%3Bblog%2C24.300.100%2CN%3Bconversion%2C24.0.0%2CN%3Blanding%2C24.800.300%2CN%3Breport%2C24.100.100%2CN%3Bcurrency%2C24.100.0%2CN%3Bbitrix.eshop%2C24.100.0%2CN%3Bbitrixcloud%2C25.0.0%2CN%3Bpull%2C25.200.100%2CN%3Bbitrix.sitecorporate%2C24.0.0%2CN%3Blocation%2C25.100.0%2CN%3Bclouds%2C25.100.0%2CN%3Bperfmon%2C24.200.0%2CN%3Bhighloadblock%2C24.100.0%2CN%3Bform%2C25.0.0%2CN%3Bui%2C25.50.200%2CN&reqm=artamonov.rest&lim=Y&SUPD_SRS=RU&SUPD_CMP=N
+2026-03-25 13:22:14 -  - exec CUpdateClientPartner::GetHTTPPage
+2026-03-25 13:22:14 -  - TIME LoadModulesUpdates(request) 0.178 sec
+2026-03-25 13:22:14 -  - exec CUpdateClientPartner::ParseServerData
+2026-03-25 13:22:14 - S - STEP
+2026-03-25 13:22:14 - LMU01 - LoadModulesUpdates-Step
+2026-03-25 13:22:14 -  - exec CUpdateClientPartner::LoadModulesUpdates
+2026-03-25 13:22:14 -  - exec CUpdateClientPartner::ParseServerData
+2026-03-25 13:22:14 -  - loadFile
+2026-03-25 13:22:14 - U - RETURN
+2026-03-25 13:22:14 -  - exec CUpdateClientPartner::UnGzipArchive
+2026-03-25 13:22:14 -  - TIME UnGzipArchive 0.012 sec
+2026-03-25 13:22:14 -  - TIME UpdateStepModules 0.018 sec
+2026-03-25 13:22:14 - UPD_SUCCESS - Updated: artamonov.rest (4.13.0)<br><ul> <li><b>Доработано</b>: поправлена логика проверки входных параметров.</li> </ul>
+2026-03-25 13:22:14 -  - exec CUpdateClientPartner::LoadModulesUpdates
+2026-03-25 13:22:14 -  - exec CUpdateClientPartner::__CollectRequestData
+2026-03-25 13:22:14 -  - utf=Y&lang=ru&stable=Y&CANGZIP=Y&SUPD_DBS=MYSQL&XE=N&CLIENT_SITE=bauman-polytech.ru&LICENSE_KEY=X&SUPD_STS=1&SUPD_URS=0&TYPENC=E&CLIENT_PHPVER=8.2.29&NGINX=Y&dbv=8.0.25&instm=main%2C25.100.500%2CN%3Bsearch%2C25.0.0%2CN%3Babtest%2C24.100.0%2CN%3Bforum%2C25.200.0%2CN%3Bsale%2C25.0.200%2CN%3Bseo%2C24.700.100%2CN%3Bcatalog%2C25.0.100%2CN%3Btranslate%2C25.0.0%2CN%3Bmessageservice%2C24.900.100%2CN%3Bsender%2C24.400.100%2CN%3Bsocialservices%2C24.200.100%2CN%3Bb24connector%2C24.0.100%2CN%3Bsecurity%2C24.0.300%2CN%3Bsubscribe%2C24.0.0%2CN%3Bmobileapp%2C24.200.0%2CN%3Bstoreassist%2C24.0.0%2CN%3Bfileman%2C25.0.0%2CN%3Biblock%2C25.0.100%2CN%3Bvote%2C25.0.0%2CN%3Bphotogallery%2C25.0.0%2CN%3Bartamonov.rest%2C4.13.0%2CY%3Brest%2C25.300.100%2CN%3Bblog%2C24.300.100%2CN%3Bconversion%2C24.0.0%2CN%3Blanding%2C24.800.300%2CN%3Breport%2C24.100.100%2CN%3Bcurrency%2C24.100.0%2CN%3Bbitrix.eshop%2C24.100.0%2CN%3Bbitrixcloud%2C25.0.0%2CN%3Bpull%2C25.200.100%2CN%3Bbitrix.sitecorporate%2C24.0.0%2CN%3Blocation%2C25.100.0%2CN%3Bclouds%2C25.100.0%2CN%3Bperfmon%2C24.200.0%2CN%3Bhighloadblock%2C24.100.0%2CN%3Bform%2C25.0.0%2CN%3Bui%2C25.50.200%2CN&reqm=artamonov.rest&lim=Y&SUPD_SRS=RU&SUPD_CMP=N
+2026-03-25 13:22:14 -  - exec CUpdateClientPartner::GetHTTPPage
+2026-03-25 13:22:14 -  - TIME LoadModulesUpdates(request) 0.179 sec
+2026-03-25 13:22:14 -  - exec CUpdateClientPartner::ParseServerData
+2026-03-25 13:22:14 - S - STEP
+2026-03-25 13:22:14 - LMU01 - LoadModulesUpdates-Step
+2026-03-25 13:22:15 -  - exec CUpdateClientPartner::LoadModulesUpdates
+2026-03-25 13:22:15 -  - exec CUpdateClientPartner::ParseServerData
+2026-03-25 13:22:15 -  - loadFile
+2026-03-25 13:22:15 - U - RETURN
+2026-03-25 13:22:15 -  - exec CUpdateClientPartner::UnGzipArchive
+2026-03-25 13:22:15 -  - TIME UnGzipArchive 0.009 sec
+2026-03-25 13:22:15 -  - TIME UpdateStepModules 0.014 sec
+2026-03-25 13:22:15 - UPD_SUCCESS - Updated: artamonov.rest (4.13.1)<br><ul> <li><b>Доработано</b>: обновлена ссылка на документацию к модулю.</li> </ul> 
+2026-03-25 13:22:15 -  - exec CUpdateClientPartner::LoadModulesUpdates
+2026-03-25 13:22:15 -  - exec CUpdateClientPartner::__CollectRequestData
+2026-03-25 13:22:15 -  - utf=Y&lang=ru&stable=Y&CANGZIP=Y&SUPD_DBS=MYSQL&XE=N&CLIENT_SITE=bauman-polytech.ru&LICENSE_KEY=X&SUPD_STS=1&SUPD_URS=0&TYPENC=E&CLIENT_PHPVER=8.2.29&NGINX=Y&dbv=8.0.25&instm=main%2C25.100.500%2CN%3Bsearch%2C25.0.0%2CN%3Babtest%2C24.100.0%2CN%3Bforum%2C25.200.0%2CN%3Bsale%2C25.0.200%2CN%3Bseo%2C24.700.100%2CN%3Bcatalog%2C25.0.100%2CN%3Btranslate%2C25.0.0%2CN%3Bmessageservice%2C24.900.100%2CN%3Bsender%2C24.400.100%2CN%3Bsocialservices%2C24.200.100%2CN%3Bb24connector%2C24.0.100%2CN%3Bsecurity%2C24.0.300%2CN%3Bsubscribe%2C24.0.0%2CN%3Bmobileapp%2C24.200.0%2CN%3Bstoreassist%2C24.0.0%2CN%3Bfileman%2C25.0.0%2CN%3Biblock%2C25.0.100%2CN%3Bvote%2C25.0.0%2CN%3Bphotogallery%2C25.0.0%2CN%3Bartamonov.rest%2C4.13.1%2CY%3Brest%2C25.300.100%2CN%3Bblog%2C24.300.100%2CN%3Bconversion%2C24.0.0%2CN%3Blanding%2C24.800.300%2CN%3Breport%2C24.100.100%2CN%3Bcurrency%2C24.100.0%2CN%3Bbitrix.eshop%2C24.100.0%2CN%3Bbitrixcloud%2C25.0.0%2CN%3Bpull%2C25.200.100%2CN%3Bbitrix.sitecorporate%2C24.0.0%2CN%3Blocation%2C25.100.0%2CN%3Bclouds%2C25.100.0%2CN%3Bperfmon%2C24.200.0%2CN%3Bhighloadblock%2C24.100.0%2CN%3Bform%2C25.0.0%2CN%3Bui%2C25.50.200%2CN&reqm=artamonov.rest&lim=Y&SUPD_SRS=RU&SUPD_CMP=N
+2026-03-25 13:22:15 -  - exec CUpdateClientPartner::GetHTTPPage
+2026-03-25 13:22:15 -  - TIME LoadModulesUpdates(request) 0.174 sec
+2026-03-25 13:22:15 -  - exec CUpdateClientPartner::ParseServerData
+2026-03-25 13:22:15 - S - STEP
+2026-03-25 13:22:15 - LMU01 - LoadModulesUpdates-Step
+2026-03-25 13:22:15 -  - exec CUpdateClientPartner::LoadModulesUpdates
+2026-03-25 13:22:15 -  - exec CUpdateClientPartner::ParseServerData
+2026-03-25 13:22:15 -  - loadFile
+2026-03-25 13:22:15 - U - RETURN
+2026-03-25 13:22:15 -  - exec CUpdateClientPartner::UnGzipArchive
+2026-03-25 13:22:15 -  - TIME UnGzipArchive 0.011 sec
+2026-03-25 13:22:15 -  - TIME UpdateStepModules 0.018 sec
+2026-03-25 13:22:15 - UPD_SUCCESS - Updated: artamonov.rest (4.13.2)<br><ul> <li><b>Доработано</b>: улучшена совместимость с PHP 8 и выше.</li> </ul> 
+2026-03-25 13:22:16 -  - exec CUpdateClientPartner::LoadModulesUpdates
+2026-03-25 13:22:16 -  - exec CUpdateClientPartner::__CollectRequestData
+2026-03-25 13:22:16 -  - utf=Y&lang=ru&stable=Y&CANGZIP=Y&SUPD_DBS=MYSQL&XE=N&CLIENT_SITE=bauman-polytech.ru&LICENSE_KEY=X&SUPD_STS=1&SUPD_URS=0&TYPENC=E&CLIENT_PHPVER=8.2.29&NGINX=Y&dbv=8.0.25&instm=main%2C25.100.500%2CN%3Bsearch%2C25.0.0%2CN%3Babtest%2C24.100.0%2CN%3Bforum%2C25.200.0%2CN%3Bsale%2C25.0.200%2CN%3Bseo%2C24.700.100%2CN%3Bcatalog%2C25.0.100%2CN%3Btranslate%2C25.0.0%2CN%3Bmessageservice%2C24.900.100%2CN%3Bsender%2C24.400.100%2CN%3Bsocialservices%2C24.200.100%2CN%3Bb24connector%2C24.0.100%2CN%3Bsecurity%2C24.0.300%2CN%3Bsubscribe%2C24.0.0%2CN%3Bmobileapp%2C24.200.0%2CN%3Bstoreassist%2C24.0.0%2CN%3Bfileman%2C25.0.0%2CN%3Biblock%2C25.0.100%2CN%3Bvote%2C25.0.0%2CN%3Bphotogallery%2C25.0.0%2CN%3Bartamonov.rest%2C4.13.2%2CY%3Brest%2C25.300.100%2CN%3Bblog%2C24.300.100%2CN%3Bconversion%2C24.0.0%2CN%3Blanding%2C24.800.300%2CN%3Breport%2C24.100.100%2CN%3Bcurrency%2C24.100.0%2CN%3Bbitrix.eshop%2C24.100.0%2CN%3Bbitrixcloud%2C25.0.0%2CN%3Bpull%2C25.200.100%2CN%3Bbitrix.sitecorporate%2C24.0.0%2CN%3Blocation%2C25.100.0%2CN%3Bclouds%2C25.100.0%2CN%3Bperfmon%2C24.200.0%2CN%3Bhighloadblock%2C24.100.0%2CN%3Bform%2C25.0.0%2CN%3Bui%2C25.50.200%2CN&reqm=artamonov.rest&lim=Y&SUPD_SRS=RU&SUPD_CMP=N
+2026-03-25 13:22:16 -  - exec CUpdateClientPartner::GetHTTPPage
+2026-03-25 13:22:16 -  - TIME LoadModulesUpdates(request) 0.178 sec
+2026-03-25 13:22:16 -  - exec CUpdateClientPartner::ParseServerData
+2026-03-25 13:22:16 - S - STEP
+2026-03-25 13:22:16 - LMU01 - LoadModulesUpdates-Step
+2026-03-25 13:22:16 -  - exec CUpdateClientPartner::LoadModulesUpdates
+2026-03-25 13:22:16 -  - exec CUpdateClientPartner::ParseServerData
+2026-03-25 13:22:16 -  - loadFile
+2026-03-25 13:22:16 - U - RETURN
+2026-03-25 13:22:16 -  - exec CUpdateClientPartner::UnGzipArchive
+2026-03-25 13:22:16 -  - TIME UnGzipArchive 0.009 sec
+2026-03-25 13:22:16 -  - TIME UpdateStepModules 0.016 sec
+2026-03-25 13:22:16 - UPD_SUCCESS - Updated: artamonov.rest (4.14.0)<br><ul> <li><b>Доработано</b>: добавлена возможность указывать собственный заголовок Content-Type при ответе клиенту. Внимание: при проверке используется функция str_contains, которая доступна только с версии PHP 8.0.</li> </ul> 
+2026-03-25 13:22:16 -  - exec CUpdateClientPartner::LoadModulesUpdates
+2026-03-25 13:22:16 -  - exec CUpdateClientPartner::__CollectRequestData
+2026-03-25 13:22:16 -  - utf=Y&lang=ru&stable=Y&CANGZIP=Y&SUPD_DBS=MYSQL&XE=N&CLIENT_SITE=bauman-polytech.ru&LICENSE_KEY=X&SUPD_STS=1&SUPD_URS=0&TYPENC=E&CLIENT_PHPVER=8.2.29&NGINX=Y&dbv=8.0.25&instm=main%2C25.100.500%2CN%3Bsearch%2C25.0.0%2CN%3Babtest%2C24.100.0%2CN%3Bforum%2C25.200.0%2CN%3Bsale%2C25.0.200%2CN%3Bseo%2C24.700.100%2CN%3Bcatalog%2C25.0.100%2CN%3Btranslate%2C25.0.0%2CN%3Bmessageservice%2C24.900.100%2CN%3Bsender%2C24.400.100%2CN%3Bsocialservices%2C24.200.100%2CN%3Bb24connector%2C24.0.100%2CN%3Bsecurity%2C24.0.300%2CN%3Bsubscribe%2C24.0.0%2CN%3Bmobileapp%2C24.200.0%2CN%3Bstoreassist%2C24.0.0%2CN%3Bfileman%2C25.0.0%2CN%3Biblock%2C25.0.100%2CN%3Bvote%2C25.0.0%2CN%3Bphotogallery%2C25.0.0%2CN%3Bartamonov.rest%2C4.14.0%2CY%3Brest%2C25.300.100%2CN%3Bblog%2C24.300.100%2CN%3Bconversion%2C24.0.0%2CN%3Blanding%2C24.800.300%2CN%3Breport%2C24.100.100%2CN%3Bcurrency%2C24.100.0%2CN%3Bbitrix.eshop%2C24.100.0%2CN%3Bbitrixcloud%2C25.0.0%2CN%3Bpull%2C25.200.100%2CN%3Bbitrix.sitecorporate%2C24.0.0%2CN%3Blocation%2C25.100.0%2CN%3Bclouds%2C25.100.0%2CN%3Bperfmon%2C24.200.0%2CN%3Bhighloadblock%2C24.100.0%2CN%3Bform%2C25.0.0%2CN%3Bui%2C25.50.200%2CN&reqm=artamonov.rest&lim=Y&SUPD_SRS=RU&SUPD_CMP=N
+2026-03-25 13:22:16 -  - exec CUpdateClientPartner::GetHTTPPage
+2026-03-25 13:22:16 -  - TIME LoadModulesUpdates(request) 0.181 sec
+2026-03-25 13:22:16 -  - exec CUpdateClientPartner::ParseServerData
+2026-03-25 13:22:16 - S - STEP
+2026-03-25 13:22:16 - LMU01 - LoadModulesUpdates-Step
+2026-03-25 13:22:16 -  - exec CUpdateClientPartner::LoadModulesUpdates
+2026-03-25 13:22:16 -  - exec CUpdateClientPartner::ParseServerData
+2026-03-25 13:22:16 -  - loadFile
+2026-03-25 13:22:16 - U - RETURN
+2026-03-25 13:22:16 -  - exec CUpdateClientPartner::UnGzipArchive
+2026-03-25 13:22:16 -  - TIME UnGzipArchive 0.009 sec
+2026-03-25 13:22:16 -  - TIME UpdateStepModules 0.015 sec
+2026-03-25 13:22:16 - UPD_SUCCESS - Updated: artamonov.rest (4.15.0)<br><ul> <li><b>Доработано</b>: добавлена возможность указывать кастомные заголовки Content-Type (+json) при выполнении запросов к модулю. Например: Content-Type: application/vnd.eda.picker.errors.v1+json или application/problem+json, и так далее. Подробнее: https://www.iana.org/assignments/media-types/media-types.xhtml</li> <li><b>Доработано</b>: добавлена возможность передачи собственного ID клиента в функцию journal()->add().</li> <li><b>Доработано</b>: добавлены функции-полифилы для корректной работы модуля на версии PHP меньше 8.0: str_contains, str_starts_with, str_ends_with.</li> </ul> 
+2026-03-25 13:22:17 -  - exec CUpdateClientPartner::LoadModulesUpdates
+2026-03-25 13:22:17 -  - exec CUpdateClientPartner::__CollectRequestData
+2026-03-25 13:22:17 -  - utf=Y&lang=ru&stable=Y&CANGZIP=Y&SUPD_DBS=MYSQL&XE=N&CLIENT_SITE=bauman-polytech.ru&LICENSE_KEY=X&SUPD_STS=1&SUPD_URS=0&TYPENC=E&CLIENT_PHPVER=8.2.29&NGINX=Y&dbv=8.0.25&instm=main%2C25.100.500%2CN%3Bsearch%2C25.0.0%2CN%3Babtest%2C24.100.0%2CN%3Bforum%2C25.200.0%2CN%3Bsale%2C25.0.200%2CN%3Bseo%2C24.700.100%2CN%3Bcatalog%2C25.0.100%2CN%3Btranslate%2C25.0.0%2CN%3Bmessageservice%2C24.900.100%2CN%3Bsender%2C24.400.100%2CN%3Bsocialservices%2C24.200.100%2CN%3Bb24connector%2C24.0.100%2CN%3Bsecurity%2C24.0.300%2CN%3Bsubscribe%2C24.0.0%2CN%3Bmobileapp%2C24.200.0%2CN%3Bstoreassist%2C24.0.0%2CN%3Bfileman%2C25.0.0%2CN%3Biblock%2C25.0.100%2CN%3Bvote%2C25.0.0%2CN%3Bphotogallery%2C25.0.0%2CN%3Bartamonov.rest%2C4.15.0%2CY%3Brest%2C25.300.100%2CN%3Bblog%2C24.300.100%2CN%3Bconversion%2C24.0.0%2CN%3Blanding%2C24.800.300%2CN%3Breport%2C24.100.100%2CN%3Bcurrency%2C24.100.0%2CN%3Bbitrix.eshop%2C24.100.0%2CN%3Bbitrixcloud%2C25.0.0%2CN%3Bpull%2C25.200.100%2CN%3Bbitrix.sitecorporate%2C24.0.0%2CN%3Blocation%2C25.100.0%2CN%3Bclouds%2C25.100.0%2CN%3Bperfmon%2C24.200.0%2CN%3Bhighloadblock%2C24.100.0%2CN%3Bform%2C25.0.0%2CN%3Bui%2C25.50.200%2CN&reqm=artamonov.rest&lim=Y&SUPD_SRS=RU&SUPD_CMP=N
+2026-03-25 13:22:17 -  - exec CUpdateClientPartner::GetHTTPPage
+2026-03-25 13:22:17 -  - TIME LoadModulesUpdates(request) 0.159 sec
+2026-03-25 13:22:17 -  - exec CUpdateClientPartner::ParseServerData
+2026-03-25 13:22:17 - S - STEP
+2026-03-25 13:22:17 - LMU01 - LoadModulesUpdates-Step
+2026-03-25 13:22:17 -  - exec CUpdateClientPartner::LoadModulesUpdates
+2026-03-25 13:22:17 -  - exec CUpdateClientPartner::ParseServerData
+2026-03-25 13:22:17 -  - loadFile
+2026-03-25 13:22:17 - U - RETURN
+2026-03-25 13:22:17 -  - exec CUpdateClientPartner::UnGzipArchive
+2026-03-25 13:22:17 -  - TIME UnGzipArchive 0.009 sec
+2026-03-25 13:22:17 -  - TIME UpdateStepModules 0.015 sec
+2026-03-25 13:22:17 - UPD_SUCCESS - Updated: artamonov.rest (4.16.0)<br><ul> <li><b>Доработано</b>: улучшено определение кастомных заголовков Content-Type (+json) при выполнении запросов к модулю.</li> </ul> 
+2026-03-25 13:22:17 -  - exec CUpdateClientPartner::LoadModulesUpdates
+2026-03-25 13:22:17 -  - exec CUpdateClientPartner::__CollectRequestData
+2026-03-25 13:22:17 -  - utf=Y&lang=ru&stable=Y&CANGZIP=Y&SUPD_DBS=MYSQL&XE=N&CLIENT_SITE=bauman-polytech.ru&LICENSE_KEY=X&SUPD_STS=1&SUPD_URS=0&TYPENC=E&CLIENT_PHPVER=8.2.29&NGINX=Y&dbv=8.0.25&instm=main%2C25.100.500%2CN%3Bsearch%2C25.0.0%2CN%3Babtest%2C24.100.0%2CN%3Bforum%2C25.200.0%2CN%3Bsale%2C25.0.200%2CN%3Bseo%2C24.700.100%2CN%3Bcatalog%2C25.0.100%2CN%3Btranslate%2C25.0.0%2CN%3Bmessageservice%2C24.900.100%2CN%3Bsender%2C24.400.100%2CN%3Bsocialservices%2C24.200.100%2CN%3Bb24connector%2C24.0.100%2CN%3Bsecurity%2C24.0.300%2CN%3Bsubscribe%2C24.0.0%2CN%3Bmobileapp%2C24.200.0%2CN%3Bstoreassist%2C24.0.0%2CN%3Bfileman%2C25.0.0%2CN%3Biblock%2C25.0.100%2CN%3Bvote%2C25.0.0%2CN%3Bphotogallery%2C25.0.0%2CN%3Bartamonov.rest%2C4.16.0%2CY%3Brest%2C25.300.100%2CN%3Bblog%2C24.300.100%2CN%3Bconversion%2C24.0.0%2CN%3Blanding%2C24.800.300%2CN%3Breport%2C24.100.100%2CN%3Bcurrency%2C24.100.0%2CN%3Bbitrix.eshop%2C24.100.0%2CN%3Bbitrixcloud%2C25.0.0%2CN%3Bpull%2C25.200.100%2CN%3Bbitrix.sitecorporate%2C24.0.0%2CN%3Blocation%2C25.100.0%2CN%3Bclouds%2C25.100.0%2CN%3Bperfmon%2C24.200.0%2CN%3Bhighloadblock%2C24.100.0%2CN%3Bform%2C25.0.0%2CN%3Bui%2C25.50.200%2CN&reqm=artamonov.rest&lim=Y&SUPD_SRS=RU&SUPD_CMP=N
+2026-03-25 13:22:17 -  - exec CUpdateClientPartner::GetHTTPPage
+2026-03-25 13:22:17 -  - TIME LoadModulesUpdates(request) 0.187 sec
+2026-03-25 13:22:17 -  - exec CUpdateClientPartner::ParseServerData
+2026-03-25 13:22:17 - S - STEP
+2026-03-25 13:22:17 - LMU01 - LoadModulesUpdates-Step
+2026-03-25 13:22:17 -  - exec CUpdateClientPartner::LoadModulesUpdates
+2026-03-25 13:22:17 -  - exec CUpdateClientPartner::ParseServerData
+2026-03-25 13:22:17 -  - loadFile
+2026-03-25 13:22:17 - U - RETURN
+2026-03-25 13:22:17 -  - exec CUpdateClientPartner::UnGzipArchive
+2026-03-25 13:22:17 -  - TIME UnGzipArchive 0.01 sec
+2026-03-25 13:22:17 -  - TIME UpdateStepModules 0.018 sec
+2026-03-25 13:22:17 - UPD_SUCCESS - Updated: artamonov.rest (4.17.0)<br><ul> <li><b>Доработано</b>: добавлена поддержка отключения передачи данных ответа при использовании json(). Например: response()->json(null, 404);</li> <li><b>Доработано</b>: добавлена проверка существования пути при установке пути к собственным картам роутов.</li> <li><b>Доработано</b>: добавлена возможность дополнять заголовок Access-Control-Allow-Headers. Смотрите раздел: Безопасность - Фильтры.</li> </ul>
+2026-03-25 13:22:17 -  - exec CUpdateClientPartner::LoadModulesUpdates
+2026-03-25 13:22:17 -  - exec CUpdateClientPartner::__CollectRequestData
+2026-03-25 13:22:17 -  - utf=Y&lang=ru&stable=Y&CANGZIP=Y&SUPD_DBS=MYSQL&XE=N&CLIENT_SITE=bauman-polytech.ru&LICENSE_KEY=X&SUPD_STS=1&SUPD_URS=0&TYPENC=E&CLIENT_PHPVER=8.2.29&NGINX=Y&dbv=8.0.25&instm=main%2C25.100.500%2CN%3Bsearch%2C25.0.0%2CN%3Babtest%2C24.100.0%2CN%3Bforum%2C25.200.0%2CN%3Bsale%2C25.0.200%2CN%3Bseo%2C24.700.100%2CN%3Bcatalog%2C25.0.100%2CN%3Btranslate%2C25.0.0%2CN%3Bmessageservice%2C24.900.100%2CN%3Bsender%2C24.400.100%2CN%3Bsocialservices%2C24.200.100%2CN%3Bb24connector%2C24.0.100%2CN%3Bsecurity%2C24.0.300%2CN%3Bsubscribe%2C24.0.0%2CN%3Bmobileapp%2C24.200.0%2CN%3Bstoreassist%2C24.0.0%2CN%3Bfileman%2C25.0.0%2CN%3Biblock%2C25.0.100%2CN%3Bvote%2C25.0.0%2CN%3Bphotogallery%2C25.0.0%2CN%3Bartamonov.rest%2C4.17.0%2CY%3Brest%2C25.300.100%2CN%3Bblog%2C24.300.100%2CN%3Bconversion%2C24.0.0%2CN%3Blanding%2C24.800.300%2CN%3Breport%2C24.100.100%2CN%3Bcurrency%2C24.100.0%2CN%3Bbitrix.eshop%2C24.100.0%2CN%3Bbitrixcloud%2C25.0.0%2CN%3Bpull%2C25.200.100%2CN%3Bbitrix.sitecorporate%2C24.0.0%2CN%3Blocation%2C25.100.0%2CN%3Bclouds%2C25.100.0%2CN%3Bperfmon%2C24.200.0%2CN%3Bhighloadblock%2C24.100.0%2CN%3Bform%2C25.0.0%2CN%3Bui%2C25.50.200%2CN&reqm=artamonov.rest&lim=Y&SUPD_SRS=RU&SUPD_CMP=N
+2026-03-25 13:22:17 -  - exec CUpdateClientPartner::GetHTTPPage
+2026-03-25 13:22:18 -  - TIME LoadModulesUpdates(request) 0.171 sec
+2026-03-25 13:22:18 -  - exec CUpdateClientPartner::ParseServerData
+2026-03-25 13:22:18 - S - STEP
+2026-03-25 13:22:18 - LMU01 - LoadModulesUpdates-Step
+2026-03-25 13:22:18 -  - exec CUpdateClientPartner::LoadModulesUpdates
+2026-03-25 13:22:18 -  - exec CUpdateClientPartner::ParseServerData
+2026-03-25 13:22:18 -  - loadFile
+2026-03-25 13:22:18 - U - RETURN
+2026-03-25 13:22:18 -  - exec CUpdateClientPartner::UnGzipArchive
+2026-03-25 13:22:18 -  - TIME UnGzipArchive 0.011 sec
+2026-03-25 13:22:18 -  - TIME UpdateStepModules 0.014 sec
+2026-03-25 13:22:18 - UPD_SUCCESS - Updated: artamonov.rest (4.18.0)<br><ul> <li><b>Доработано</b>: техническое обновление.</li> <li><b>Доработано</b>: улучшена поддержка версии PHP выше 8.1.</li> </ul> 
+2026-03-25 13:22:18 -  - exec CUpdateClientPartner::LoadModulesUpdates
+2026-03-25 13:22:18 -  - exec CUpdateClientPartner::__CollectRequestData
+2026-03-25 13:22:18 -  - utf=Y&lang=ru&stable=Y&CANGZIP=Y&SUPD_DBS=MYSQL&XE=N&CLIENT_SITE=bauman-polytech.ru&LICENSE_KEY=X&SUPD_STS=1&SUPD_URS=0&TYPENC=E&CLIENT_PHPVER=8.2.29&NGINX=Y&dbv=8.0.25&instm=main%2C25.100.500%2CN%3Bsearch%2C25.0.0%2CN%3Babtest%2C24.100.0%2CN%3Bforum%2C25.200.0%2CN%3Bsale%2C25.0.200%2CN%3Bseo%2C24.700.100%2CN%3Bcatalog%2C25.0.100%2CN%3Btranslate%2C25.0.0%2CN%3Bmessageservice%2C24.900.100%2CN%3Bsender%2C24.400.100%2CN%3Bsocialservices%2C24.200.100%2CN%3Bb24connector%2C24.0.100%2CN%3Bsecurity%2C24.0.300%2CN%3Bsubscribe%2C24.0.0%2CN%3Bmobileapp%2C24.200.0%2CN%3Bstoreassist%2C24.0.0%2CN%3Bfileman%2C25.0.0%2CN%3Biblock%2C25.0.100%2CN%3Bvote%2C25.0.0%2CN%3Bphotogallery%2C25.0.0%2CN%3Bartamonov.rest%2C4.18.0%2CY%3Brest%2C25.300.100%2CN%3Bblog%2C24.300.100%2CN%3Bconversion%2C24.0.0%2CN%3Blanding%2C24.800.300%2CN%3Breport%2C24.100.100%2CN%3Bcurrency%2C24.100.0%2CN%3Bbitrix.eshop%2C24.100.0%2CN%3Bbitrixcloud%2C25.0.0%2CN%3Bpull%2C25.200.100%2CN%3Bbitrix.sitecorporate%2C24.0.0%2CN%3Blocation%2C25.100.0%2CN%3Bclouds%2C25.100.0%2CN%3Bperfmon%2C24.200.0%2CN%3Bhighloadblock%2C24.100.0%2CN%3Bform%2C25.0.0%2CN%3Bui%2C25.50.200%2CN&reqm=artamonov.rest&lim=Y&SUPD_SRS=RU&SUPD_CMP=N
+2026-03-25 13:22:18 -  - exec CUpdateClientPartner::GetHTTPPage
+2026-03-25 13:22:18 -  - TIME LoadModulesUpdates(request) 0.182 sec
+2026-03-25 13:22:18 -  - exec CUpdateClientPartner::ParseServerData
+2026-03-25 13:22:18 - S - STEP
+2026-03-25 13:22:18 - LMU01 - LoadModulesUpdates-Step
+2026-03-25 13:22:18 -  - exec CUpdateClientPartner::LoadModulesUpdates
+2026-03-25 13:22:18 -  - exec CUpdateClientPartner::ParseServerData
+2026-03-25 13:22:18 -  - loadFile
+2026-03-25 13:22:18 - U - RETURN
+2026-03-25 13:22:18 -  - exec CUpdateClientPartner::UnGzipArchive
+2026-03-25 13:22:18 -  - TIME UnGzipArchive 0.009 sec
+2026-03-25 13:22:18 -  - TIME UpdateStepModules 0.015 sec
+2026-03-25 13:22:18 - UPD_SUCCESS - Updated: artamonov.rest (4.18.1)<br><ul> <li><b>Исправлено</b>: исправлено получение значений параметров. Причина: после обновления платформы, названия параметров приводились к нижнему регистру.</li> <li><b>Доработано</b>: обновлена ссылка на Документацию в меню модуля.</li> <li><b>Доработано</b>: доработано описание параметра Отложенный запуск.</li> </ul> 
+2026-03-25 13:22:18 -  - exec CUpdateClientPartner::LoadModulesUpdates
+2026-03-25 13:22:18 -  - exec CUpdateClientPartner::__CollectRequestData
+2026-03-25 13:22:18 -  - utf=Y&lang=ru&stable=Y&CANGZIP=Y&SUPD_DBS=MYSQL&XE=N&CLIENT_SITE=bauman-polytech.ru&LICENSE_KEY=X&SUPD_STS=1&SUPD_URS=0&TYPENC=E&CLIENT_PHPVER=8.2.29&NGINX=Y&dbv=8.0.25&instm=main%2C25.100.500%2CN%3Bsearch%2C25.0.0%2CN%3Babtest%2C24.100.0%2CN%3Bforum%2C25.200.0%2CN%3Bsale%2C25.0.200%2CN%3Bseo%2C24.700.100%2CN%3Bcatalog%2C25.0.100%2CN%3Btranslate%2C25.0.0%2CN%3Bmessageservice%2C24.900.100%2CN%3Bsender%2C24.400.100%2CN%3Bsocialservices%2C24.200.100%2CN%3Bb24connector%2C24.0.100%2CN%3Bsecurity%2C24.0.300%2CN%3Bsubscribe%2C24.0.0%2CN%3Bmobileapp%2C24.200.0%2CN%3Bstoreassist%2C24.0.0%2CN%3Bfileman%2C25.0.0%2CN%3Biblock%2C25.0.100%2CN%3Bvote%2C25.0.0%2CN%3Bphotogallery%2C25.0.0%2CN%3Bartamonov.rest%2C4.18.1%2CY%3Brest%2C25.300.100%2CN%3Bblog%2C24.300.100%2CN%3Bconversion%2C24.0.0%2CN%3Blanding%2C24.800.300%2CN%3Breport%2C24.100.100%2CN%3Bcurrency%2C24.100.0%2CN%3Bbitrix.eshop%2C24.100.0%2CN%3Bbitrixcloud%2C25.0.0%2CN%3Bpull%2C25.200.100%2CN%3Bbitrix.sitecorporate%2C24.0.0%2CN%3Blocation%2C25.100.0%2CN%3Bclouds%2C25.100.0%2CN%3Bperfmon%2C24.200.0%2CN%3Bhighloadblock%2C24.100.0%2CN%3Bform%2C25.0.0%2CN%3Bui%2C25.50.200%2CN&reqm=artamonov.rest&lim=Y&SUPD_SRS=RU&SUPD_CMP=N
+2026-03-25 13:22:18 -  - exec CUpdateClientPartner::GetHTTPPage
+2026-03-25 13:22:19 -  - TIME LoadModulesUpdates(request) 0.171 sec
+2026-03-25 13:22:19 -  - exec CUpdateClientPartner::ParseServerData
+2026-03-25 13:22:19 - S - STEP
+2026-03-25 13:22:19 - LMU01 - LoadModulesUpdates-Step
+2026-03-25 13:22:19 -  - exec CUpdateClientPartner::LoadModulesUpdates
+2026-03-25 13:22:19 -  - exec CUpdateClientPartner::ParseServerData
+2026-03-25 13:22:19 -  - loadFile
+2026-03-25 13:22:19 - U - RETURN
+2026-03-25 13:22:19 -  - exec CUpdateClientPartner::UnGzipArchive
+2026-03-25 13:22:19 -  - TIME UnGzipArchive 0.007 sec
+2026-03-25 13:22:19 -  - TIME UpdateStepModules 0.013 sec
+2026-03-25 13:22:19 - UPD_SUCCESS - Updated: artamonov.rest (4.18.2)<br><ul> <li><b>Исправлено</b>: поправлен сброс значений параметров.</li> </ul> 
+2026-03-25 13:22:19 -  - exec CUpdateClientPartner::LoadModulesUpdates
+2026-03-25 13:22:19 -  - exec CUpdateClientPartner::__CollectRequestData
+2026-03-25 13:22:19 -  - utf=Y&lang=ru&stable=Y&CANGZIP=Y&SUPD_DBS=MYSQL&XE=N&CLIENT_SITE=bauman-polytech.ru&LICENSE_KEY=X&SUPD_STS=1&SUPD_URS=0&TYPENC=E&CLIENT_PHPVER=8.2.29&NGINX=Y&dbv=8.0.25&instm=main%2C25.100.500%2CN%3Bsearch%2C25.0.0%2CN%3Babtest%2C24.100.0%2CN%3Bforum%2C25.200.0%2CN%3Bsale%2C25.0.200%2CN%3Bseo%2C24.700.100%2CN%3Bcatalog%2C25.0.100%2CN%3Btranslate%2C25.0.0%2CN%3Bmessageservice%2C24.900.100%2CN%3Bsender%2C24.400.100%2CN%3Bsocialservices%2C24.200.100%2CN%3Bb24connector%2C24.0.100%2CN%3Bsecurity%2C24.0.300%2CN%3Bsubscribe%2C24.0.0%2CN%3Bmobileapp%2C24.200.0%2CN%3Bstoreassist%2C24.0.0%2CN%3Bfileman%2C25.0.0%2CN%3Biblock%2C25.0.100%2CN%3Bvote%2C25.0.0%2CN%3Bphotogallery%2C25.0.0%2CN%3Bartamonov.rest%2C4.18.2%2CY%3Brest%2C25.300.100%2CN%3Bblog%2C24.300.100%2CN%3Bconversion%2C24.0.0%2CN%3Blanding%2C24.800.300%2CN%3Breport%2C24.100.100%2CN%3Bcurrency%2C24.100.0%2CN%3Bbitrix.eshop%2C24.100.0%2CN%3Bbitrixcloud%2C25.0.0%2CN%3Bpull%2C25.200.100%2CN%3Bbitrix.sitecorporate%2C24.0.0%2CN%3Blocation%2C25.100.0%2CN%3Bclouds%2C25.100.0%2CN%3Bperfmon%2C24.200.0%2CN%3Bhighloadblock%2C24.100.0%2CN%3Bform%2C25.0.0%2CN%3Bui%2C25.50.200%2CN&reqm=artamonov.rest&lim=Y&SUPD_SRS=RU&SUPD_CMP=N
+2026-03-25 13:22:19 -  - exec CUpdateClientPartner::GetHTTPPage
+2026-03-25 13:22:19 -  - TIME LoadModulesUpdates(request) 0.179 sec
+2026-03-25 13:22:19 -  - exec CUpdateClientPartner::ParseServerData
+2026-03-25 13:22:19 - STEP - Finish - NOUPDATES
+2026-03-25 13:22:19 - STEP - Finish - NOUPDATES
+2026-03-25 13:22:24 -  - exec CUpdateClientPartner::GetUpdatesList
+2026-03-25 13:22:24 -  - exec CUpdateClientPartner::__CollectRequestData
+2026-03-25 13:22:24 -  - utf=Y&lang=ru&stable=Y&CANGZIP=Y&SUPD_DBS=MYSQL&XE=N&CLIENT_SITE=bauman-polytech.ru&LICENSE_KEY=X&SUPD_STS=1&SUPD_URS=0&TYPENC=E&CLIENT_PHPVER=8.2.29&NGINX=Y&dbv=8.0.25&instm=main%2C25.100.500%2CN%3Bsearch%2C25.0.0%2CN%3Babtest%2C24.100.0%2CN%3Bforum%2C25.200.0%2CN%3Bsale%2C25.0.200%2CN%3Bseo%2C24.700.100%2CN%3Bcatalog%2C25.0.100%2CN%3Btranslate%2C25.0.0%2CN%3Bmessageservice%2C24.900.100%2CN%3Bsender%2C24.400.100%2CN%3Bsocialservices%2C24.200.100%2CN%3Bb24connector%2C24.0.100%2CN%3Bsecurity%2C24.0.300%2CN%3Bsubscribe%2C24.0.0%2CN%3Bmobileapp%2C24.200.0%2CN%3Bstoreassist%2C24.0.0%2CN%3Bfileman%2C25.0.0%2CN%3Biblock%2C25.0.100%2CN%3Bvote%2C25.0.0%2CN%3Bphotogallery%2C25.0.0%2CN%3Bartamonov.rest%2C4.18.2%2CY%3Brest%2C25.300.100%2CN%3Bblog%2C24.300.100%2CN%3Bconversion%2C24.0.0%2CN%3Blanding%2C24.800.300%2CN%3Breport%2C24.100.100%2CN%3Bcurrency%2C24.100.0%2CN%3Bbitrix.eshop%2C24.100.0%2CN%3Bbitrixcloud%2C25.0.0%2CN%3Bpull%2C25.200.100%2CN%3Bbitrix.sitecorporate%2C24.0.0%2CN%3Blocation%2C25.100.0%2CN%3Bclouds%2C25.100.0%2CN%3Bperfmon%2C24.200.0%2CN%3Bhighloadblock%2C24.100.0%2CN%3Bform%2C25.0.0%2CN%3Bui%2C25.50.200%2CN&reqm=artamonov.rest%2Cbitrix.eshop%2Cbitrix.sitecorporate&fullmoduleinfo=Y&SUPD_SRS=RU&SUPD_CMP=N
+2026-03-25 13:22:24 -  - exec CUpdateClientPartner::GetHTTPPage
+2026-03-25 13:22:24 -  - TIME GetUpdatesList(request) 0.197 sec
+2026-03-25 13:22:24 -  - exec CUpdateClientPartner::ParseServerData

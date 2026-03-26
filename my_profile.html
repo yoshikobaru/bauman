@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Политехническое Общество Выпускников</title>
+	<link rel="stylesheet" href="css/swiper-bundle.min.css">
+	<link rel="stylesheet" href="css/fancybox.css">
+	<!-- style -->
+	<link rel="stylesheet" href="css/main.css">
+</head>
+<body class="account-page">
+	<header class="header">
+		<div class="container">
+			<div class="header-wrapper">
+				<a href="index.html" class="header-wrapper__logo desk-none">
+					<img src="img/logo-header.png" alt="Политехническое Общество Выпускников">
+				</a>
+				<button class="header-wrapper__burger" aria-label="Открыть меню">
+					<span></span>
+					<span></span>
+					<span></span>
+				</button>
+				<div class="header-wrapper__menu-mobile">
+					<a href="index.html" class="header-wrapper__logo desk-block">
+						<img src="img/logo-header.png" alt="Политехническое Общество Выпускников">
+					</a>
+					<nav>
+						<ul class="header-wrapper__list">
+							<li class="header-wrapper__item">
+								<a href="index.html" target="_blank">
+									Главная
+								</a>
+							</li>
+							<li class="header-wrapper__item">
+								<a href="" target="_blank">
+									Поддержать
+								</a>
+							</li>
+							<li class="header-wrapper__item">
+								<a href="projects.html" target="_blank">
+									Проекты
+								</a>
+							</li>
+							<li class="header-wrapper__item">
+								<a href="news-page.html" target="_blank">
+									События
+								</a>
+							</li>
+							<li class="header-wrapper__item">
+								<a href="about.html" target="_blank">
+									О нас
+								</a>
+							</li>
+							<li class="header-wrapper__item">
+								<a href="contacts.html" target="_blank">
+									Контакты
+								</a>
+							</li>
+							<li class="header-wrapper__item">
+								<a href="reference.html" target="_blank">
+									Референс-визиты
+								</a>
+							</li>
+							<li class="header-wrapper__item">
+								<a href="" target="_blank">
+									Карьерная платформа
+								</a>
+							</li>
+							<li class="header-wrapper__item">
+								<a href="" target="_blank">
+									Витрина компетенций
+								</a>
+							</li>
+						</ul>
+					</nav>
+					<div class="header-wrapper__buttons">
+						<a href="subscriptions.html" target="_blank" class="btn header-wrapper__btn header-wrapper--join">Вступить</a>
+						<button class="btn header-wrapper__btn header-wrapper__btn--sign btn-empty" data-fancybox data-src="#form-login">Войти</button>
+					</div>
+				</div>				
+			</div>
+		</div>
+	</header>
+	<main>
+		<section class="account">
+            <div class="container">
+                <div class="account__wrapper">
+                    <div class="account__sidebar">
+                        <div class="account__menu">
+                            <a href="#" class="account__menu-item account__menu-item--active">Мой профиль</a>
+                            <a href="#" class="account__menu-item">Безопасность</a>
+                            <a href="#" class="account__menu-item">Мои активности</a>
+                            <a href="#" class="account__menu-item">Мои заявки</a>
+                        </div>
+                    </div>
+
+                    <div class="account__main">
+                        <div class="account__block">
+                            <h2 class="account__title account__title">Мой профиль</h2>
+                            <div class="account__photo">
+                                <img src="img/my_profile/avatar.png" alt="" class="account__photo-image">
+                                <div class="account__photo-content">
+                                    <label class="account__photo-upload">
+                                        Загрузить аватар
+                                        <input type="file" class="account__photo-input" accept="image/png, image/jpeg">
+                                    </label>
+                                    <p>
+                                        Изображение размером 300x300, формат jpg, png
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="account__personal">
+                                <div class="account__chapter">
+                                    <h3 class="account__subtitle">
+                                        Личные данные
+                                    </h3>
+                                    <button class="account__chapter-edit">Редактировать</button>
+                                </div>
+                                <div class="account__personal-list account__grid">
+                                    <input type="text" placeholder="Фамилия">
+                                    <input type="text" placeholder="Имя">
+                                    <input type="text" placeholder="Отчество">
+                                    <input type="text" placeholder="Дата Рождения">
+                                    <input type="email" placeholder="Електропочта">
+                                    <input type="password" placeholder="Пароль">
+                                </div>
+                            </div>
+                            <div class="account__graduate">
+                                <div class="account__chapter">
+                                    <h3 class="account__subtitle">
+                                        Выпускник МГТУ? 
+                                    </h3>
+                                </div>
+                                <div class="account__graduate-choice">
+                                    <label class="account__graduate-item">
+                                        <input type="radio" name="subscribe" value="yes" class="account__graduate-input">
+                                        <span class="account__graduate-box"></span>
+                                        Да
+                                    </label>
+
+                                    <label class="account__graduate-item">
+                                        <input type="radio" name="subscribe" value="no" class="account__graduate-input">
+                                        <span class="account__graduate-box"></span>
+                                        Нет
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="account__personal">
+                                <div class="account__chapter">
+                                    <h3 class="account__subtitle">
+                                        Данные выпускника
+                                    </h3>
+                                    <button class="account__chapter-edit">Редактировать</button>
+                                </div>
+                                <div class="account__personal-list account__personal-list--short account__grid">
+                                    <select name="Department" id="">
+                                        <option value="">Год окончания</option>
+                                        <option value="Кафедра">Кафедра</option>
+                                        <option value="Кафедра">Кафедра</option>
+                                        <option value="Кафедра">Кафедра</option>
+                                    </select>
+                                    <select name="Department" id="">
+                                        <option value="">Выпускающая кафедра</option>
+                                        <option value="Кафедра">Кафедра</option>
+                                        <option value="Кафедра">Кафедра</option>
+                                        <option value="Кафедра">Кафедра</option>
+                                    </select>
+                                    <input type="text" placeholder="Telegram" required>
+                                </div>
+                            </div>
+                            <div class="account__personal">
+                                <div class="account__chapter">
+                                    <h3 class="account__subtitle">
+                                    Сведения о дипломе
+                                    </h3>
+                                    <button class="account__chapter-edit">Редактировать</button>
+                                </div>
+                                <div class="account__personal-list account__personal-list--short account__grid">
+                                    <input type="text" placeholder="Серия бланка">
+                                    <input type="text" placeholder="Номер бланка">
+                                    <input type="text" placeholder="Дата выдачи">
+                                </div>
+                            </div>
+                            <div class="account__file">
+                                <div class="account__file-complete">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="20" viewBox="0 0 16 20" fill="none">
+                                        <path d="M11.2871 0.5L15.5 4.88281V19.5H0.5V0.5H11.2871Z" stroke="black"/>
+                                    </svg>
+                                    <p>document-23553-plan.pdf</p>
+                                </div>
+                                <div class="account__file-info">
+                                    <div class="account__file-content account__photo-content">
+                                        <label class="account__photo-upload">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="20" viewBox="0 0 16 20" fill="none">
+                                                <path d="M11.2871 0.5L15.5 4.88281V19.5H0.5V0.5H11.2871Z" stroke="black"/>
+                                            </svg>
+                                            Перетащите или <span>загрузите файл</span> PDF
+                                            <input type="file" class="account__photo-input" accept="image/png, image/jpeg">
+                                        </label>
+                                    </div>
+                                </div>                            
+                            </div>
+                            
+                            <div class="account__chapter">
+                                <h3 class="account__subtitle">
+                                    Ваш тариф
+                                </h3>
+                            </div>
+                            <div class="account__rate account__rate--proff">
+                                <img src="img/my_profile/rate-conus.png" alt="" class="account__rate-conus">
+                                <div class="account__rate-info">
+                                    <span class="account__rate-status">Активный</span>
+                                    <div class="account__rate-date">
+                                        <span>Срок действия</span>  до 11 Апреля 2027
+                                    </div>
+                                </div>
+                                <h4 class="account__rate-plan">
+                                    Профессиональное
+                                </h4>
+                                <p class="account__rate-price">
+                                    50 000 Р
+                                </p>
+                                <p class="account__rate-when">
+                                    ежегодно
+                                </p>
+                                <p class="account__rate-advantages">
+                                    + Возможности Базового
+                                </p>
+                                <ul class="account__rate-list">
+                                    <li class="account__rate-item">
+                                        Участие в закрытом чате членов общества уровня «Бизнес»;
+                                    </li>
+                                    <li class="account__rate-item">
+                                        Размещение информации и новостей о компании на площадках Политехнического общества;
+                                    </li>
+                                    <li class="account__rate-item">
+                                        Возможность предложить собственный проект для поиска спонсоров и поддержки Политехнического общества;
+                                    </li>
+                                    <li class="account__rate-item">
+                                        Участие в бизнес-мероприятиях Политехнического общества в онлайн и очном форматах;
+                                    </li>
+                                    <li class="account__rate-item">
+                                        Доступ к базе резюме выпускников на карьерной платформе Политехнического общества.
+                                    </li>
+                                </ul>
+                                <div class="account__rate-buttons account__grid">
+                                    <button class="account__rate-btn btn">Продлить</button>
+                                    <button class="account__rate-btn account__rate-btn--changes btn">Изменить тариф</button>
+                                </div>
+                            </div>
+                            <div class="account__ready">
+                                <div class="account__ready-info">
+                                    <p class="account__ready-text">
+                                        8(800)888-00-98
+                                    </p>
+                                    <p class="account__ready-status">
+                                        Подключено
+                                    </p>
+                                </div>
+                                <div class="account__ready-info">
+                                    <p class="account__ready-text">
+                                        example@mail.ru
+                                    </p>
+                                    <p class="account__ready-status">
+                                        Подключено
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="account__log">
+                                <div class="account__chapter">
+                                    <h3 class="account__subtitle">
+                                        Привязка аккаунта для быстрого входа
+                                    </h3>
+                                </div>
+                                <div class="account__log-wrapper">
+                                    <button class="account__log-btn">
+                                        <img src="img/my_profile/yandex-icon.png" alt="">
+                                        Войти через Яндекс
+                                    </button>
+                                    <button class="account__log-btn">
+                                        <img src="img/my_profile/gos-icon.png" alt="">
+                                        Войти через Госуслуги
+                                    </button>
+                                    <button class="account__log-btn">
+                                        <img src="img/my_profile/vk-icon.png" alt="">
+                                        Войти через Вконтакте
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="account__activity">
+                                <div class="account__chapter">
+                                    <h3 class="account__subtitle">
+                                        Активные сессии
+                                    </h3>
+                                </div>
+                                <div class="account__activity-wrapper account__grid">
+                                    <div class="account__activity-card">
+                                        <div class="account__activity-type">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="20" viewBox="0 0 22 20" fill="none">
+                                                <path d="M7 19H15M11 15V19M3 1H19C20.1046 1 21 1.89543 21 3V13C21 14.1046 20.1046 15 19 15H3C1.89543 15 1 14.1046 1 13V3C1 1.89543 1.89543 1 3 1Z" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                            </svg>
+                                            Chrome
+                                        </div>
+                                        <p class="account__activity-text">
+                                            Москва
+                                        </p>
+                                        <p class="account__activity-text">
+                                            Это устройство
+                                        </p>
+                                    </div>
+                                    <div class="account__activity-card">
+                                        <div class="account__activity-type">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                                <path d="M12 18H12.01M7 2H17C18.1046 2 19 2.89543 19 4V20C19 21.1046 18.1046 22 17 22H7C5.89543 22 5 21.1046 5 20V4C5 2.89543 5.89543 2 7 2Z" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                            </svg>
+                                            iPhone 17
+                                        </div>
+                                        <p class="account__activity-text">
+                                            Москва
+                                        </p>
+                                        <p class="account__activity-text">
+                                            Сегодня в 17:00
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                       <div class="account__block">
+                            <h2 class="account__title account__title">Мои активности</h2>
+                            <div class="account__bots">
+                                <div class="account__chapter">
+                                    <h3 class="account__subtitle">
+                                        Доступные Telegram-чаты
+                                    </h3>
+                                </div>
+                                <a href="#" class="account__bots-link">Название чата в тг канале, наименование кликабельно</a>
+                                <a href="#" class="account__bots-link">Название чата в тг канале, наименование полностью кликабельно</a>
+                                <a href="#" class="account__bots-link">Наименование чата в тг, название кликабельно</a>
+                                <a href="#" class="account__bots-link">Название чата в тг канале</a>
+                                <a href="#" class="account__bots-link">Наименование полностью кликабельно</a>
+                            </div>
+                            <div class="account__events">
+                                <div class="account__chapter">
+                                    <h3 class="account__subtitle">
+                                        Мероприятия
+                                    </h3>
+                                    <p class="account__show-more">
+                                        Показать все
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="7" viewBox="0 0 13 7" fill="none">
+                                            <path d="M12.5 0.5L6.5 6.5L0.5 0.5" stroke="black" stroke-linecap="round" stroke-linejoin="round"/>
+                                        </svg>
+                                    </p>
+                                </div>
+                                <div class="account__events-list">
+                                    <div class="account__events-card">
+                                        <img src="img/news-img.png" alt="">
+                                        <div>
+                                            <span class="account__events-status">Активно</span>
+                                            <h4 class="account__events-name">
+                                                Бауманский университет пилотирует создание Фонда целевого капитала.
+                                            </h4>
+                                            <a href="#" class="account__events-btn">Вступить в чат</a>
+                                        </div>
+                                    </div>
+                                    <div class="account__events-card account__events-card--disactive">
+                                        <img src="img/news-img.png" alt="">
+                                        <div>
+                                            <span class="account__events-status">Завершено</span>
+                                            <h4 class="account__events-name">
+                                                Бауманский университет пилотирует создание Фонда целевого капитала.
+                                            </h4>
+                                            <a href="#" class="account__events-btn">Вступить в чат</a>
+                                        </div>
+                                    </div>
+                                    <div class="account__events-card account__events-card--disactive">
+                                        <img src="img/news-img.png" alt="">
+                                        <div>
+                                            <span class="account__events-status">Завершено</span>
+                                            <h4 class="account__events-name">
+                                                Бауманский университет пилотирует создание Фонда целевого капитала.
+                                            </h4>
+                                            <a href="#" class="account__events-btn">Вступить в чат</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="account__donate">
+                                <div class="account__chapter">
+                                    <h3 class="account__subtitle">
+                                        История пожертвований
+                                    </h3>
+                                     <p class="account__show-more">
+                                        Показать все
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="7" viewBox="0 0 13 7" fill="none">
+                                            <path d="M12.5 0.5L6.5 6.5L0.5 0.5" stroke="black" stroke-linecap="round" stroke-linejoin="round"/>
+                                        </svg>
+                                    </p>
+                                </div>
+                                <div class="account__donate-list account__grid">
+                                    <div class="account__donate-card">
+                                        <div class="account__donate-info">
+                                            <span class="account__donate-status">Активный</span>
+                                            <div class="account__donate-time">
+                                                <span>Запущен</span>
+                                                <p>
+                                                    11 Апреля 2025
+                                                </p>
+                                            </div>
+                                        </div>
+                                         <h4 class="account__donate-title">
+                                                Бауманский университет пилотирует создание Фонда целевого капитала
+                                            </h4>
+                                            <p class="account__donate-text">
+                                                Сумма
+                                            </p>
+                                            <p class="account__donate-price">
+                                                300 Р
+                                            </p>
+                                    </div>
+                                    <div class="account__donate-card account__donate-card--disactive">
+                                        <div class="account__donate-info">
+                                            <span class="account__donate-status">Активный</span>
+                                            <div class="account__donate-time">
+                                                <span>Завершено</span>
+                                                <p>
+                                                    11 Апреля 2025
+                                                </p>
+                                            </div>
+                                        </div>
+                                         <h4 class="account__donate-title">
+                                            Бауманский университет пилотирует создание Фонда целевого капитала
+                                        </h4>
+                                        <p class="account__donate-text">
+                                            Сумма
+                                        </p>
+                                        <p class="account__donate-price">
+                                            300 Р
+                                        </p>
+                                    </div>
+                                    <div class="account__donate-card account__donate-card--disactive">
+                                        <div class="account__donate-info">
+                                            <span class="account__donate-status">Активный</span>
+                                            <div class="account__donate-time">
+                                                <span>Завершено</span>
+                                                <p>
+                                                    11 Апреля 2025
+                                                </p>
+                                            </div>
+                                        </div>
+                                         <h4 class="account__donate-title">
+                                            Бауманский университет пилотирует создание Фонда целевого капитала
+                                        </h4>
+                                        <p class="account__donate-text">
+                                            Сумма
+                                        </p>
+                                        <p class="account__donate-price">
+                                            300 Р
+                                        </p>
+                                    </div>
+                                    <div class="account__donate-card account__donate-card--disactive">
+                                        <div class="account__donate-info">
+                                            <span class="account__donate-status">Активный</span>
+                                            <div class="account__donate-time">
+                                                <span>Завершено</span>
+                                                <p>
+                                                    11 Апреля 2025
+                                                </p>
+                                            </div>
+                                        </div>
+                                         <h4 class="account__donate-title">
+                                            Бауманский университет пилотирует создание Фонда целевого капитала
+                                        </h4>
+                                        <p class="account__donate-text">
+                                            Сумма
+                                        </p>
+                                        <p class="account__donate-price">
+                                            300 Р
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                       </div>
+                       <div class="account__block">
+                            <h2 class="account__title account__title">Мои заявки</h2>
+                            <div class="account__applications">
+                                <div class="account__chapter">
+                                    <h3 class="account__subtitle">
+                                        Статусы заявок
+                                    </h3>
+                                     <p class="account__show-more">
+                                        Показать все
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="7" viewBox="0 0 13 7" fill="none">
+                                            <path d="M12.5 0.5L6.5 6.5L0.5 0.5" stroke="black" stroke-linecap="round" stroke-linejoin="round"/>
+                                        </svg>
+                                    </p>
+                                </div>
+                                <div class="account__applications-card">
+                                    <div class="account__applications-info">
+                                        <p class="account__applications-name">
+                                            Вступление
+                                        </p>
+                                        <span class="account__applications-status">
+                                            На рассмотрении
+                                        </span>
+                                    </div>
+                                    <h4 class="account__applications-title">
+                                        Бауманский университет пилотирует создание Фонда целевого капитала
+                                    </h4>
+                                    <div class="account__donate-time">
+                                        <span>Подано</span>
+                                        <p>
+                                            11 Апреля 2025
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="account__applications-card account__applications-card--disactive">
+                                    <div class="account__applications-info">
+                                        <p class="account__applications-name">
+                                            Вступление
+                                        </p>
+                                        <span class="account__applications-status">
+                                            Завершено
+                                        </span>
+                                    </div>
+                                    <h4 class="account__applications-title">
+                                        Бауманский университет пилотирует создание Фонда целевого капитала
+                                    </h4>
+                                    <div class="account__donate-time">
+                                        <span>Подано</span>
+                                        <p>
+                                            11 Апреля 2025
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="account__applications-card account__applications-card--disactive">
+                                    <div class="account__applications-info">
+                                        <p class="account__applications-name">
+                                            Вступление
+                                        </p>
+                                        <span class="account__applications-status">
+                                            Завершено
+                                        </span>
+                                    </div>
+                                    <h4 class="account__applications-title">
+                                        Бауманский университет пилотирует создание Фонда целевого капитала
+                                    </h4>
+                                    <div class="account__donate-time">
+                                        <span>Подано</span>
+                                        <p>
+                                            11 Апреля 2025
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                       </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+	</main>
+	<!-- footer -->
+	<footer class="footer">
+		<div class="container">
+			<a href="mailto:info@bauman-polytech.ru" class="footer-mail">
+				info@bauman-polytech.ru
+			</a>
+			<a href="#" class="footer-address">
+				Москва, Бригадирский переулок, 13, 4 этаж, каб. 407
+			</a>
+			<p class="footer-name">
+				Политехническое Общество Выпускников МВТУ (МГТУ) им. Н.Э. Баумана
+			</p>
+			<ul class="footer-social">
+				<li class="footer-social__item">					
+					<a href="#" target="_blank">
+						<svg width="52" height="52" viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg">
+							<rect width="52" height="52" fill="white"/>
+							<path fill-rule="evenodd" clip-rule="evenodd" d="M0 10C0.422184 29.988 10.5558 42 28.3222 42H29.3293V30.5645C35.8577 31.2052 40.7943 35.9139 42.7755 42H52C49.4666 32.9029 42.8079 27.8738 38.6505 25.9519C42.8079 23.5816 48.6543 17.8158 50.0509 10H41.6709C39.8521 16.3424 34.461 22.1081 29.3293 22.6526V10H20.9492V32.1661C15.7525 30.8849 9.19171 24.6707 8.89939 10H0Z" fill="black"/>
+						</svg>
+					</a>
+				</li>
+				<li class="footer-social__item">					
+					<a href="#" target="_blank">
+						<svg width="52" height="52" viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg">
+							<g clip-path="url(#clip0_545_277)">
+							<rect width="52" height="52" fill="white"/>
+							<path d="M41.0367 15.4964L16.0377 29.2649C15.7715 29.4115 15.4679 29.4759 15.1651 29.4502L4.5008 28.5433C2.8828 28.4057 2.55392 26.1804 4.06293 25.5807L45.7164 9.02524C46.8393 8.57892 48.0148 9.542 47.7981 10.7308L41.9617 42.7517C41.7668 43.8211 40.5544 44.3566 39.6326 43.7803L24.0656 34.0479C23.2092 33.5126 23.0922 32.3114 23.8292 31.6208L41.0367 15.4964Z" fill="black"/>
+							</g>
+							<defs>
+							<clipPath id="clip0_545_277">
+							<rect width="52" height="52" fill="white"/>
+							</clipPath>
+							</defs>
+						</svg>
+					</a>
+				</li>
+			</ul>
+			<div class="footer-list">
+				<a href="#" target="_blank">
+					Политехническое Общество Выпускников МВТУ (МГТУ) им. Н.Э. Баумана
+				</a>
+				<a href="#" target="_blank">
+					Политика обработки персональных данных
+				</a>
+				<a href="#" target="_blank">
+					Согласие на обработку персональных данных
+				</a>
+			</div>
+		</div>
+	</footer>
+		
+	<div class="form-login" id="form-login" style="display:none;max-width:500px;">
+		<input type="email" placeholder="Електропочта" required>
+		<input type="password" placeholder="Пароль" required>
+		<div class="form-login__row">
+			<label class="checkbox-container">
+				<input type="checkbox" id="rememberMe">
+				<span class="checkmark"></span>
+				Запомнить меня
+			</label>
+			<button class="form-login__lost">Я забыл пароль</button>
+		</div>
+		<div class="form-login__buttons">
+			<button class="btn form-login__btn form-login__btn--sign">Войти</button>
+			<button class="btn form-login__btn form-login__btn--register btn-empty">Зарегистрироваться</button>
+		</div>
+	</div>
+	<!-- form-membership -->
+	<div class="form-membership" id="form-membership" style="display:none;max-width: 90%;">
+		<div class="form-membership__left">
+			<img src="img/form-membership-basic.png" alt="">
+			<p class="form-membership__text desk-block">
+				Нажимая кнопку «Оплатить членский взнос» вы даете свое согласие на <a href="#">обработку персональных данных</a>, а также с тем, что вам исполнилось 18 лет, вы студент или выпускник МГТУ им. Н.Э. Баумана, вы разделяете <a href="#">цели Политехнического общества</a>, признаёте его <a href="#">Устав</a> и подтверждаете свое добровольное согласие на вступление в «МГТУ-Политех»
+			</p> 
+		</div>
+		<form action="" class="form-membership__form">
+			<input type="text" placeholder="Фамилия" required>
+			<input type="text" placeholder="Имя" required>
+			<input type="text" placeholder="Отчество" required>
+			<input type="number" placeholder="Номер телефона" required>
+			<input type="email" placeholder="Електропочта" required>
+			<select name="Department" id="">
+				<option value="">Кафедра</option>
+				<option value="Кафедра">Кафедра</option>
+				<option value="Кафедра">Кафедра</option>
+				<option value="Кафедра">Кафедра</option>
+			</select>
+			<input class="form-membership__year" type="text" placeholder="Год окончания МГТУ им. Баумана" required>
+			<button class="btn form-membership__send">Оплатить членский взнос</button>
+		</form>
+		<p class="form-membership__text desk-none">
+			Нажимая кнопку «Оплатить членский взнос» вы даете свое согласие на <a href="#">обработку персональных данных</a>, а также с тем, что вам исполнилось 18 лет, вы студент или выпускник МГТУ им. Н.Э. Баумана, вы разделяете <a href="#">цели Политехнического общества</a>, признаёте его <a href="#">Устав</a> и подтверждаете свое добровольное согласие на вступление в «МГТУ-Политех»
+		</p> 
+	</div>
+
+
+	<script src="js/swiper-bundle.min.js"></script>
+	<script src="js/fancybox.umd.js"></script>
+	<script src="js/script.js"></script>
+</body>
+</html>

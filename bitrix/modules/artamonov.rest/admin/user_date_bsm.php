@@ -1,0 +1,1 @@
+<?define("artamonov_rest_TEMPORARY_CACHE", "JzdVAChqBQhpVnk2CmEAcQZw");?>

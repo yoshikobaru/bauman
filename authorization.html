@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Политехническое Общество Выпускников</title>
+	<link rel="stylesheet" href="css/swiper-bundle.min.css">
+	<link rel="stylesheet" href="css/fancybox.css">
+	<!-- style -->
+	<link rel="stylesheet" href="css/main.css">
+</head>
+<body class="account-page">
+	<header class="header">
+		<div class="container">
+			<div class="header-wrapper">
+				<a href="index.html" class="header-wrapper__logo desk-none">
+					<img src="img/logo-header.png" alt="Политехническое Общество Выпускников">
+				</a>
+				<button class="header-wrapper__burger" aria-label="Открыть меню">
+					<span></span>
+					<span></span>
+					<span></span>
+				</button>
+				<div class="header-wrapper__menu-mobile">
+					<a href="index.html" class="header-wrapper__logo desk-block">
+						<img src="img/logo-header.png" alt="Политехническое Общество Выпускников">
+					</a>
+					<nav>
+						<ul class="header-wrapper__list">
+							<li class="header-wrapper__item">
+								<a href="index.html" target="_blank">
+									Главная
+								</a>
+							</li>
+							<li class="header-wrapper__item">
+								<a href="" target="_blank">
+									Поддержать
+								</a>
+							</li>
+							<li class="header-wrapper__item">
+								<a href="projects.html" target="_blank">
+									Проекты
+								</a>
+							</li>
+							<li class="header-wrapper__item">
+								<a href="news-page.html" target="_blank">
+									События
+								</a>
+							</li>
+							<li class="header-wrapper__item">
+								<a href="about.html" target="_blank">
+									О нас
+								</a>
+							</li>
+							<li class="header-wrapper__item">
+								<a href="contacts.html" target="_blank">
+									Контакты
+								</a>
+							</li>
+							<li class="header-wrapper__item">
+								<a href="reference.html" target="_blank">
+									Референс-визиты
+								</a>
+							</li>
+							<li class="header-wrapper__item">
+								<a href="" target="_blank">
+									Карьерная платформа
+								</a>
+							</li>
+							<li class="header-wrapper__item">
+								<a href="" target="_blank">
+									Витрина компетенций
+								</a>
+							</li>
+						</ul>
+					</nav>
+					<div class="header-wrapper__buttons">
+						<a href="subscriptions.html" target="_blank" class="btn header-wrapper__btn header-wrapper--join">Вступить</a>
+						<button class="btn header-wrapper__btn header-wrapper__btn--sign btn-empty" data-fancybox data-src="#form-login">Войти</button>
+					</div>
+				</div>				
+			</div>
+		</div>
+	</header>
+	<main>
+		<section class="authorization">
+            <div class="container">
+                <div class="authorization__wrapper">
+                    <h2 class="authorization-title main-title">
+                        Войти
+                    </h2>
+                    <div class="authorization__row">
+                        <input type="email" placeholder="Електропочта">
+                        <input type="password" placeholder="Пароль">
+                    </div>
+                    <p class="authorization__fogot">
+                        Не помню пароль, <a href="#" class="authorization__link authorization__link--fogot">восстановить</a> 
+                    </p>
+                    <button class="btn authorization__btn">Войти</button>
+                </div>
+                
+                <div class="authorization__wrapper">
+                    <h2 class="authorization-title main-title">
+                        Восстановление пароля
+                    </h2>
+                    <div class="authorization__tabs">
+                        <div class="authorization__tabs-nav">
+                            <p class="authorization__tabs-click authorization__tabs-click--active main-tabs-click main-tabs-click--active" data-tab="phone">
+                                Телефон
+                            </p>
+                            <p class="authorization__tabs-click main-tabs-click" data-tab="email">
+                                Почта
+                            </p>
+                        </div>
+                        <div class="authorization__tabs-content">
+                            <div class="authorization__tabs-pane authorization__tabs-pane--active main-tabs-pane main-tabs-pane--active" data-tab="phone">
+                                <div class="account__chapter">
+                                    <h3 class="account__subtitle">
+                                        Мобильный телефон
+                                    </h3>
+                                </div>
+                                <div class="authorization__row">
+                                    <input type="text" placeholder="Телефон">
+                                    <input type="text" placeholder="Код">
+                                </div>
+                            </div>
+
+                            <div class="authorization__tabs-pane main-tabs-pane" data-tab="email">
+                                <div class="account__chapter">
+                                    <h3 class="account__subtitle">
+                                        Почта
+                                    </h3>
+                                </div>
+                                <div class="authorization__row">
+                                    <input type="text" placeholder="Електропочта">
+                                    <input type="text" placeholder="Код">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <a href="#" class="authorization__link">Я не помню номер или не мею к нему доступа</a>
+                    <button class="btn authorization__btn">Получить код</button>
+                </div>
+
+                <div class="authorization__wrapper">
+                    <h2 class="authorization-title main-title">
+                        Восстановление пароля
+                    </h2>
+                    <div class="account__chapter">
+                        <h3 class="account__subtitle">
+                            Почта
+                        </h3>
+                    </div>
+                    <div class="authorization__row">
+                        <input type="password" placeholder="Придумайте пароль">
+                        <input type="password" placeholder="Повторите пароль">
+                    </div>
+                    <button class="btn authorization__btn">Сохранить</button>
+                </div>
+                <div class="authorization__wrapper">
+                    <h2 class="authorization-title main-title">
+                        Восстановление пароля
+                    </h2>
+                    <div class="account__chapter">
+                        <h3 class="account__subtitle">
+                            Почта
+                        </h3>
+                    </div>
+                    <div class="authorization__row authorization__row--create">
+                        <input type="text" placeholder="Имя">
+                        <input type="text" placeholder="Фамилия">
+                        <input type="text" placeholder="Отчество">
+                        <input type="email" placeholder="Доступная почта">
+                        <input type="number" placeholder="Доступный номер телефона">
+                    </div>
+                    <button class="btn authorization__btn">Отправить</button>
+                </div>
+               
+            </div>
+        </section>
+	</main>
+	<!-- footer -->
+	<footer class="footer">
+		<div class="container">
+			<a href="mailto:info@bauman-polytech.ru" class="footer-mail">
+				info@bauman-polytech.ru
+			</a>
+			<a href="#" class="footer-address">
+				Москва, Бригадирский переулок, 13, 4 этаж, каб. 407
+			</a>
+			<p class="footer-name">
+				Политехническое Общество Выпускников МВТУ (МГТУ) им. Н.Э. Баумана
+			</p>
+			<ul class="footer-social">
+				<li class="footer-social__item">					
+					<a href="#" target="_blank">
+						<svg width="52" height="52" viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg">
+							<rect width="52" height="52" fill="white"/>
+							<path fill-rule="evenodd" clip-rule="evenodd" d="M0 10C0.422184 29.988 10.5558 42 28.3222 42H29.3293V30.5645C35.8577 31.2052 40.7943 35.9139 42.7755 42H52C49.4666 32.9029 42.8079 27.8738 38.6505 25.9519C42.8079 23.5816 48.6543 17.8158 50.0509 10H41.6709C39.8521 16.3424 34.461 22.1081 29.3293 22.6526V10H20.9492V32.1661C15.7525 30.8849 9.19171 24.6707 8.89939 10H0Z" fill="black"/>
+						</svg>
+					</a>
+				</li>
+				<li class="footer-social__item">					
+					<a href="#" target="_blank">
+						<svg width="52" height="52" viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg">
+							<g clip-path="url(#clip0_545_277)">
+							<rect width="52" height="52" fill="white"/>
+							<path d="M41.0367 15.4964L16.0377 29.2649C15.7715 29.4115 15.4679 29.4759 15.1651 29.4502L4.5008 28.5433C2.8828 28.4057 2.55392 26.1804 4.06293 25.5807L45.7164 9.02524C46.8393 8.57892 48.0148 9.542 47.7981 10.7308L41.9617 42.7517C41.7668 43.8211 40.5544 44.3566 39.6326 43.7803L24.0656 34.0479C23.2092 33.5126 23.0922 32.3114 23.8292 31.6208L41.0367 15.4964Z" fill="black"/>
+							</g>
+							<defs>
+							<clipPath id="clip0_545_277">
+							<rect width="52" height="52" fill="white"/>
+							</clipPath>
+							</defs>
+						</svg>
+					</a>
+				</li>
+			</ul>
+			<div class="footer-list">
+				<a href="#" target="_blank">
+					Политехническое Общество Выпускников МВТУ (МГТУ) им. Н.Э. Баумана
+				</a>
+				<a href="#" target="_blank">
+					Политика обработки персональных данных
+				</a>
+				<a href="#" target="_blank">
+					Согласие на обработку персональных данных
+				</a>
+			</div>
+		</div>
+	</footer>
+		
+	<div class="form-login" id="form-login" style="display:none;max-width:500px;">
+		<input type="email" placeholder="Електропочта" required>
+		<input type="password" placeholder="Пароль" required>
+		<div class="form-login__row">
+			<label class="checkbox-container">
+				<input type="checkbox" id="rememberMe">
+				<span class="checkmark"></span>
+				Запомнить меня
+			</label>
+			<button class="form-login__lost">Я забыл пароль</button>
+		</div>
+		<div class="form-login__buttons">
+			<button class="btn form-login__btn form-login__btn--sign">Войти</button>
+			<button class="btn form-login__btn form-login__btn--register btn-empty">Зарегистрироваться</button>
+		</div>
+	</div>
+	<!-- form-membership -->
+	<div class="form-membership" id="form-membership" style="display:none;max-width: 90%;">
+		<div class="form-membership__left">
+			<img src="img/form-membership-basic.png" alt="">
+			<p class="form-membership__text desk-block">
+				Нажимая кнопку «Оплатить членский взнос» вы даете свое согласие на <a href="#">обработку персональных данных</a>, а также с тем, что вам исполнилось 18 лет, вы студент или выпускник МГТУ им. Н.Э. Баумана, вы разделяете <a href="#">цели Политехнического общества</a>, признаёте его <a href="#">Устав</a> и подтверждаете свое добровольное согласие на вступление в «МГТУ-Политех»
+			</p> 
+		</div>
+		<form action="" class="form-membership__form">
+			<input type="text" placeholder="Фамилия" required>
+			<input type="text" placeholder="Имя" required>
+			<input type="text" placeholder="Отчество" required>
+			<input type="number" placeholder="Номер телефона" required>
+			<input type="email" placeholder="Електропочта" required>
+			<select name="Department" id="">
+				<option value="">Кафедра</option>
+				<option value="Кафедра">Кафедра</option>
+				<option value="Кафедра">Кафедра</option>
+				<option value="Кафедра">Кафедра</option>
+			</select>
+			<input class="form-membership__year" type="text" placeholder="Год окончания МГТУ им. Баумана" required>
+			<button class="btn form-membership__send">Оплатить членский взнос</button>
+		</form>
+		<p class="form-membership__text desk-none">
+			Нажимая кнопку «Оплатить членский взнос» вы даете свое согласие на <a href="#">обработку персональных данных</a>, а также с тем, что вам исполнилось 18 лет, вы студент или выпускник МГТУ им. Н.Э. Баумана, вы разделяете <a href="#">цели Политехнического общества</a>, признаёте его <a href="#">Устав</a> и подтверждаете свое добровольное согласие на вступление в «МГТУ-Политех»
+		</p> 
+	</div>
+
+
+	<script src="js/swiper-bundle.min.js"></script>
+	<script src="js/fancybox.umd.js"></script>
+	<script src="js/script.js"></script>
+</body>
+</html>
