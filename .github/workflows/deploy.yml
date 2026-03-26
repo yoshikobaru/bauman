@@ -20,4 +20,4 @@ jobs:
           key: ${{ secrets.DEPLOY }}
           script: |
             cd ${{ secrets.PATH }}
-            git pull origin main   # или нужную ветку
+            git pull origin main 
