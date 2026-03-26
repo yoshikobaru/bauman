@@ -11,6 +11,7 @@
 	<link rel="stylesheet" href="<?=SITE_TEMPLATE_PATH?>/assets/css/main.css">
 </head>
 <body>
+<?php $APPLICATION->ShowPanel();?>
 	<header class="header">
 		<div class="container">
 			<div class="header-wrapper">
