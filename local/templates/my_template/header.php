@@ -6,6 +6,7 @@
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title><?=$APPLICATION->GetTitle()?></title>
+	<?$APPLICATION->ShowHead();?>
 	<link rel="stylesheet" href="<?=SITE_TEMPLATE_PATH?>/assets/css/swiper-bundle.min.css">
 	<link rel="stylesheet" href="<?=SITE_TEMPLATE_PATH?>/assets/css/fancybox.css">
 	<link rel="stylesheet" href="<?=SITE_TEMPLATE_PATH?>/assets/css/main.css">
