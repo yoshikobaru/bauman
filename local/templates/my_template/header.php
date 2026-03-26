@@ -1,8 +1,4 @@
 <?php if (!defined('B_PROLOG_INCLUDED') || B_PROLOG_INCLUDED !== true) die();?>
-<?php // DEBUG: удалить после проверки ?>
-<div style="background:red;color:#fff;font-size:14px;padding:8px;position:fixed;top:0;left:0;z-index:99999;font-family:monospace">
-	SITE_TEMPLATE_PATH = [<?=SITE_TEMPLATE_PATH?>]
-</div>
 <!DOCTYPE html>
 <html lang="ru">
 <head>

@@ -1,14 +1,13 @@
-# Игнорируем ядро Битрикс и служебные папки
+# Ядро Bitrix и служебные папки
 /bitrix/
 /upload/
 /bitrix/*
 !/bitrix/php_interface/
-!/bitrix/templates/
 /bitrix/php_interface/dbconn.php
 /bitrix/.settings.php
 
-# Папка /local — должна быть в репозитории (если она есть)
-!/local/
+# Временные папки upload внутри шаблонов
+/local/templates/my_template/upload/
 
 # Временные файлы
 *.log
