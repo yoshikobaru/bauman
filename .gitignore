@@ -1,9 +1,16 @@
-/bitrix/cache/
-/bitrix/managed_cache/
-/bitrix/stack_cache/
-/bitrix/backup/
-/bitrix/tmp/
+# Игнорируем ядро Битрикс и служебные папки
+/bitrix/
 /upload/
-/.settings.php
-/bitrix/.settings.php
+/bitrix/*
+!/bitrix/php_interface/
+!/bitrix/templates/
 /bitrix/php_interface/dbconn.php
+/bitrix/.settings.php
+
+# Папка /local — должна быть в репозитории (если она есть)
+!/local/
+
+# Временные файлы
+*.log
+*.bak
+.DS_Store
