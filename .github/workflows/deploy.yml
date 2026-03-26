@@ -1,0 +1,23 @@
+name: Deploy to server
+
+on:
+  push:
+    branches:
+      - main   # или любая другая ветка, при пуше в которую нужно обновлять сервер
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USER }}
+          key: ${{ secrets.DEPLOY }}
+          script: |
+            cd ${{ secrets.PATH }}
+            git pull origin main   # или нужную ветку
