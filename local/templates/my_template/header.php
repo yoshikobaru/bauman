@@ -78,8 +78,26 @@
 						</ul>
 					</nav>
 					<div class="header-wrapper__buttons">
-						<a href="/subscriptions/" class="btn header-wrapper__btn header-wrapper--join">Вступить</a>
-						<button class="btn header-wrapper__btn header-wrapper__btn--sign btn-empty" data-fancybox data-src="#form-login">Войти</button>
+						<?php
+						$_isMember = defined('PO_MEMBER_BASIC_ID') && $USER->IsInGroup([
+							PO_MEMBER_BASIC_ID,
+							PO_MEMBER_PREMIUM_ID,
+							PO_PARTNER_ID,
+						]);
+						if (!$USER->IsAuthorized()):
+						?>
+							<a href="/join/" class="btn header-wrapper__btn header-wrapper--join">Вступить</a>
+							<button class="btn header-wrapper__btn header-wrapper__btn--sign btn-empty" data-fancybox data-src="#form-login">Войти</button>
+						<?php elseif ($_isMember): ?>
+							<a href="/profile/" class="btn header-wrapper__btn header-wrapper__btn--sign btn-empty">
+								<?= htmlspecialchars($USER->GetParam('NAME') . ' ' . $USER->GetParam('LAST_NAME')) ?>
+							</a>
+						<?php else: ?>
+							<a href="/join/" class="btn header-wrapper__btn header-wrapper--join">Вступить</a>
+							<a href="/profile/" class="btn header-wrapper__btn header-wrapper__btn--sign btn-empty">
+								<?= htmlspecialchars($USER->GetParam('EMAIL')) ?>
+							</a>
+						<?php endif; ?>
 					</div>
 				</div>				
 			</div>

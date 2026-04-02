@@ -52,21 +52,48 @@
 
 	<!-- Форма входа -->
 	<div class="form-login" id="form-login" style="display:none;max-width:500px;">
-		<input type="email" placeholder="Електропочта" required>
-		<input type="password" placeholder="Пароль" required>
+		<p id="form-login-error" style="display:none;color:#c0392b;margin-bottom:12px"></p>
+		<input type="email"    id="modal-email"    placeholder="Электропочта" required>
+		<input type="password" id="modal-password" placeholder="Пароль" required>
 		<div class="form-login__row">
 			<label class="checkbox-container">
-				<input type="checkbox" id="rememberMe">
+				<input type="checkbox" id="modal-remember">
 				<span class="checkmark"></span>
 				Запомнить меня
 			</label>
-			<button class="form-login__lost">Я забыл пароль</button>
+			<a href="/authorization/" class="form-login__lost">Я забыл пароль</a>
 		</div>
 		<div class="form-login__buttons">
-			<button class="btn form-login__btn form-login__btn--sign">Войти</button>
-			<button class="btn form-login__btn form-login__btn--register btn-empty">Зарегистрироваться</button>
+			<button class="btn form-login__btn form-login__btn--sign" id="modal-login-btn">Войти</button>
+			<a href="/join/" class="btn form-login__btn form-login__btn--register btn-empty">Зарегистрироваться</a>
 		</div>
 	</div>
+	<script>
+	(function(){
+		var btn = document.getElementById('modal-login-btn');
+		if (!btn) return;
+		btn.addEventListener('click', function() {
+			var email    = document.getElementById('modal-email').value.trim();
+			var password = document.getElementById('modal-password').value;
+			var remember = document.getElementById('modal-remember').checked ? '1' : '0';
+			var errEl    = document.getElementById('form-login-error');
+			errEl.style.display = 'none';
+			if (!email || !password) { errEl.textContent = 'Заполните email и пароль'; errEl.style.display = ''; return; }
+			btn.disabled = true;
+			var fd = new FormData();
+			fd.append('email', email);
+			fd.append('password', password);
+			fd.append('remember', remember);
+			fetch('/authorization/ajax.php', { method: 'POST', body: fd })
+				.then(function(r){ return r.json(); })
+				.then(function(data){
+					if (data.success) { window.location.href = data.redirect || '/profile/'; }
+					else { errEl.textContent = data.message || 'Ошибка входа'; errEl.style.display = ''; btn.disabled = false; }
+				})
+				.catch(function(){ errEl.textContent = 'Ошибка соединения'; errEl.style.display = ''; btn.disabled = false; });
+		});
+	})();
+	</script>
 	<!-- Форма вступления -->
 	<div class="form-membership" id="form-membership" style="display:none;max-width: 90%;">
 		<div class="form-membership__left">

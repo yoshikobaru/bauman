@@ -1,215 +1,327 @@
 <?php
 require($_SERVER["DOCUMENT_ROOT"]."/bitrix/header.php");
 $APPLICATION->SetTitle("Вступить в общество");
+
+$isMember = defined('PO_MEMBER_BASIC_ID') && $USER->IsInGroup([
+    PO_MEMBER_BASIC_ID,
+    PO_MEMBER_PREMIUM_ID,
+    PO_PARTNER_ID,
+]);
+$isAuthorized = $USER->IsAuthorized();
+
+$errors   = [];
+$joinDone = false;
+
+// — Обработчик формы вступления —
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['join_action'])) {
+    $lastName       = trim($_POST['last_name'] ?? '');
+    $firstName      = trim($_POST['first_name'] ?? '');
+    $secondName     = trim($_POST['second_name'] ?? '');
+    $email          = trim($_POST['email'] ?? '');
+    $password       = $_POST['password'] ?? '';
+    $isGraduate     = ($_POST['is_graduate'] ?? '') === 'yes';
+    $gradYear       = (int)($_POST['grad_year'] ?? 0);
+    $gradDept       = trim($_POST['grad_dept'] ?? '');
+    $telegram       = trim($_POST['telegram'] ?? '');
+    $diplomaSeries  = trim($_POST['diploma_series'] ?? '');
+    $diplomaNumber  = trim($_POST['diploma_number'] ?? '');
+    $diplomaDate    = trim($_POST['diploma_date'] ?? '');
+    $membershipType = trim($_POST['membership_type'] ?? 'basic');
+    $agreeCharter   = ($_POST['agree_charter'] ?? '') === 'yes';
+    $agreePd        = ($_POST['agree_pd'] ?? '') === 'yes';
+
+    if (!$agreeCharter || !$agreePd) {
+        $errors[] = 'Необходимо согласие с Уставом и политикой ПДн';
+    }
+
+    if (!$isAuthorized) {
+        // Новый пользователь — регистрация
+        if (!$email)              $errors[] = 'Введите email';
+        if (strlen($password) < 6) $errors[] = 'Пароль должен содержать не менее 6 символов';
+        if (!$lastName)           $errors[] = 'Введите фамилию';
+        if (!$firstName)          $errors[] = 'Введите имя';
+
+        if (empty($errors)) {
+            $oUser  = new CUser();
+            $userId = $oUser->Add([
+                'LOGIN'            => $email,
+                'EMAIL'            => $email,
+                'PASSWORD'         => $password,
+                'CONFIRM_PASSWORD' => $password,
+                'NAME'             => $firstName,
+                'LAST_NAME'        => $lastName,
+                'SECOND_NAME'      => $secondName,
+                'ACTIVE'           => 'Y',
+                'GROUP_ID'         => [PO_REGISTERED_ID],
+                'UF_MEMBERSHIP_STATUS' => 'pending',
+                'UF_MEMBERSHIP_TYPE'   => $membershipType,
+                'UF_GRADUATE_YEAR'     => $isGraduate ? $gradYear : '',
+                'UF_GRADUATE_DEPT'     => $isGraduate ? $gradDept : '',
+                'UF_TELEGRAM'          => $telegram,
+                'UF_DIPLOMA_SERIES'    => $diplomaSeries,
+                'UF_DIPLOMA_NUMBER'    => $diplomaNumber,
+                'UF_DIPLOMA_DATE'      => $diplomaDate,
+            ]);
+
+            if ($userId) {
+                $USER->Login($email, $password, 'N');
+                LocalRedirect('/profile/?joined=1');
+            } else {
+                $errors[] = $oUser->LAST_ERROR ?: 'Ошибка при создании аккаунта';
+            }
+        }
+    } else {
+        // Авторизованный не-член — обновляем UF_ поля
+        $userId = $USER->GetID();
+        $oUser  = new CUser();
+        $result = $oUser->Update($userId, [
+            'UF_MEMBERSHIP_STATUS' => 'pending',
+            'UF_MEMBERSHIP_TYPE'   => $membershipType,
+            'UF_GRADUATE_YEAR'     => $isGraduate ? $gradYear : '',
+            'UF_GRADUATE_DEPT'     => $isGraduate ? $gradDept : '',
+            'UF_TELEGRAM'          => $telegram,
+            'UF_DIPLOMA_SERIES'    => $diplomaSeries,
+            'UF_DIPLOMA_NUMBER'    => $diplomaNumber,
+            'UF_DIPLOMA_DATE'      => $diplomaDate,
+        ]);
+
+        if ($result) {
+            LocalRedirect('/profile/?joined=1');
+        } else {
+            $errors[] = $oUser->LAST_ERROR ?: 'Ошибка сохранения данных';
+        }
+    }
+}
+
+// Данные текущего пользователя для предзаполнения
+$arCurrentUser = [];
+if ($isAuthorized && !$isMember) {
+    $dbUser = CUser::GetByID($USER->GetID());
+    $arCurrentUser = $dbUser->Fetch() ?: [];
+}
 ?>
 
 <main>
-		<section class="join">
-            <div class="container">
-                <div class="join__wrapper">
-                    <h2 class="account__title main-title">Вступить в общество</h2>
-                    <div class="account__photo">
-                        <img src="<?=SITE_TEMPLATE_PATH?>/assets/img/my_profile/avatar.png" alt="" class="account__photo-image">
-                        <div class="account__photo-content">
-                            <label class="account__photo-upload">
-                                Загрузить аватар
-                                <input type="file" class="account__photo-input" accept="image/png, image/jpeg">
+    <section class="join">
+        <div class="container">
+
+            <?php if (!empty($errors)): ?>
+                <div class="authorization__alert authorization__alert--error" style="margin-bottom:20px">
+                    <?php foreach ($errors as $msg): ?><p><?= htmlspecialchars($msg) ?></p><?php endforeach; ?>
+                </div>
+            <?php endif; ?>
+
+            <?php if ($isMember): ?>
+            <!-- Сценарий 3: уже член общества -->
+            <div class="join__wrapper">
+                <h2 class="account__title main-title">Вы уже член общества</h2>
+                <div class="account__chapter">
+                    <h3 class="account__subtitle">Ваш тариф</h3>
+                </div>
+                <div class="account__rate account__rate--proff">
+                    <img src="<?=SITE_TEMPLATE_PATH?>/assets/img/my_profile/rate-conus.png" alt="" class="account__rate-conus">
+                    <h4 class="account__rate-plan">
+                        <?php
+                        $typeLabels = [
+                            'basic'   => 'Базовое',
+                            'premium' => 'Профессиональное',
+                            'partner' => 'Партнёрское',
+                            'honorary'=> 'Почётное',
+                        ];
+                        echo htmlspecialchars($typeLabels[$arCurrentUser['UF_MEMBERSHIP_TYPE'] ?? ''] ?? 'Активное');
+                        ?>
+                    </h4>
+                    <div class="account__rate-buttons">
+                        <a href="/profile/" class="account__rate-btn btn">Перейти в личный кабинет</a>
+                    </div>
+                </div>
+            </div>
+
+            <?php elseif ($isAuthorized): ?>
+            <!-- Сценарий 2: авторизован, не член — сокращённая форма -->
+            <div class="join__wrapper">
+                <h2 class="account__title main-title">Вступить в общество</h2>
+                <p style="margin-bottom:16px;color:#666">
+                    Ваши данные предзаполнены из профиля. Проверьте и отправьте заявку.
+                </p>
+                <form method="POST" action="/join/">
+                    <input type="hidden" name="join_action" value="1">
+                    <input type="hidden" name="membership_type" value="basic" id="membership_type">
+                    <div class="account__chapter">
+                        <h3 class="account__subtitle">Личные данные</h3>
+                    </div>
+                    <div class="join__grid">
+                        <input type="text" name="last_name"   placeholder="Фамилия"
+                               value="<?= htmlspecialchars($arCurrentUser['LAST_NAME'] ?? '') ?>">
+                        <input type="text" name="first_name"  placeholder="Имя"
+                               value="<?= htmlspecialchars($arCurrentUser['NAME'] ?? '') ?>">
+                        <input type="text" name="second_name" placeholder="Отчество"
+                               value="<?= htmlspecialchars($arCurrentUser['SECOND_NAME'] ?? '') ?>">
+                        <input type="text" name="telegram"    placeholder="Telegram"
+                               value="<?= htmlspecialchars($arCurrentUser['UF_TELEGRAM'] ?? '') ?>">
+                    </div>
+                    <div class="account__graduate">
+                        <div class="account__chapter">
+                            <h3 class="account__subtitle">Выпускник МГТУ?</h3>
+                        </div>
+                        <div class="account__graduate-choice">
+                            <label class="account__graduate-item">
+                                <input type="radio" name="is_graduate" value="yes" class="account__graduate-input"
+                                       <?= !empty($arCurrentUser['UF_GRADUATE_YEAR']) ? 'checked' : '' ?>>
+                                <span class="account__graduate-box"></span>Да
                             </label>
-                            <p>
-                                Изображение размером 300x300, формат jpg, png
-                            </p>
+                            <label class="account__graduate-item">
+                                <input type="radio" name="is_graduate" value="no" class="account__graduate-input"
+                                       <?= empty($arCurrentUser['UF_GRADUATE_YEAR']) ? 'checked' : '' ?>>
+                                <span class="account__graduate-box"></span>Нет
+                            </label>
                         </div>
                     </div>
+                    <div class="join__politic">
+                        <div class="join__politic-question">
+                            <p class="join__politic-link">
+                                Ознакомлен(а) и согласен(а) с <a href="#">Уставом</a> и <a href="#">Положением о членских взносах</a>
+                            </p>
+                            <div class="account__graduate-choice">
+                                <label class="account__graduate-item">
+                                    <input type="radio" name="agree_charter" value="yes" class="account__graduate-input">
+                                    <span class="account__graduate-box"></span>Да
+                                </label>
+                                <label class="account__graduate-item">
+                                    <input type="radio" name="agree_charter" value="no" class="account__graduate-input">
+                                    <span class="account__graduate-box"></span>Нет
+                                </label>
+                            </div>
+                        </div>
+                        <div class="join__politic-question">
+                            <p class="join__politic-link">Согласен с <a href="#">политикой обработки ПДн</a></p>
+                            <div class="account__graduate-choice">
+                                <label class="account__graduate-item">
+                                    <input type="radio" name="agree_pd" value="yes" class="account__graduate-input">
+                                    <span class="account__graduate-box"></span>Да
+                                </label>
+                                <label class="account__graduate-item">
+                                    <input type="radio" name="agree_pd" value="no" class="account__graduate-input">
+                                    <span class="account__graduate-box"></span>Нет
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn authorization__btn">Подать заявку</button>
+                </form>
+            </div>
+
+            <?php else: ?>
+            <!-- Сценарий 1: гость — полная форма регистрации -->
+            <div class="join__wrapper">
+                <h2 class="account__title main-title">Вступить в общество</h2>
+                <form method="POST" action="/join/" enctype="multipart/form-data">
+                    <input type="hidden" name="join_action" value="1">
+                    <input type="hidden" name="membership_type" value="basic" id="membership_type">
                     <div class="account__personal">
                         <div class="account__chapter">
-                            <h3 class="account__subtitle">
-                                Личные данные
-                            </h3>
+                            <h3 class="account__subtitle">Личные данные</h3>
                         </div>
                         <div class="account__personal-list account__grid">
-                            <input type="email" placeholder="Електропочта">
-                            <input type="password" placeholder="Пароль">
-                            <input type="text" placeholder="Фамилия">
-                            <input type="text" placeholder="Имя">
-                            <input type="text" placeholder="Отчество">
-                            <input type="text" placeholder="Дата Рождения">
-                            
+                            <input type="email" name="email"       placeholder="Электропочта" required
+                                   value="<?= htmlspecialchars($_POST['email'] ?? '') ?>">
+                            <input type="password" name="password" placeholder="Пароль (мин. 6 символов)" required>
+                            <input type="text" name="last_name"    placeholder="Фамилия" required
+                                   value="<?= htmlspecialchars($_POST['last_name'] ?? '') ?>">
+                            <input type="text" name="first_name"   placeholder="Имя" required
+                                   value="<?= htmlspecialchars($_POST['first_name'] ?? '') ?>">
+                            <input type="text" name="second_name"  placeholder="Отчество"
+                                   value="<?= htmlspecialchars($_POST['second_name'] ?? '') ?>">
                         </div>
                     </div>
                     <div class="account__graduate">
                         <div class="account__chapter">
-                            <h3 class="account__subtitle">
-                                Выпускник МГТУ? 
-                            </h3>
+                            <h3 class="account__subtitle">Выпускник МГТУ?</h3>
                         </div>
                         <div class="account__graduate-choice">
                             <label class="account__graduate-item">
-                                <input type="radio" name="subscribe" value="yes" class="account__graduate-input">
-                                <span class="account__graduate-box"></span>
-                                Да
+                                <input type="radio" name="is_graduate" value="yes" class="account__graduate-input" id="grad-yes"
+                                       <?= ($_POST['is_graduate'] ?? '') === 'yes' ? 'checked' : '' ?>>
+                                <span class="account__graduate-box"></span>Да
                             </label>
-
                             <label class="account__graduate-item">
-                                <input type="radio" name="subscribe" value="no" class="account__graduate-input">
-                                <span class="account__graduate-box"></span>
-                                Нет
+                                <input type="radio" name="is_graduate" value="no"  class="account__graduate-input" id="grad-no"
+                                       <?= ($_POST['is_graduate'] ?? 'no') !== 'yes' ? 'checked' : '' ?>>
+                                <span class="account__graduate-box"></span>Нет
                             </label>
                         </div>
                     </div>
-                    <div class="account__personal">
+                    <div class="account__personal" id="graduate-data"
+                         style="<?= ($_POST['is_graduate'] ?? 'no') !== 'yes' ? 'display:none' : '' ?>">
                         <div class="account__chapter">
-                            <h3 class="account__subtitle">
-                                Данные выпускника
-                            </h3>
-                            <button class="account__chapter-edit">Редактировать</button>
+                            <h3 class="account__subtitle">Данные выпускника</h3>
                         </div>
                         <div class="account__personal-list account__personal-list--short account__grid">
-                            <select name="Department" id="">
-                                <option value="">Год окончания</option>
-                                <option value="Кафедра">Кафедра</option>
-                                <option value="Кафедра">Кафедра</option>
-                                <option value="Кафедра">Кафедра</option>
-                            </select>
-                            <select name="Department" id="">
-                                <option value="">Выпускающая кафедра</option>
-                                <option value="Кафедра">Кафедра</option>
-                                <option value="Кафедра">Кафедра</option>
-                                <option value="Кафедра">Кафедра</option>
-                            </select>
-                            <input type="text" placeholder="Telegram" required>
+                            <input type="number" name="grad_year" placeholder="Год окончания" min="1900" max="2099"
+                                   value="<?= (int)($_POST['grad_year'] ?? 0) ?: '' ?>">
+                            <input type="text"   name="grad_dept" placeholder="Выпускающая кафедра"
+                                   value="<?= htmlspecialchars($_POST['grad_dept'] ?? '') ?>">
+                            <input type="text"   name="telegram"  placeholder="Telegram"
+                                   value="<?= htmlspecialchars($_POST['telegram'] ?? '') ?>">
                         </div>
                     </div>
-                    <div class="account__personal">
+                    <div class="account__personal" id="diploma-data"
+                         style="<?= ($_POST['is_graduate'] ?? 'no') !== 'yes' ? 'display:none' : '' ?>">
                         <div class="account__chapter">
-                            <h3 class="account__subtitle">
-                            Сведения о дипломе
-                            </h3>
-                            <button class="account__chapter-edit">Редактировать</button>
+                            <h3 class="account__subtitle">Сведения о дипломе</h3>
                         </div>
                         <div class="account__personal-list account__personal-list--short account__grid">
-                            <input type="text" placeholder="Серия бланка">
-                            <input type="text" placeholder="Номер бланка">
-                            <input type="text" placeholder="Дата выдачи">
-                            <textarea name="" id="" placeholder="Достижения"></textarea>
+                            <input type="text" name="diploma_series" placeholder="Серия бланка"
+                                   value="<?= htmlspecialchars($_POST['diploma_series'] ?? '') ?>">
+                            <input type="text" name="diploma_number" placeholder="Номер бланка"
+                                   value="<?= htmlspecialchars($_POST['diploma_number'] ?? '') ?>">
+                            <input type="text" name="diploma_date"   placeholder="Дата выдачи"
+                                   value="<?= htmlspecialchars($_POST['diploma_date'] ?? '') ?>">
                         </div>
                     </div>
 
-                    <div class="account__file">
-                        <div class="account__file-info">
-                            <div class="account__file-content account__photo-content">
-                                <label class="account__photo-upload">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="20" viewBox="0 0 16 20" fill="none">
-                                        <path d="M11.2871 0.5L15.5 4.88281V19.5H0.5V0.5H11.2871Z" stroke="black"/>
-                                    </svg>
-                                    Перетащите или <span>загрузите файл</span> PDF
-                                    <input type="file" class="account__photo-input" accept="image/png, image/jpeg">
-                                </label>
-                            </div>
-                        </div>                            
-                    </div>
+                    <!-- Выбор тарифа -->
                     <div class="membership-slider swiper">
                         <div class="swiper-wrapper">
                             <div class="swiper-slide membership-slider__card">
-                                <h3 class="membership-slider__title">
-                                    Базовое
-                                </h3>
-                                <p class="membership-slider__name">
-                                    5 000 Р
-                                </p>
-                                <p class="membership-slider__time">
-                                    ежегодно
-                                </p>
+                                <h3 class="membership-slider__title">Базовое</h3>
+                                <p class="membership-slider__name">5 000 Р</p>
+                                <p class="membership-slider__time">ежегодно</p>
                                 <ul class="membership-slider__list">
-                                    <li class="membership-slider__item">
-                                        Возможность размещения резюме на карьерной платформе Политехнического общества;
-                                    </li>
-                                    <li class="membership-slider__item">
-                                        Доступ в закрытый карьерный канал с вакансиями от профильных компаний;
-                                    </li>
-                                    <li class="membership-slider__item">
-                                        Участие в активностях, выставках и мероприятиях Политехнического общества;
-                                    </li>
-                                    <li class="membership-slider__item">
-                                        Доступ в электронную библиотеку МГТУ (в разработке);
-                                    </li>
-                                    <li class="membership-slider__item">
-                                        Доступ к витрине компетенций партнёров Политехнического общества, кафедр, студенческих конструкторских бюро и научно-образовательных центров МГТУ.
-                                    </li>
+                                    <li class="membership-slider__item">Возможность размещения резюме на карьерной платформе;</li>
+                                    <li class="membership-slider__item">Доступ в закрытый карьерный канал с вакансиями;</li>
+                                    <li class="membership-slider__item">Участие в активностях и мероприятиях общества;</li>
+                                    <li class="membership-slider__item">Доступ к витрине компетенций партнёров.</li>
                                 </ul>
-                                <button class="membership-slider__join btn btn-empty" data-fancybox data-src="#form-membership">Выбрать</button>
+                                <button type="button" class="membership-slider__join btn btn-empty select-plan" data-plan="basic">Выбрать</button>
                             </div>
                             <div class="swiper-slide membership-slider__card membership-slider__card--proffesional">
-                                <h3 class="membership-slider__title">
-                                    Профессиональное
-                                </h3>
-                                <p class="membership-slider__name">
-                                    50 000 Р
-                                </p>
-                                <p class="membership-slider__time">
-                                    ежегодно
-                                </p>
+                                <h3 class="membership-slider__title">Профессиональное</h3>
+                                <p class="membership-slider__name">50 000 Р</p>
+                                <p class="membership-slider__time">ежегодно</p>
                                 <button class="membership-slider__advantages">+ Возможности Базового</button>
                                 <ul class="membership-slider__list">
-                                    <li class="membership-slider__item">
-                                        Участие в закрытом чате членов общества уровня «Бизнес»;
-                                    </li>
-                                    <li class="membership-slider__item">
-                                        Размещение информации и новостей о компании на площадках Политехнического общества;
-                                    </li>
-                                    <li class="membership-slider__item">
-                                        Возможность предложить собственный проект для поиска спонсоров и поддержки Политехнического общества;
-                                    </li>
-                                    <li class="membership-slider__item">
-                                        Участие в бизнес-мероприятиях Политехнического общества в онлайн и очном форматах;
-                                    </li>
-                                    <li class="membership-slider__item">
-                                        Доступ к базе резюме выпускников на карьерной платформе Политехнического общества.
-                                    </li>
+                                    <li class="membership-slider__item">Участие в закрытом чате членов уровня «Бизнес»;</li>
+                                    <li class="membership-slider__item">Размещение информации о компании на площадках общества;</li>
+                                    <li class="membership-slider__item">Доступ к базе резюме выпускников.</li>
                                 </ul>
-                                <button class="membership-slider__join btn btn-empty" data-fancybox data-src="#form-membership">Выбрать</button>
+                                <button type="button" class="membership-slider__join btn btn-empty select-plan" data-plan="premium">Выбрать</button>
                             </div>
                             <div class="swiper-slide membership-slider__card membership-slider__card--honorary">
-                                <h3 class="membership-slider__title">
-                                    Партнёрское
-                                </h3>
-                                <p class="membership-slider__name membership-slider__name--small">
-                                    Индивидуальные условия
-                                </p>
-                                <p class="membership-slider__time">
-                                    обсуждается индивидуально
-                                </p>
+                                <h3 class="membership-slider__title">Партнёрское</h3>
+                                <p class="membership-slider__name membership-slider__name--small">Индивидуальные условия</p>
+                                <p class="membership-slider__time">обсуждается индивидуально</p>
                                 <button class="membership-slider__advantages">+ Возможности профессионального</button>
                                 <ul class="membership-slider__list">
-                                    <li class="membership-slider__item">
-                                        Участие в закрытых мероприятиях Политехнического общества;
-                                    </li>
-                                    <li class="membership-slider__item">
-                                        Право стать членом правления Политехнического общества выпускников МВТУ (МГТУ) им. Н.Э. Баумана;
-                                    </li>
-                                    <li class="membership-slider__item">
-                                        Участие в закрытом чате почётных членов Политехнического общества.
-                                    </li>
+                                    <li class="membership-slider__item">Участие в закрытых мероприятиях;</li>
+                                    <li class="membership-slider__item">Право стать членом правления.</li>
                                 </ul>
-                                <button class="membership-slider__join btn btn-empty" data-fancybox data-src="#form-membership">Выбрать</button>
-                            </div>
-                            <div class="swiper-slide membership-slider__card membership-slider__card--gratuitous">
-                               <h3 class="membership-slider__title">
-                                    Почётное
-                                </h3>
-                                <p class="membership-slider__time">
-                                    по результатам заполненной анкеты
-                                </p>
-                                <button class="membership-slider__advantages">+ Возможности Базового</button>
-                                <ul class="membership-slider__list">
-                                    <li class="membership-slider__item">
-                                        Для тех, кто внёс значительный вклад в развитие технической науки, образования, технологий и деятельности Политехнического общества.
-                                    </li>
-                                </ul>
-                                <button class="membership-slider__join btn btn-empty" data-fancybox data-src="#form-membership">Выбрать</button>
+                                <button type="button" class="membership-slider__join btn btn-empty select-plan" data-plan="partner">Выбрать</button>
                             </div>
                         </div>
                         <div class="swiper-pagination"></div>
                     </div>
+
                     <div class="join__politic">
                         <div class="join__politic-question">
                             <p class="join__politic-link">
@@ -217,172 +329,59 @@ $APPLICATION->SetTitle("Вступить в общество");
                             </p>
                             <div class="account__graduate-choice">
                                 <label class="account__graduate-item">
-                                    <input type="radio" name="subscribe" value="yes" class="account__graduate-input">
-                                    <span class="account__graduate-box"></span>
-                                    Да
+                                    <input type="radio" name="agree_charter" value="yes" class="account__graduate-input">
+                                    <span class="account__graduate-box"></span>Да
                                 </label>
-
                                 <label class="account__graduate-item">
-                                    <input type="radio" name="subscribe" value="no" class="account__graduate-input">
-                                    <span class="account__graduate-box"></span>
-                                    Нет
+                                    <input type="radio" name="agree_charter" value="no" class="account__graduate-input">
+                                    <span class="account__graduate-box"></span>Нет
                                 </label>
                             </div>
                         </div>
                         <div class="join__politic-question">
-                            <p class="join__politic-link">
-                                Согласен с <a href="#">политикой обработки ПДн</a>
-                            </p>
+                            <p class="join__politic-link">Согласен с <a href="#">политикой обработки ПДн</a></p>
                             <div class="account__graduate-choice">
                                 <label class="account__graduate-item">
-                                    <input type="radio" name="subscribe" value="yes" class="account__graduate-input">
-                                    <span class="account__graduate-box"></span>
-                                    Да
+                                    <input type="radio" name="agree_pd" value="yes" class="account__graduate-input">
+                                    <span class="account__graduate-box"></span>Да
                                 </label>
-
                                 <label class="account__graduate-item">
-                                    <input type="radio" name="subscribe" value="no" class="account__graduate-input">
-                                    <span class="account__graduate-box"></span>
-                                    Нет
-                                </label>
-                            </div>
-                        </div>                        
-                    </div>
-                    <button class="btn authorization__btn">Вступить</button>
-                </div>
-                <div class="join__wrapper">
-                    <h2 class="account__title main-title">Вы уже член общества</h2>
-                    <div class="account__chapter">
-                        <h3 class="account__subtitle">
-                           Ваш тариф
-                        </h3>
-                    </div>
-                     <div class="account__rate account__rate--proff">
-                        <img src="<?=SITE_TEMPLATE_PATH?>/assets/img/my_profile/rate-conus.png" alt="" class="account__rate-conus">
-                        <h4 class="account__rate-plan">
-                            Профессиональное
-                        </h4>
-                        <p class="account__rate-price">
-                            50 000 Р
-                        </p>
-                        <p class="account__rate-when">
-                            ежегодно
-                        </p>
-                        <p class="account__rate-advantages">
-                            + Возможности Базового
-                        </p>
-                        <ul class="account__rate-list">
-                            <li class="account__rate-item">
-                                Участие в закрытом чате членов общества уровня «Бизнес»;
-                            </li>
-                            <li class="account__rate-item">
-                                Размещение информации и новостей о компании на площадках Политехнического общества;
-                            </li>
-                            <li class="account__rate-item">
-                                Возможность предложить собственный проект для поиска спонсоров и поддержки Политехнического общества;
-                            </li>
-                            <li class="account__rate-item">
-                                Участие в бизнес-мероприятиях Политехнического общества в онлайн и очном форматах;
-                            </li>
-                            <li class="account__rate-item">
-                                Доступ к базе резюме выпускников на карьерной платформе Политехнического общества.
-                            </li>
-                        </ul>
-                        <div class="account__rate-buttons">
-                            <button class="account__rate-btn account__rate-btn--changes btn">Изменить тариф</button>
-                        </div>
-                    </div>
-                </div>
-                <div class="join__wrapper">
-                    <h2 class="account__title main-title">Вступить в общество</h2>
-                    <div class="account__chapter">
-                        <h3 class="account__subtitle">
-                           Личные данные
-                        </h3>
-                    </div>
-                     <div class="join__grid">
-                        <input type="text" placeholder="Фамилия">
-                        <input type="text" placeholder="Имя">
-                        <input type="text" placeholder="Отчество">
-                        <input type="text" placeholder="Компания">
-                        <input type="text" placeholder="Тема">
-                        <textarea name="" id="" placeholder="Комментарий"></textarea>
-                        <input type="email" placeholder="Електропочта">
-                        <input type="password" placeholder="Пароль">
-                    </div>
-                    <div class="account__graduate">
-                        <div class="account__chapter">
-                            <h3 class="account__subtitle">
-                                Выпускник МГТУ? 
-                            </h3>
-                        </div>
-                        <div class="account__graduate-choice">
-                            <label class="account__graduate-item">
-                                <input type="radio" name="subscribe" value="yes" class="account__graduate-input">
-                                <span class="account__graduate-box"></span>
-                                Да
-                            </label>
-
-                            <label class="account__graduate-item">
-                                <input type="radio" name="subscribe" value="no" class="account__graduate-input">
-                                <span class="account__graduate-box"></span>
-                                Нет
-                            </label>
-                        </div>
-                    </div>
-                    <div class="join__dont">
-                        <p>
-                            Если вы не являетесь членом «Политехнического общества выпускников МВТУ (МГТУ) им. Н.Э. Баумана» мы также будем рады обсудить возможные форматы сотрудничества.
-                        </p>
-                        <a href="mailto:info@bauman-polytech.ru" class="footer-mail">
-                            info@bauman-polytech.ru
-                        </a>
-                    </div>
-                    <div class="join__politic">
-                        <div class="join__politic-question">
-                            <p class="join__politic-link">
-                                Ознакомлен(а) и согласен(а) с <a href="#">Уставом</a> и <a href="#">Положением о членских взносах</a>
-                            </p>
-                            <div class="account__graduate-choice">
-                                <label class="account__graduate-item">
-                                    <input type="radio" name="subscribe" value="yes" class="account__graduate-input">
-                                    <span class="account__graduate-box"></span>
-                                    Да
-                                </label>
-
-                                <label class="account__graduate-item">
-                                    <input type="radio" name="subscribe" value="no" class="account__graduate-input">
-                                    <span class="account__graduate-box"></span>
-                                    Нет
+                                    <input type="radio" name="agree_pd" value="no" class="account__graduate-input">
+                                    <span class="account__graduate-box"></span>Нет
                                 </label>
                             </div>
                         </div>
-                        <div class="join__politic-question">
-                            <p class="join__politic-link">
-                                Согласен с <a href="#">политикой обработки ПДн</a>
-                            </p>
-                            <div class="account__graduate-choice">
-                                <label class="account__graduate-item">
-                                    <input type="radio" name="subscribe" value="yes" class="account__graduate-input">
-                                    <span class="account__graduate-box"></span>
-                                    Да
-                                </label>
-
-                                <label class="account__graduate-item">
-                                    <input type="radio" name="subscribe" value="no" class="account__graduate-input">
-                                    <span class="account__graduate-box"></span>
-                                    Нет
-                                </label>
-                            </div>
-                        </div>                        
                     </div>
-                    <button class="btn authorization__btn">Вступить</button>
-
-                </div>
-                
+                    <button type="submit" class="btn authorization__btn">Вступить</button>
+                </form>
             </div>
-             
-        </section>
-	</main>
+            <?php endif; ?>
 
-<?php require($_SERVER["DOCUMENT_ROOT"]."/bitrix/footer.php");?>
+        </div>
+    </section>
+</main>
+
+<script>
+// Показать/скрыть поля выпускника
+document.querySelectorAll('[name="is_graduate"]').forEach(function(r) {
+    r.addEventListener('change', function() {
+        var show = this.value === 'yes';
+        ['graduate-data','diploma-data'].forEach(function(id) {
+            var el = document.getElementById(id);
+            if (el) el.style.display = show ? '' : 'none';
+        });
+    });
+});
+// Выбор тарифа
+document.querySelectorAll('.select-plan').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+        var plan = this.getAttribute('data-plan');
+        var field = document.getElementById('membership_type');
+        if (field) field.value = plan;
+        document.querySelectorAll('.select-plan').forEach(function(b) { b.classList.remove('btn--active'); });
+        this.classList.add('btn--active');
+    });
+});
+</script>
+
+<?php require($_SERVER["DOCUMENT_ROOT"]."/bitrix/footer.php"); ?>
