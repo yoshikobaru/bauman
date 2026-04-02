@@ -37,6 +37,20 @@ define('IBLOCK_BOARD_ID',    4); // Правление
 define('HL_APPLICATIONS_ID', 2);
 
 /**
+ * HL-блоки карьерной платформы.
+ * ID присваиваются при запуске setup_career.php
+ */
+define('HL_VACANCIES_ID', 3);
+define('HL_RESUMES_ID',   4);
+
+/**
+ * Инфоблоки каталогов.
+ * ID присваиваются при запуске соответствующих setup-скриптов.
+ */
+define('IBLOCK_COMPETENCIES_ID', 5);
+define('IBLOCK_FUNDS_ID',        6); // после setup_funds.php
+
+/**
  * Email администратора для уведомлений о новых заявках.
  */
 define('PO_ADMIN_EMAIL', 'admin@bauman-polytech.ru');
