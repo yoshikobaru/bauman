@@ -3,29 +3,20 @@
  * ВРЕМЕННЫЙ файл для разработки — удалить после завершения Блока 1.
  * Создаёт группы пользователей и UF_* поля через REST API.
  */
+
+$controllersDir = $_SERVER['DOCUMENT_ROOT'] . '/local/artamonov-rest/controllers/';
+
 return [
     [
         'route'      => '/setup/install',
         'method'     => 'GET',
-        'controller' => 'SetupController',
+        'controller' => $controllersDir . 'SetupController.php',
         'action'     => 'install',
-        'security'   => [
-            'auth' => [
-                'required' => true,
-                'type'     => 'token',
-            ],
-        ],
     ],
     [
         'route'      => '/setup/status',
         'method'     => 'GET',
-        'controller' => 'SetupController',
+        'controller' => $controllersDir . 'SetupController.php',
         'action'     => 'status',
-        'security'   => [
-            'auth' => [
-                'required' => true,
-                'type'     => 'token',
-            ],
-        ],
     ],
 ];

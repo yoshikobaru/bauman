@@ -6,7 +6,7 @@
 class SetupController
 {
     /** Коды групп и их названия */
-    private static array $groups = [
+    private static $groups = [
         'PO_REGISTERED'     => 'Зарегистрированный (без членства)',
         'PO_MEMBER_BASIC'   => 'Член общества — Базовое',
         'PO_MEMBER_PREMIUM' => 'Член общества — Привилегированное',
@@ -15,7 +15,7 @@ class SetupController
     ];
 
     /** Пользовательские поля для сущности USER */
-    private static array $userFields = [
+    private static $userFields = [
         [
             'FIELD_NAME'        => 'UF_MEMBERSHIP_TYPE',
             'USER_TYPE_ID'      => 'string',
@@ -133,7 +133,7 @@ class SetupController
     /**
      * Показывает текущее состояние: какие группы и поля уже существуют.
      */
-    public function status(): array
+    public function status()
     {
         $existingGroups = [];
         $dbGroups = CGroup::GetList([], []);
@@ -171,7 +171,7 @@ class SetupController
     /**
      * Создаёт все группы и UF_* поля, пропуская уже существующие.
      */
-    public function install(): array
+    public function install()
     {
         $result = [
             'groups' => [],
