@@ -16,8 +16,8 @@ if (Bitrix\Main\Loader::includeModule('artamonov.rest')) {
  * ID заполняются после выполнения /api/setup/install.
  * Значения можно проверить через /api/setup/status.
  */
-define('PO_REGISTERED_ID',     0); // Зарегистрированный (без членства)
-define('PO_MEMBER_BASIC_ID',   0); // Член общества — Базовое
-define('PO_MEMBER_PREMIUM_ID', 0); // Член общества — Привилегированное
-define('PO_PARTNER_ID',        0); // Партнёр (юр. лицо)
-define('PO_MODERATOR_ID',      0); // Модератор / Сотрудник
+define('PO_REGISTERED_ID',     5); // Зарегистрированный (без членства)
+define('PO_MEMBER_BASIC_ID',   6); // Член общества — Базовое
+define('PO_MEMBER_PREMIUM_ID', 7); // Член общества — Привилегированное
+define('PO_PARTNER_ID',        8); // Партнёр (юр. лицо)
+define('PO_MODERATOR_ID',      9); // Модератор / Сотрудник
