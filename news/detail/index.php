@@ -65,6 +65,11 @@ if ($isEvent && $hlOk && defined('HL_APPLICATIONS_ID') && HL_APPLICATIONS_ID > 0
                 ]);
                 if ($res->isSuccess()) {
                     $regDone = true;
+                    po_sendAdminEmail('event_reg', [
+                        'Имя'      => $firstName, 'Фамилия'  => $lastName,
+                        'Email'    => $email,     'Телефон'  => $phone,
+                        'Telegram' => $telegram,  'Событие'  => $arElement['NAME'] ?? $elementId,
+                    ]);
                 } else {
                     $regError = implode('; ', $res->getErrorMessages());
                 }

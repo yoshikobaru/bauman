@@ -44,8 +44,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['d6_action'])) {
                             'request'    => trim($_POST['request'] ?? ''),
                         ], JSON_UNESCAPED_UNICODE),
                     ]);
-                    if ($res->isSuccess()) $d6Done = true;
-                    else $d6Error = 'Ошибка сохранения. Попробуйте позже.';
+                    if ($res->isSuccess()) {
+                        $d6Done = true;
+                        po_sendAdminEmail('competency_request', [
+                            'Компания' => $company, 'Имя'   => $fn,
+                            'Фамилия'  => trim($_POST['last_name'] ?? ''),
+                            'Email'    => $em,      'Запрос' => trim($_POST['request'] ?? ''),
+                        ]);
+                    } else {
+                        $d6Error = 'Ошибка сохранения. Попробуйте позже.';
+                    }
                 }
             } else {
                 $d6Done = true; // HL не настроен — просто принимаем

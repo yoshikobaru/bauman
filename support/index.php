@@ -52,7 +52,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['d2_action'])) {
         } else {
             $saved = true;
         }
-        if ($saved) $d2Done = true;
+        if ($saved) {
+            $d2Done = true;
+            po_sendAdminEmail('project_support', [
+                'Имя'      => $fn,    'Фамилия'  => $ln,
+                'Email'    => $email, 'Телефон'  => $phone,
+                'Проект'   => $project, 'Сумма'  => $amount,
+                'Тип'      => $donorType, 'Компания' => $company,
+            ]);
+        }
     }
 }
 

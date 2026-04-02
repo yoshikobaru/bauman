@@ -49,8 +49,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['d4_action'])) {
                 'email'      => $em, 'phone'      => trim($_POST['phone'] ?? ''),
                 'telegram'   => trim($_POST['telegram'] ?? ''),
             ]) : false;
-            if (!$hlOk || $saved) $d4Done = true;
-            else $d4Error = 'Ошибка сохранения. Попробуйте позже.';
+            if (!$hlOk || $saved) {
+                $d4Done = true;
+                po_sendAdminEmail('reference_visit', [
+                    'Имя'     => $fn, 'Фамилия' => $ln,
+                    'Email'   => $em, 'Телефон' => trim($_POST['phone'] ?? ''),
+                ]);
+            } else {
+                $d4Error = 'Ошибка сохранения. Попробуйте позже.';
+            }
         }
     }
 }
@@ -74,8 +81,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['d5_action'])) {
             'email'      => $em,     'phone'     => trim($_POST['d5_phone'] ?? ''),
             'site'       => trim($_POST['d5_site']  ?? ''),
         ]) : false;
-        if (!$hlOk || $saved) $d5Done = true;
-        else $d5Error = 'Ошибка сохранения. Попробуйте позже.';
+        if (!$hlOk || $saved) {
+            $d5Done = true;
+            po_sendAdminEmail('reference_org', [
+                'Компания' => $company, 'О компании' => $about,
+                'Имя'      => $fn,     'Фамилия'    => $ln,
+                'Email'    => $em,
+            ]);
+        } else {
+            $d5Error = 'Ошибка сохранения. Попробуйте позже.';
+        }
     }
 }
 ?>

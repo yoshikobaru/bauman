@@ -5,16 +5,29 @@ $APPLICATION->SetTitle("Проекты");
 use Bitrix\Main\Loader;
 $iblockOk = Loader::includeModule('iblock');
 
+// ?status=active | completed | (all by default)
+$statusFilter = $_GET['status'] ?? 'all';
+if (!in_array($statusFilter, ['active', 'completed', 'all'])) {
+    $statusFilter = 'all';
+}
+
 $dbProjects = null;
 if ($iblockOk && defined('IBLOCK_PROJECTS_ID') && IBLOCK_PROJECTS_ID > 0) {
+    $arFilter = ['IBLOCK_ID' => IBLOCK_PROJECTS_ID, 'ACTIVE' => 'Y'];
+    if ($statusFilter !== 'all') {
+        // Filter by PROJECT_STATUS property value
+        $arFilter['PROPERTY_PROJECT_STATUS'] = $statusFilter;
+    }
     $dbProjects = CIBlockElement::GetList(
         ['SORT' => 'ASC'],
-        ['IBLOCK_ID' => IBLOCK_PROJECTS_ID, 'ACTIVE' => 'Y'],
+        $arFilter,
         false,
         false,
         ['ID', 'NAME', 'CODE', 'DATE_ACTIVE_FROM', 'PREVIEW_TEXT', 'PREVIEW_PICTURE', 'DETAIL_PAGE_URL']
     );
 }
+
+$statusLabels = ['all' => 'Все', 'active' => 'Активные', 'completed' => 'Завершённые'];
 ?>
 <main>
     <!-- banner-other -->
@@ -37,7 +50,19 @@ if ($iblockOk && defined('IBLOCK_PROJECTS_ID') && IBLOCK_PROJECTS_ID > 0) {
     <!-- visits / проекты из CMS -->
     <section class="visits">
         <div class="container">
-            <h2 class="main-title visits__title">Текущие проекты</h2>
+            <h2 class="main-title visits__title">Проекты сообщества</h2>
+
+            <!-- Фильтр по статусу -->
+            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:32px;">
+                <?php foreach ($statusLabels as $key => $label): ?>
+                <a href="/projects/?status=<?= $key ?>"
+                   class="btn <?= $statusFilter === $key ? '' : 'btn-transparent' ?>"
+                   style="<?= $statusFilter === $key ? '' : 'opacity:0.7;' ?>">
+                    <?= $label ?>
+                </a>
+                <?php endforeach; ?>
+            </div>
+
             <div class="visits__list">
                 <?php if ($dbProjects):
                     $hasItems = false;
@@ -72,7 +97,7 @@ if ($iblockOk && defined('IBLOCK_PROJECTS_ID') && IBLOCK_PROJECTS_ID > 0) {
                 </div>
                 <?php endwhile;
                     if (!$hasItems): ?>
-                    <p style="color:#888">Проекты появятся здесь после добавления в административной панели.</p>
+                    <p style="color:#888">Проекты по выбранному фильтру не найдены.</p>
                 <?php endif;
                 else: ?>
                     <p style="color:#888">Контент из CMS недоступен — настройте инфоблоки в <code>local/php_interface/init.php</code>.</p>

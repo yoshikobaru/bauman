@@ -50,7 +50,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['d7_action'])) {
         } else {
             $saved = true; // HL не настроен — принимаем без записи
         }
-        if ($saved) $d7Done = true;
+        if ($saved) {
+            $d7Done = true;
+            po_sendAdminEmail('partnership', [
+                'Фамилия'  => $ln,     'Имя'      => $fn,
+                'Отчество' => $sn,     'Email'    => $email,
+                'Компания' => $company, 'Сайт'    => $site,
+            ]);
+        }
     } else {
         $d7Error = implode('; ', $d7Errors);
     }

@@ -5,15 +5,26 @@ $APPLICATION->SetTitle("Новости и события");
 use Bitrix\Main\Loader;
 $iblockOk = Loader::includeModule('iblock');
 
-// Собираем ID активных инфоблоков
+// ?type=news | events | (all by default)
+$typeFilter = $_GET['type'] ?? 'all';
+if (!in_array($typeFilter, ['news', 'events', 'all'])) {
+    $typeFilter = 'all';
+}
+
+// Собираем ID нужных инфоблоков
 $iblockIds = [];
 if ($iblockOk) {
-    foreach (['IBLOCK_NEWS_ID', 'IBLOCK_EVENTS_ID'] as $c) {
-        if (defined($c) && constant($c) > 0) {
-            $iblockIds[] = constant($c);
-        }
+    if ($typeFilter === 'all' || $typeFilter === 'news') {
+        if (defined('IBLOCK_NEWS_ID') && IBLOCK_NEWS_ID > 0)
+            $iblockIds[] = IBLOCK_NEWS_ID;
+    }
+    if ($typeFilter === 'all' || $typeFilter === 'events') {
+        if (defined('IBLOCK_EVENTS_ID') && IBLOCK_EVENTS_ID > 0)
+            $iblockIds[] = IBLOCK_EVENTS_ID;
     }
 }
+
+$filterLabels = ['all' => 'Все', 'news' => 'Новости', 'events' => 'События'];
 ?>
 <main>
     <section class="breadcrumbs">
@@ -28,6 +39,18 @@ if ($iblockOk) {
     <section class="news news-page">
         <div class="container">
             <h2 class="main-title news__title">Новости и события</h2>
+
+            <!-- Фильтр по типу -->
+            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:32px;">
+                <?php foreach ($filterLabels as $key => $label): ?>
+                <a href="/news/?type=<?= $key ?>"
+                   class="btn <?= $typeFilter === $key ? '' : 'btn-transparent' ?>"
+                   style="<?= $typeFilter === $key ? '' : 'opacity:0.7;' ?>">
+                    <?= $label ?>
+                </a>
+                <?php endforeach; ?>
+            </div>
+
             <div class="news__wrapper">
                 <?php if ($iblockOk && !empty($iblockIds)):
                     $dbItems = CIBlockElement::GetList(
@@ -49,8 +72,12 @@ if ($iblockOk) {
                             ? date('d.m.Y', strtotime($row['DATE_ACTIVE_FROM']))
                             : '';
                         $link = '/news/detail/?id=' . (int)$row['ID'];
+                        $isEvent = defined('IBLOCK_EVENTS_ID') && (int)$row['IBLOCK_ID'] === IBLOCK_EVENTS_ID;
                 ?>
                 <a href="<?= $link ?>" class="news__card">
+                    <?php if ($isEvent): ?>
+                    <span class="news__badge" style="position:absolute;top:10px;left:10px;background:#e31e24;color:#fff;font-size:11px;padding:2px 8px;border-radius:4px;">Событие</span>
+                    <?php endif; ?>
                     <img src="<?= htmlspecialchars($imgSrc) ?>" alt="">
                     <div class="news__content">
                         <h3 class="news__card-title"><?= htmlspecialchars($row['NAME']) ?></h3>

@@ -153,105 +153,33 @@ $APPLICATION->SetTitle("Политехническое Общество Выпу
 						Члены правления Политехнического общества
 					</h2>
 					<div class="boards__list">
+<?php
+if (defined('IBLOCK_BOARD_ID') && IBLOCK_BOARD_ID > 0 && \Bitrix\Main\Loader::includeModule('iblock')):
+    $dbBoard = CIBlockElement::GetList(
+        ['SORT' => 'ASC'],
+        ['IBLOCK_ID' => IBLOCK_BOARD_ID, 'ACTIVE' => 'Y'],
+        false,
+        ['nTopCount' => 12],
+        ['ID', 'NAME', 'PREVIEW_PICTURE', 'PREVIEW_TEXT']
+    );
+    while ($board = $dbBoard->GetNext()):
+        $photoSrc = $board['PREVIEW_PICTURE']
+            ? CFile::GetPath($board['PREVIEW_PICTURE'])
+            : SITE_TEMPLATE_PATH . '/assets/img/board-placeholder.png';
+?>
 						<div class="boards__item">
-							<img src="<?=SITE_TEMPLATE_PATH?>/assets/img/board-img-1.png" alt="Абакумов Евгений" class="boards__item-image">
+							<img src="<?= htmlspecialchars($photoSrc) ?>" alt="<?= htmlspecialchars($board['NAME']) ?>" class="boards__item-image">
 							<h3 class="boards__item-title">
-								Абакумов Евгений
+								<?= htmlspecialchars($board['NAME']) ?>
 							</h3>
 							<p class="boards__item-text">
-								Директор по информационным технологиям госкорпорации «Росатом»
+								<?= htmlspecialchars($board['PREVIEW_TEXT']) ?>
 							</p>
 						</div>
-						<div class="boards__item">
-							<img src="<?=SITE_TEMPLATE_PATH?>/assets/img/board-img-2.png" alt="Нагайцев Максим" class="boards__item-image">
-							<h3 class="boards__item-title">
-								Нагайцев Максим
-							</h3>
-							<p class="boards__item-text">
-								Доктор технических наук
-							</p>
-						</div>
-						<div class="boards__item">
-							<img src="<?=SITE_TEMPLATE_PATH?>/assets/img/board-img-3.png" alt="Гордин Михаил" class="boards__item-image">
-							<h3 class="boards__item-title">
-								Гордин Михаил
-							</h3>
-							<p class="boards__item-text">
-								Ректор МГТУ им. Н.Э. Баумана Кандидат технических наук «Росатом»
-							</p>
-						</div>
-						<div class="boards__item">
-							<img src="<?=SITE_TEMPLATE_PATH?>/assets/img/board-img-4.png" alt="Кондратьев Андрей" class="boards__item-image">
-							<h3 class="boards__item-title">
-								Кондратьев Андрей
-							</h3>
-							<p class="boards__item-text">
-								Генеральный директор АО «РТ-ФИНАНС», председатель совета директоров НОВИКОМа
-							</p>
-						</div>
-						<div class="boards__item">
-							<img src="<?=SITE_TEMPLATE_PATH?>/assets/img/board-img-5.png" alt="Майоров Игорь " class="boards__item-image">
-							<h3 class="boards__item-title">
-								Майоров Игорь 
-							</h3>
-							<p class="boards__item-text">
-								Генеральный директор METEOR Lift
-							</p>
-						</div>
-						<div class="boards__item">
-							<img src="<?=SITE_TEMPLATE_PATH?>/assets/img/board-img-6.png" alt="" class="boards__item-image">
-							<h3 class="boards__item-title">
-								Фетисов Алексей
-							</h3>
-							<p class="boards__item-text">
-								Генеральный директор Холдинга Т1
-							</p>
-						</div>
-						<div class="boards__item">
-							<img src="<?=SITE_TEMPLATE_PATH?>/assets/img/board-img-7.png" alt="Федоров Алексей" class="boards__item-image">
-							<h3 class="boards__item-title">
-								Федоров Алексей
-							</h3>
-							<p class="boards__item-text">
-								Вице-Президент «Газпромбанк»
-							</p>
-						</div>
-						<div class="boards__item">
-							<img src="<?=SITE_TEMPLATE_PATH?>/assets/img/board-img-8.png" alt="Шелобков Алексей" class="boards__item-image">
-							<h3 class="boards__item-title">
-								Шелобков Алексей
-							</h3>
-							<p class="boards__item-text">
-								Генеральный директор ООО «Бюро 1440»
-							</p>
-						</div>
-						<div class="boards__item">
-							<img src="<?=SITE_TEMPLATE_PATH?>/assets/img/board-img-9.png" alt="Дабагов Анатолий" class="boards__item-image">
-							<h3 class="boards__item-title">
-								Дабагов Анатолий
-							</h3>
-							<p class="boards__item-text">
-								Кандидат технических наук, президент МТЛ
-							</p>
-						</div>
-						<div class="boards__item">
-							<img src="<?=SITE_TEMPLATE_PATH?>/assets/img/board-img-10.png" alt="Краснов Дмитрий " class="boards__item-image">
-							<h3 class="boards__item-title">
-								Краснов Дмитрий 
-							</h3>
-							<p class="boards__item-text">
-								Кандидат технических наук, Председатель Правления Промышленной Группы «Приводная Техника»
-							</p>
-						</div>
-						<div class="boards__item">
-							<img src="<?=SITE_TEMPLATE_PATH?>/assets/img/board-img-11.png" alt="Пивень Валерий " class="boards__item-image">
-							<h3 class="boards__item-title">
-								Пивень Валерий 
-							</h3>
-							<p class="boards__item-text">
-								Директор департамента станкостроения и тяжелого машиностроения
-							</p>
-						</div>
+<?php
+    endwhile;
+endif;
+?>
 					</div>
 				</div>
 			</div>
@@ -270,34 +198,33 @@ $APPLICATION->SetTitle("Политехническое Общество Выпу
 							Наши резиденты запустили важные проекты Политеха. Станьте частью братства и используйте все возможности сообщества.
 						</p>
 					</div>
+<?php
+if (defined('IBLOCK_PROJECTS_ID') && IBLOCK_PROJECTS_ID > 0 && \Bitrix\Main\Loader::includeModule('iblock')):
+    $dbProjects = CIBlockElement::GetList(
+        ['SORT' => 'ASC'],
+        ['IBLOCK_ID' => IBLOCK_PROJECTS_ID, 'ACTIVE' => 'Y'],
+        false,
+        ['nTopCount' => 4],
+        ['ID', 'NAME', 'PREVIEW_PICTURE']
+    );
+    while ($proj = $dbProjects->GetNext()):
+        $projImg = $proj['PREVIEW_PICTURE']
+            ? CFile::GetPath($proj['PREVIEW_PICTURE'])
+            : SITE_TEMPLATE_PATH . '/assets/img/initiative-img-1.png';
+?>
 					<div class="initiative__card">
 						<h3>
-							Конференция PolytechExpo
+							<?= htmlspecialchars($proj['NAME']) ?>
 						</h3>
-						<img src="<?=SITE_TEMPLATE_PATH?>/assets/img/initiative-img-1.png" alt="" class="initiative__image desk-block" />
-						<img src="<?=SITE_TEMPLATE_PATH?>/assets/img/initiative-img-mob-1.png" alt="" class="initiative__image desk-none" />
+						<a href="/projects/detail/?id=<?= (int)$proj['ID'] ?>">
+							<img src="<?= htmlspecialchars($projImg) ?>" alt="<?= htmlspecialchars($proj['NAME']) ?>" class="initiative__image desk-block" />
+							<img src="<?= htmlspecialchars($projImg) ?>" alt="<?= htmlspecialchars($proj['NAME']) ?>" class="initiative__image desk-none" />
+						</a>
 					</div>
-					<div class="initiative__card">
-						<h3>
-							Конференция Встреча выпускников
-						</h3>
-						<img src="<?=SITE_TEMPLATE_PATH?>/assets/img/initiative-img-2.png" alt="" class="initiative__image desk-block" />
-						<img src="<?=SITE_TEMPLATE_PATH?>/assets/img/initiative-img-mob-2.png" alt="" class="initiative__image desk-none" />
-					</div>
-					<div class="initiative__card">
-						<h3>
-							Попечительский совет
-						</h3>
-						<img src="<?=SITE_TEMPLATE_PATH?>/assets/img/initiative-img-3.png" alt="" class="initiative__image desk-block" />
-						<img src="<?=SITE_TEMPLATE_PATH?>/assets/img/initiative-img-mob-3.png" alt="" class="initiative__image desk-none" />
-					</div>
-					<div class="initiative__card">
-						<h3>
-							Реставрации Ротонды
-						</h3>
-						<img src="<?=SITE_TEMPLATE_PATH?>/assets/img/initiative-img-4.png" alt="" class="initiative__image desk-block" />
-						<img src="<?=SITE_TEMPLATE_PATH?>/assets/img/initiative-img-mob-4.png" alt="" class="initiative__image desk-none" />
-					</div>
+<?php
+    endwhile;
+endif;
+?>
 				</div>
 			</div>
 			<!-- /.container -->
@@ -580,104 +507,47 @@ $APPLICATION->SetTitle("Политехническое Общество Выпу
 					Новости и события
 				</h2>
 				<div class="news__wrapper">
-					<a href="#" class="news__card">
-						<img src="<?=SITE_TEMPLATE_PATH?>/assets/img/news-img.png" alt="">
+<?php
+if (\Bitrix\Main\Loader::includeModule('iblock')):
+    $newsIblockIds = [];
+    if (defined('IBLOCK_NEWS_ID')   && IBLOCK_NEWS_ID   > 0) $newsIblockIds[] = IBLOCK_NEWS_ID;
+    if (defined('IBLOCK_EVENTS_ID') && IBLOCK_EVENTS_ID > 0) $newsIblockIds[] = IBLOCK_EVENTS_ID;
+    if (!empty($newsIblockIds)):
+        $dbNews = CIBlockElement::GetList(
+            ['DATE_ACTIVE_FROM' => 'DESC', 'ID' => 'DESC'],
+            ['IBLOCK_ID' => $newsIblockIds, 'ACTIVE' => 'Y'],
+            false,
+            ['nTopCount' => 6],
+            ['ID', 'NAME', 'DATE_ACTIVE_FROM', 'PREVIEW_PICTURE', 'IBLOCK_ID']
+        );
+        while ($newsItem = $dbNews->GetNext()):
+            $newsImg = $newsItem['PREVIEW_PICTURE']
+                ? CFile::GetPath($newsItem['PREVIEW_PICTURE'])
+                : SITE_TEMPLATE_PATH . '/assets/img/news-img.png';
+            $newsDate = $newsItem['DATE_ACTIVE_FROM']
+                ? date('d.m.Y', strtotime($newsItem['DATE_ACTIVE_FROM']))
+                : '';
+?>
+					<a href="/news/detail/?id=<?= (int)$newsItem['ID'] ?>" class="news__card">
+						<img src="<?= htmlspecialchars($newsImg) ?>" alt="<?= htmlspecialchars($newsItem['NAME']) ?>">
 						<div class="news__content">
 							<h3 class="news__card-title">
-								Бауманский университет пилотирует создание Фонда целевого капитала.
+								<?= htmlspecialchars($newsItem['NAME']) ?>
 							</h3>
 							<div class="news__row">
 								<p class="news__date">
-									11.04.2025
-								</p>
-								<p class="news__time">
-									25 мин
+									<?= $newsDate ?>
 								</p>
 							</div>
 						</div>
 					</a>
-					<a href="#" class="news__card">
-						<img src="<?=SITE_TEMPLATE_PATH?>/assets/img/news-img.png" alt="">
-						<div class="news__content">
-							<h3 class="news__card-title">
-								Бауманский университет пилотирует создание Фонда целевого капитала.
-							</h3>
-							<div class="news__row">
-								<p class="news__date">
-									11.04.2025
-								</p>
-								<p class="news__time">
-									25 мин
-								</p>
-							</div>
-						</div>
-					</a>
-					<a href="#" class="news__card">
-						<img src="<?=SITE_TEMPLATE_PATH?>/assets/img/news-img.png" alt="">
-						<div class="news__content">
-							<h3 class="news__card-title">
-								Бауманский университет пилотирует создание Фонда целевого капитала.
-							</h3>
-							<div class="news__row">
-								<p class="news__date">
-									11.04.2025
-								</p>
-								<p class="news__time">
-									25 мин
-								</p>
-							</div>
-						</div>
-					</a>
-					<a href="#" class="news__card">
-						<img src="<?=SITE_TEMPLATE_PATH?>/assets/img/news-img.png" alt="">
-						<div class="news__content">
-							<h3 class="news__card-title">
-								Бауманский университет пилотирует создание Фонда целевого капитала.
-							</h3>
-							<div class="news__row">
-								<p class="news__date">
-									11.04.2025
-								</p>
-								<p class="news__time">
-									25 мин
-								</p>
-							</div>
-						</div>
-					</a>
-					<a href="#" class="news__card">
-						<img src="<?=SITE_TEMPLATE_PATH?>/assets/img/news-img.png" alt="">
-						<div class="news__content">
-							<h3 class="news__card-title">
-								Бауманский университет пилотирует создание Фонда целевого капитала.
-							</h3>
-							<div class="news__row">
-								<p class="news__date">
-									11.04.2025
-								</p>
-								<p class="news__time">
-									25 мин
-								</p>
-							</div>
-						</div>
-					</a>
-					<a href="#" class="news__card">
-						<img src="<?=SITE_TEMPLATE_PATH?>/assets/img/news-img.png" alt="">
-						<div class="news__content">
-							<h3 class="news__card-title">
-								Бауманский университет пилотирует создание Фонда целевого капитала.
-							</h3>
-							<div class="news__row">
-								<p class="news__date">
-									11.04.2025
-								</p>
-								<p class="news__time">
-									25 мин
-								</p>
-							</div>
-						</div>
-					</a>
+<?php
+        endwhile;
+    endif;
+endif;
+?>
 				</div>
-				<button class="btn news__btn btn-transparent">Все новости</button>
+				<a href="/news/" class="btn news__btn btn-transparent">Все новости</a>
 			</div>
 			<!-- /.container -->
 		</section>

@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 require($_SERVER["DOCUMENT_ROOT"]."/bitrix/header.php");
 $APPLICATION->SetTitle("О нас");
 ?>
@@ -64,105 +64,35 @@ $APPLICATION->SetTitle("О нас");
 						Члены правления Политехнического общества
 					</h2>
 					<div class="boards__list">
-						<div class="boards__item" data-fancybox data-src="#form-boards-1">
-							<img src="<?=SITE_TEMPLATE_PATH?>/assets/img/board-img-1.png" alt="Абакумов Евгений" class="boards__item-image">
+<?php
+$boardMembers = [];
+if (defined('IBLOCK_BOARD_ID') && IBLOCK_BOARD_ID > 0 && \Bitrix\Main\Loader::includeModule('iblock')):
+    $dbBoardAbout = CIBlockElement::GetList(
+        ['SORT' => 'ASC'],
+        ['IBLOCK_ID' => IBLOCK_BOARD_ID, 'ACTIVE' => 'Y'],
+        false,
+        false,
+        ['ID', 'NAME', 'PREVIEW_PICTURE', 'PREVIEW_TEXT', 'DETAIL_TEXT']
+    );
+    while ($bm = $dbBoardAbout->GetNext()):
+        $boardMembers[] = $bm;
+        $photoSrc = $bm['PREVIEW_PICTURE']
+            ? CFile::GetPath($bm['PREVIEW_PICTURE'])
+            : SITE_TEMPLATE_PATH . '/assets/img/board-placeholder.png';
+?>
+						<div class="boards__item" data-fancybox data-src="#board-modal-<?= (int)$bm['ID'] ?>" style="cursor:pointer;">
+							<img src="<?= htmlspecialchars($photoSrc) ?>" alt="<?= htmlspecialchars($bm['NAME']) ?>" class="boards__item-image">
 							<h3 class="boards__item-title">
-								Абакумов Евгений Михайлович
+								<?= htmlspecialchars($bm['NAME']) ?>
 							</h3>
 							<p class="boards__item-text">
-								Директор по информационным технологиям госкорпорации «Росатом»
+								<?= htmlspecialchars($bm['PREVIEW_TEXT']) ?>
 							</p>
 						</div>
-						<div class="boards__item">
-							<img src="<?=SITE_TEMPLATE_PATH?>/assets/img/board-img-2.png" alt="Нагайцев Максим" class="boards__item-image">
-							<h3 class="boards__item-title">
-								Нагайцев Максим Валерьевич
-							</h3>
-							<p class="boards__item-text">
-								Доктор технических наук
-							</p>
-						</div>
-						<div class="boards__item">
-							<img src="<?=SITE_TEMPLATE_PATH?>/assets/img/board-img-3.png" alt="Гордин Михаил" class="boards__item-image">
-							<h3 class="boards__item-title">
-								Гордин Михаил Валерьевич
-							</h3>
-							<p class="boards__item-text">
-								Ректор МГТУ им. Н.Э. Баумана Кандидат технических наук «Росатом»
-							</p>
-						</div>
-						<div class="boards__item">
-							<img src="<?=SITE_TEMPLATE_PATH?>/assets/img/board-img-4.png" alt="Кондратьев Андрей" class="boards__item-image">
-							<h3 class="boards__item-title">
-								Кондратьев Андрей Валерьевич
-							</h3>
-							<p class="boards__item-text">
-								Генеральный директор АО «РТ-ФИНАНС», председатель совета директоров НОВИКОМа
-							</p>
-						</div>
-						<div class="boards__item">
-							<img src="<?=SITE_TEMPLATE_PATH?>/assets/img/board-img-5.png" alt="Майоров Игорь " class="boards__item-image">
-							<h3 class="boards__item-title">
-								Майоров Игорь Николаевич
-							</h3>
-							<p class="boards__item-text">
-								Генеральный директор METEOR Lift
-							</p>
-						</div>
-						<div class="boards__item">
-							<img src="<?=SITE_TEMPLATE_PATH?>/assets/img/board-img-6.png" alt="" class="boards__item-image">
-							<h3 class="boards__item-title">
-								Фетисов Алексей Вячеславович
-							</h3>
-							<p class="boards__item-text">
-								Генеральный директор Холдинга Т1
-							</p>
-						</div>
-						<div class="boards__item">
-							<img src="<?=SITE_TEMPLATE_PATH?>/assets/img/board-img-7.png" alt="Федоров Алексей" class="boards__item-image">
-							<h3 class="boards__item-title">
-								Федоров Алексей Константинович
-							</h3>
-							<p class="boards__item-text">
-								Вице-Президент «Газпромбанк»
-							</p>
-						</div>
-						<div class="boards__item">
-							<img src="<?=SITE_TEMPLATE_PATH?>/assets/img/board-img-8.png" alt="Шелобков Алексей" class="boards__item-image">
-							<h3 class="boards__item-title">
-								Шелобков Алексей Анатольевич
-							</h3>
-							<p class="boards__item-text">
-								Генеральный директор ООО «Бюро 1440»
-							</p>
-						</div>
-						<div class="boards__item">
-							<img src="<?=SITE_TEMPLATE_PATH?>/assets/img/board-img-9.png" alt="Дабагов Анатолий" class="boards__item-image">
-							<h3 class="boards__item-title">
-								Дабагов Анатолий Рудольфович
-							</h3>
-							<p class="boards__item-text">
-								Кандидат технических наук, президент МТЛ
-							</p>
-						</div>
-						<div class="boards__item">
-							<img src="<?=SITE_TEMPLATE_PATH?>/assets/img/board-img-10.png" alt="Краснов Дмитрий " class="boards__item-image">
-							<h3 class="boards__item-title">
-								Краснов Дмитрий Валерьевич
-							</h3>
-							<p class="boards__item-text">
-								Кандидат технических наук, Председатель Правления Промышленной Группы «Приводная Техника»
-							</p>
-						</div>
-						<div class="boards__item">
-							<img src="<?=SITE_TEMPLATE_PATH?>/assets/img/board-img-11.png" alt="Пивень Валерий " class="boards__item-image">
-							<h3 class="boards__item-title">
-								Пивень Валерий Вячеславович
-							</h3>
-							<p class="boards__item-text">
-								Директор департамента станкостроения и тяжелого машиностроения
-							</p>
-						</div>
+<?php
+    endwhile;
+endif;
+?>
 					</div>
 				</div>
 			</div>
@@ -503,24 +433,24 @@ $APPLICATION->SetTitle("О нас");
 		</section>
 		
 	</main>
-<div class="form-boards" id="form-boards-1" style="display:none;max-width:1100px;">
-		<div class="form-boards__wrapper">
-			<img src="<?=SITE_TEMPLATE_PATH?>/assets/img/board-img-1.png" alt="" class="form-boards__image">
-			<div class="form-boards__content">
-				<h2>
-					Абакумов Евгений Михайлович
-				</h2>
-				<p>
-					<strong>2003–2018 годы </strong>— ВНИИА им. Н.Л. Духова (входит в контургоскорпорации «Росатом»). Занимал должности инженера, инженера ІІ категории, инженера | категории, начальника группы, заместителя начальника конструкторского отдела, начальника отделения, начальника научно-исследовательского отделения, заместителя директора по информационным технологиям и системам управления.
-				</p>
-				<p>
-					<strong>2018–2020 годы</strong> — директор департамента информационных технологий госкорпорации «Росатом».
-				</p>
-				<p>
-					С<strong> 2020 года</strong> занимает должность директора по информационным технологиям госкорпорации «Росатом». Входит в состав экспертного совета по программному обеспечению при Минцифры.
-				</p>
-			</div>
+<?php foreach ($boardMembers as $bm):
+    $mPhotoSrc = $bm['PREVIEW_PICTURE']
+        ? CFile::GetPath($bm['PREVIEW_PICTURE'])
+        : SITE_TEMPLATE_PATH . '/assets/img/board-placeholder.png';
+?>
+<div class="form-boards" id="board-modal-<?= (int)$bm['ID'] ?>" style="display:none;max-width:1100px;">
+	<div class="form-boards__wrapper">
+		<img src="<?= htmlspecialchars($mPhotoSrc) ?>" alt="<?= htmlspecialchars($bm['NAME']) ?>" class="form-boards__image">
+		<div class="form-boards__content">
+			<h2><?= htmlspecialchars($bm['NAME']) ?></h2>
+			<?php if (!empty($bm['DETAIL_TEXT'])): ?>
+				<div><?= $bm['DETAIL_TEXT'] ?></div>
+			<?php else: ?>
+				<p><?= htmlspecialchars($bm['PREVIEW_TEXT']) ?></p>
+			<?php endif; ?>
 		</div>
 	</div>
+</div>
+<?php endforeach; ?>
 
 <?php require($_SERVER["DOCUMENT_ROOT"]."/bitrix/footer.php");?>
