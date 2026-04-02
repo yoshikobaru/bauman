@@ -1,20 +1,13 @@
 <?php
 /**
  * ВРЕМЕННЫЙ скрипт — удалить после выполнения Блока 1.
- * Создаёт группы пользователей и UF_* поля.
- * Запускать однократно: https://bauman-polytech.ru/local/setup_block1.php
+ * URL: https://bauman-polytech.ru/setup_block1.php
  */
 
-define('NO_KEEP_STATISTIC', true);
-define('NO_AGENT_STATISTIC', true);
-define('NO_AGENT_CHECK', true);
-define('DisableEventsCheck', true);
-
-$_SERVER['DOCUMENT_ROOT'] = realpath(__DIR__ . '/..');
-require_once $_SERVER['DOCUMENT_ROOT'] . '/bitrix/modules/main/include/prolog_before.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/bitrix/header.php';
 
 if (!$USER->IsAdmin()) {
-    die('Доступ запрещён. Войдите как администратор.');
+    LocalRedirect('/');
 }
 
 $groups = [
@@ -26,26 +19,26 @@ $groups = [
 ];
 
 $userFields = [
-    ['FIELD_NAME' => 'UF_MEMBERSHIP_TYPE',    'USER_TYPE_ID' => 'string',   'SORT' => 100, 'LABEL' => 'Тип членства',           'HINT' => 'basic / premium / partner / honorary'],
-    ['FIELD_NAME' => 'UF_MEMBERSHIP_STATUS',  'USER_TYPE_ID' => 'string',   'SORT' => 110, 'LABEL' => 'Статус заявки',          'HINT' => 'pending / active / rejected'],
-    ['FIELD_NAME' => 'UF_MEMBERSHIP_EXPIRES', 'USER_TYPE_ID' => 'datetime', 'SORT' => 120, 'LABEL' => 'Членство до',            'HINT' => ''],
-    ['FIELD_NAME' => 'UF_GRADUATE_YEAR',      'USER_TYPE_ID' => 'integer',  'SORT' => 200, 'LABEL' => 'Год окончания МГТУ',     'HINT' => ''],
-    ['FIELD_NAME' => 'UF_GRADUATE_DEPT',      'USER_TYPE_ID' => 'string',   'SORT' => 210, 'LABEL' => 'Кафедра / факультет',   'HINT' => ''],
-    ['FIELD_NAME' => 'UF_TELEGRAM',           'USER_TYPE_ID' => 'string',   'SORT' => 220, 'LABEL' => 'Telegram',               'HINT' => ''],
-    ['FIELD_NAME' => 'UF_DIPLOMA_SERIES',     'USER_TYPE_ID' => 'string',   'SORT' => 300, 'LABEL' => 'Серия диплома',          'HINT' => ''],
-    ['FIELD_NAME' => 'UF_DIPLOMA_NUMBER',     'USER_TYPE_ID' => 'string',   'SORT' => 310, 'LABEL' => 'Номер диплома',          'HINT' => ''],
-    ['FIELD_NAME' => 'UF_DIPLOMA_DATE',       'USER_TYPE_ID' => 'string',   'SORT' => 320, 'LABEL' => 'Дата выдачи диплома',   'HINT' => ''],
+    ['FIELD_NAME' => 'UF_MEMBERSHIP_TYPE',    'USER_TYPE_ID' => 'string',   'SORT' => 100, 'LABEL' => 'Тип членства',            'HINT' => 'basic / premium / partner / honorary'],
+    ['FIELD_NAME' => 'UF_MEMBERSHIP_STATUS',  'USER_TYPE_ID' => 'string',   'SORT' => 110, 'LABEL' => 'Статус заявки',           'HINT' => 'pending / active / rejected'],
+    ['FIELD_NAME' => 'UF_MEMBERSHIP_EXPIRES', 'USER_TYPE_ID' => 'datetime', 'SORT' => 120, 'LABEL' => 'Членство до',             'HINT' => ''],
+    ['FIELD_NAME' => 'UF_GRADUATE_YEAR',      'USER_TYPE_ID' => 'integer',  'SORT' => 200, 'LABEL' => 'Год окончания МГТУ',      'HINT' => ''],
+    ['FIELD_NAME' => 'UF_GRADUATE_DEPT',      'USER_TYPE_ID' => 'string',   'SORT' => 210, 'LABEL' => 'Кафедра / факультет',    'HINT' => ''],
+    ['FIELD_NAME' => 'UF_TELEGRAM',           'USER_TYPE_ID' => 'string',   'SORT' => 220, 'LABEL' => 'Telegram',                'HINT' => ''],
+    ['FIELD_NAME' => 'UF_DIPLOMA_SERIES',     'USER_TYPE_ID' => 'string',   'SORT' => 300, 'LABEL' => 'Серия диплома',           'HINT' => ''],
+    ['FIELD_NAME' => 'UF_DIPLOMA_NUMBER',     'USER_TYPE_ID' => 'string',   'SORT' => 310, 'LABEL' => 'Номер диплома',           'HINT' => ''],
+    ['FIELD_NAME' => 'UF_DIPLOMA_DATE',       'USER_TYPE_ID' => 'string',   'SORT' => 320, 'LABEL' => 'Дата выдачи диплома',    'HINT' => ''],
     ['FIELD_NAME' => 'UF_COMPANY_ID',         'USER_TYPE_ID' => 'integer',  'SORT' => 400, 'LABEL' => 'ID компании (юр. лицо)', 'HINT' => ''],
 ];
 
-// — Получаем существующие группы —
+// — Существующие группы —
 $existingGroups = [];
 $dbGroups = CGroup::GetList([], []);
 while ($g = $dbGroups->Fetch()) {
     $existingGroups[$g['STRING_ID']] = (int)$g['ID'];
 }
 
-// — Получаем существующие UF поля —
+// — Существующие UF поля —
 $existingFields = [];
 $dbFields = CUserTypeEntity::GetList([], ['ENTITY_ID' => 'USER']);
 while ($f = $dbFields->Fetch()) {
@@ -98,31 +91,26 @@ foreach ($userFields as $field) {
     }
 }
 ?>
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-<meta charset="UTF-8">
-<title>Setup Блок 1 — Группы и поля</title>
 <style>
-body { font-family: monospace; padding: 20px; background: #1e1e1e; color: #d4d4d4; }
-h2 { color: #569cd6; }
-.ok      { color: #4ec9b0; }
+.setup-wrap { font-family: monospace; padding: 30px; background: #1e1e1e; color: #d4d4d4; min-height: 100vh; }
+.setup-wrap h2 { color: #569cd6; border-bottom: 1px solid #444; padding-bottom: 8px; }
+.setup-wrap table { border-collapse: collapse; margin-bottom: 30px; width: 100%; max-width: 700px; }
+.setup-wrap td, .setup-wrap th { padding: 7px 16px; border: 1px solid #444; }
+.setup-wrap th { background: #333; color: #9cdcfe; }
+.created { color: #4ec9b0; }
 .exists  { color: #dcdcaa; }
 .error   { color: #f44747; }
-table { border-collapse: collapse; margin-bottom: 30px; }
-td, th { padding: 6px 14px; border: 1px solid #444; text-align: left; }
-th { background: #333; color: #9cdcfe; }
+.warn { color: #f44747; margin-top: 20px; }
 </style>
-</head>
-<body>
+<div class="setup-wrap">
 <h2>Блок 1: Группы пользователей</h2>
 <table>
 <tr><th>Код</th><th>Статус</th><th>ID</th></tr>
 <?php foreach ($groupResults as $r): ?>
 <tr>
     <td><?= htmlspecialchars($r['code']) ?></td>
-    <td class="<?= $r['status'] ?>"><?= $r['status'] ?><?= isset($r['error']) ? ': ' . htmlspecialchars($r['error']) : '' ?></td>
-    <td><?= isset($r['id']) ? $r['id'] : '—' ?></td>
+    <td class="<?= $r['status'] ?>"><?= $r['status'] ?><?= !empty($r['error']) ? ': ' . htmlspecialchars($r['error']) : '' ?></td>
+    <td><?= $r['id'] ?? '—' ?></td>
 </tr>
 <?php endforeach; ?>
 </table>
@@ -133,13 +121,14 @@ th { background: #333; color: #9cdcfe; }
 <?php foreach ($fieldResults as $r): ?>
 <tr>
     <td><?= htmlspecialchars($r['name']) ?></td>
-    <td class="<?= $r['status'] ?>"><?= $r['status'] ?><?= isset($r['error']) ? ': ' . htmlspecialchars($r['error']) : '' ?></td>
-    <td><?= isset($r['id']) ? $r['id'] : '—' ?></td>
+    <td class="<?= $r['status'] ?>"><?= $r['status'] ?><?= !empty($r['error']) ? ': ' . htmlspecialchars($r['error']) : '' ?></td>
+    <td><?= $r['id'] ?? '—' ?></td>
 </tr>
 <?php endforeach; ?>
 </table>
 
-<p style="color:#888">Скопируй ID групп и сообщи — я обновлю init.php с реальными значениями.</p>
-<p style="color:#f44747">❗ Удали этот файл после использования: <code>/local/setup_block1.php</code></p>
-</body>
-</html>
+<p>Скопируй ID групп из таблицы и передай — обновлю init.php.</p>
+<p class="warn">❗ Удали файл после использования: <code>/setup_block1.php</code></p>
+</div>
+
+<?php require_once $_SERVER['DOCUMENT_ROOT'] . '/bitrix/footer.php'; ?>
