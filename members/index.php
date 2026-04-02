@@ -1,6 +1,7 @@
 <?php
 require($_SERVER["DOCUMENT_ROOT"]."/bitrix/header.php");
 $APPLICATION->SetTitle("Участники");
+$APPLICATION->SetPageProperty('description', 'Члены Политехнического общества выпускников МГТУ им. Н.Э. Баумана: базовые, профессиональные и партнёрские участники организации.');
 
 /**
  * Страница каталога участников общества (по ТЗ).

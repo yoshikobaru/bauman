@@ -91,13 +91,203 @@ $currentStatus = $statusLabels[$membershipStatus] ?? null;
                         <?php $tab = $_GET['tab'] ?? 'profile'; ?>
                         <a href="/profile/" class="account__menu-item <?= $tab === 'profile' ? 'account__menu-item--active' : '' ?>">Мой профиль</a>
                         <a href="/profile/security/" class="account__menu-item">Безопасность</a>
+                        <a href="/profile/?tab=membership" class="account__menu-item <?= $tab === 'membership' ? 'account__menu-item--active' : '' ?>">Моё членство</a>
+                        <a href="/profile/?tab=activities" class="account__menu-item <?= $tab === 'activities' ? 'account__menu-item--active' : '' ?>">Мои активности</a>
                         <a href="/profile/?tab=applications" class="account__menu-item <?= $tab === 'applications' ? 'account__menu-item--active' : '' ?>">Мои заявки</a>
                     </div>
                 </div>
 
                 <div class="account__main">
 
-                    <?php if ($tab === 'applications'): ?>
+                    <?php if ($tab === 'membership'): ?>
+                    <!-- Моё членство -->
+                    <div class="account__block">
+                        <h2 class="account__title">Моё членство</h2>
+                        <?php if ($currentType && $membershipStatus): ?>
+                        <div class="account__rate <?= $currentType['class'] ?>" style="margin-top:24px">
+                            <img src="<?=SITE_TEMPLATE_PATH?>/assets/img/my_profile/rate-conus.png" alt="" class="account__rate-conus">
+                            <div class="account__rate-info">
+                                <span class="account__rate-status <?= $currentStatus['class'] ?? '' ?>">
+                                    <?= htmlspecialchars($currentStatus['label'] ?? $membershipStatus) ?>
+                                </span>
+                                <?php if ($membershipExpires && $membershipStatus === 'active'): ?>
+                                <div class="account__rate-date">
+                                    <span>Срок действия</span> до <?= htmlspecialchars($membershipExpires) ?>
+                                </div>
+                                <?php endif; ?>
+                            </div>
+                            <h4 class="account__rate-plan"><?= htmlspecialchars($currentType['label']) ?></h4>
+                            <p class="account__rate-price"><?= htmlspecialchars($currentType['price']) ?></p>
+                            <p class="account__rate-when">ежегодно</p>
+                            <?php if ($membershipStatus === 'active'): ?>
+                            <div class="account__rate-buttons account__grid">
+                                <button class="account__rate-btn btn" disabled title="Оплата будет доступна после подключения Газпромбанк-эквайринга">Продлить</button>
+                                <a href="/join/" class="account__rate-btn account__rate-btn--changes btn">Изменить тариф</a>
+                            </div>
+                            <?php elseif ($membershipStatus === 'pending'): ?>
+                            <div style="margin-top:16px;padding:12px 16px;background:#fff9e6;border-radius:8px;border-left:3px solid #f0a500">
+                                <strong>Заявка принята.</strong> После проверки модератором и подтверждения оплаты членство будет активировано.
+                            </div>
+                            <?php elseif ($membershipStatus === 'in_review'): ?>
+                            <div style="margin-top:16px;padding:12px 16px;background:#e8f4fd;border-radius:8px;border-left:3px solid #2980b9">
+                                <strong>На рассмотрении.</strong> Ваша заявка передана модератору. Ожидайте ответа по email.
+                            </div>
+                            <?php elseif ($membershipStatus === 'rejected'): ?>
+                            <div style="margin-top:16px;padding:12px 16px;background:#fdecea;border-radius:8px;border-left:3px solid #e74c3c">
+                                <strong>Заявка отклонена.</strong> Обратитесь к администратору или подайте новую заявку.
+                                <br><a href="/join/" class="btn" style="margin-top:10px;display:inline-block">Подать новую заявку</a>
+                            </div>
+                            <?php endif; ?>
+                        </div>
+                        <?php else: ?>
+                        <div style="margin-top:24px;padding:32px;text-align:center;background:#f8f8f8;border-radius:12px">
+                            <p style="font-size:16px;color:#555;margin-bottom:16px">У вас пока нет активного членства в обществе.</p>
+                            <a href="/join/" class="btn">Вступить в общество</a>
+                        </div>
+                        <?php endif; ?>
+                        <!-- Привилегии текущего тарифа -->
+                        <?php if ($isMember && $membershipType): ?>
+                        <div class="account__chapter" style="margin-top:32px">
+                            <h3 class="account__subtitle">Привилегии вашего тарифа</h3>
+                        </div>
+                        <?php
+                        $privileges = [
+                            'basic' => [
+                                'Размещение резюме на карьерной платформе',
+                                'Доступ в закрытый карьерный канал с вакансиями',
+                                'Участие в активностях и мероприятиях общества',
+                                'Доступ к витрине компетенций партнёров',
+                            ],
+                            'premium' => [
+                                'Все привилегии Базового тарифа',
+                                'Участие в закрытом чате членов уровня «Бизнес»',
+                                'Размещение информации о компании на площадках общества',
+                                'Доступ к базе резюме выпускников',
+                            ],
+                            'partner' => [
+                                'Все привилегии Профессионального тарифа',
+                                'Участие в закрытых мероприятиях',
+                                'Право стать членом правления',
+                                'Индивидуальное сопровождение',
+                            ],
+                            'honorary' => [
+                                'Все привилегии',
+                                'Почётный статус',
+                                'Особые условия взаимодействия',
+                            ],
+                        ];
+                        $privList = $privileges[$membershipType] ?? [];
+                        ?>
+                        <ul style="margin-top:12px;padding-left:20px">
+                            <?php foreach ($privList as $priv): ?>
+                            <li style="margin-bottom:8px;color:#444"><?= htmlspecialchars($priv) ?></li>
+                            <?php endforeach; ?>
+                        </ul>
+                        <?php endif; ?>
+                    </div>
+
+                    <?php elseif ($tab === 'activities'): ?>
+                    <!-- Мои активности -->
+                    <div class="account__block">
+                        <h2 class="account__title">Мои активности</h2>
+                        <?php
+                        $arEvents   = [];
+                        $arDonations = [];
+                        if ($hlOk && defined('HL_APPLICATIONS_ID') && HL_APPLICATIONS_ID > 0) {
+                            $hlEntity = \Bitrix\Highloadblock\HighloadBlockTable::getById(HL_APPLICATIONS_ID)->fetch();
+                            if ($hlEntity) {
+                                $hlClass = \Bitrix\Highloadblock\HighloadBlockTable::compileEntity($hlEntity)->getDataClass();
+                                $dbAll = $hlClass::getList([
+                                    'filter' => ['UF_USER_ID' => (int)$userId, 'UF_TYPE' => ['event_reg', 'project_support']],
+                                    'order'  => ['UF_DATE_CREATE' => 'DESC'],
+                                ]);
+                                while ($row = $dbAll->fetch()) {
+                                    if ($row['UF_TYPE'] === 'event_reg') {
+                                        $arEvents[] = $row;
+                                    } elseif ($row['UF_TYPE'] === 'project_support') {
+                                        $arDonations[] = $row;
+                                    }
+                                }
+                            }
+                        }
+                        $actStatusLabels = [
+                            'new'       => ['label' => 'Новая',        'color' => '#888'],
+                            'in_review' => ['label' => 'На рассмотрении','color' => '#2980b9'],
+                            'approved'  => ['label' => 'Одобрено',     'color' => '#27ae60'],
+                            'rejected'  => ['label' => 'Отклонено',    'color' => '#e74c3c'],
+                        ];
+                        ?>
+                        <!-- Секция событий -->
+                        <div class="account__chapter" style="margin-top:24px">
+                            <h3 class="account__subtitle">Мои события</h3>
+                        </div>
+                        <?php if (empty($arEvents)): ?>
+                        <p style="color:#888;margin-top:12px">Вы пока не регистрировались на события.</p>
+                        <a href="/news/?type=events" style="display:inline-block;margin-top:8px;color:#1a73e8">Посмотреть ближайшие события →</a>
+                        <?php else: ?>
+                        <table style="width:100%;border-collapse:collapse;margin-top:12px;font-size:14px">
+                            <thead>
+                                <tr style="background:#f5f5f5">
+                                    <th style="padding:10px;text-align:left;border-bottom:1px solid #eee">Событие</th>
+                                    <th style="padding:10px;text-align:left;border-bottom:1px solid #eee">Дата заявки</th>
+                                    <th style="padding:10px;text-align:left;border-bottom:1px solid #eee">Статус</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            <?php foreach ($arEvents as $ev):
+                                $evData   = json_decode($ev['UF_DATA'] ?? '{}', true) ?: [];
+                                $evTitle  = htmlspecialchars($evData['event_name'] ?? ('Событие #' . ($ev['UF_ELEMENT_ID'] ?? $ev['ID'])));
+                                $evDate   = !empty($ev['UF_DATE_CREATE']) ? $ev['UF_DATE_CREATE']->format('d.m.Y H:i') : '';
+                                $evSt     = $actStatusLabels[$ev['UF_STATUS'] ?? 'new'] ?? ['label' => $ev['UF_STATUS'], 'color' => '#888'];
+                            ?>
+                            <tr style="border-bottom:1px solid #f0f0f0">
+                                <td style="padding:10px"><?= $evTitle ?></td>
+                                <td style="padding:10px"><?= htmlspecialchars($evDate) ?></td>
+                                <td style="padding:10px;color:<?= $evSt['color'] ?>;font-weight:600"><?= htmlspecialchars($evSt['label']) ?></td>
+                            </tr>
+                            <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                        <?php endif; ?>
+
+                        <!-- Секция пожертвований/поддержки проектов -->
+                        <div class="account__chapter" style="margin-top:32px">
+                            <h3 class="account__subtitle">История поддержки проектов</h3>
+                        </div>
+                        <?php if (empty($arDonations)): ?>
+                        <p style="color:#888;margin-top:12px">Вы пока не поддерживали проекты.</p>
+                        <a href="/projects/" style="display:inline-block;margin-top:8px;color:#1a73e8">Посмотреть проекты →</a>
+                        <?php else: ?>
+                        <table style="width:100%;border-collapse:collapse;margin-top:12px;font-size:14px">
+                            <thead>
+                                <tr style="background:#f5f5f5">
+                                    <th style="padding:10px;text-align:left;border-bottom:1px solid #eee">Проект</th>
+                                    <th style="padding:10px;text-align:left;border-bottom:1px solid #eee">Сумма</th>
+                                    <th style="padding:10px;text-align:left;border-bottom:1px solid #eee">Дата</th>
+                                    <th style="padding:10px;text-align:left;border-bottom:1px solid #eee">Статус</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            <?php foreach ($arDonations as $don):
+                                $donData  = json_decode($don['UF_DATA'] ?? '{}', true) ?: [];
+                                $donTitle = htmlspecialchars($donData['project_name'] ?? ('Проект #' . ($don['UF_ELEMENT_ID'] ?? $don['ID'])));
+                                $donSum   = htmlspecialchars($donData['amount'] ?? '—');
+                                $donDate  = !empty($don['UF_DATE_CREATE']) ? $don['UF_DATE_CREATE']->format('d.m.Y H:i') : '';
+                                $donSt    = $actStatusLabels[$don['UF_STATUS'] ?? 'new'] ?? ['label' => $don['UF_STATUS'], 'color' => '#888'];
+                            ?>
+                            <tr style="border-bottom:1px solid #f0f0f0">
+                                <td style="padding:10px"><?= $donTitle ?></td>
+                                <td style="padding:10px"><?= $donSum ?></td>
+                                <td style="padding:10px"><?= htmlspecialchars($donDate) ?></td>
+                                <td style="padding:10px;color:<?= $donSt['color'] ?>;font-weight:600"><?= htmlspecialchars($donSt['label']) ?></td>
+                            </tr>
+                            <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                        <?php endif; ?>
+                    </div>
+
+                    <?php elseif ($tab === 'applications'): ?>
                     <!-- Мои заявки -->
                     <div class="account__block">
                         <h2 class="account__title">Мои заявки</h2>

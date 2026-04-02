@@ -1,6 +1,7 @@
 <?php
 require($_SERVER["DOCUMENT_ROOT"]."/bitrix/header.php");
 $APPLICATION->SetTitle("Витрина компетенций");
+$APPLICATION->SetPageProperty('description', 'Витрина компетенций МГТУ им. Н.Э. Баумана: НОЦ, студенческие КБ и компетенции партнёров Политехнического общества выпускников.');
 
 use Bitrix\Main\Loader;
 $hlOk = Loader::includeModule('highloadblock');
@@ -88,110 +89,86 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['d6_action'])) {
         
         <section class="competencies">
             <div class="container">
+                <?php
+                $catTabs = [
+                    'university' => ['title' => 'Компетенции университета',          'tab' => 'competencies__univer'],
+                    'skb'        => ['title' => 'Студенческие конструкторские бюро', 'tab' => 'competencies__student'],
+                    'partner'    => ['title' => 'Компетенции партнёров',             'tab' => 'competencies__partner'],
+                ];
+                $competenciesData = ['university' => [], 'skb' => [], 'partner' => []];
+                $useIblock = defined('IBLOCK_COMPETENCIES_ID') && IBLOCK_COMPETENCIES_ID > 0;
+                if ($useIblock) {
+                    $dbEl = CIBlockElement::GetList(
+                        ['SORT' => 'ASC'],
+                        ['IBLOCK_ID' => IBLOCK_COMPETENCIES_ID, 'ACTIVE' => 'Y'],
+                        false, false,
+                        ['ID','NAME','PREVIEW_PICTURE','PREVIEW_TEXT','DETAIL_TEXT','PROPERTY_TAGS','PROPERTY_CATEGORY','PROPERTY_PDF_LINK']
+                    );
+                    while ($arEl = $dbEl->GetNext()) {
+                        $cat = $arEl['PROPERTY_CATEGORY_VALUE'] ?? 'university';
+                        if (!isset($competenciesData[$cat])) $cat = 'university';
+                        $competenciesData[$cat][] = $arEl;
+                    }
+                }
+                $activeTab = 'university';
+                ?>
                 <div class="competencies__tabs">
                     <ul class="competencies__navs">
-                        <li class="main-tabs-click main-tabs-click--active" data-tab="competencies__univer">
-                            Компетенции университета
+                        <?php foreach ($catTabs as $catKey => $catInfo): ?>
+                        <li class="main-tabs-click <?= $catKey === $activeTab ? 'main-tabs-click--active' : '' ?>"
+                            data-tab="<?= $catInfo['tab'] ?>">
+                            <?= htmlspecialchars($catInfo['title']) ?>
                         </li>
-                        <li class="main-tabs-click" data-tab="competencies__student">
-                            Студенческие конструкторские бюро
-                        </li>
-                        <li class="main-tabs-click" data-tab="competencies__partner">
-                            Компетенции партнеров 
-                        </li>
+                        <?php endforeach; ?>
                     </ul>
                 </div>
                 <div class="competencies__content">
-                    <div class="competencies__item main-tabs-pane main-tabs-pane--active" data-tab="competencies__univer">
+                    <?php foreach ($catTabs as $catKey => $catInfo):
+                        $items = $competenciesData[$catKey];
+                    ?>
+                    <div class="competencies__item main-tabs-pane <?= $catKey === $activeTab ? 'main-tabs-pane--active' : '' ?>"
+                         data-tab="<?= $catInfo['tab'] ?>">
                         <div class="competencies__list">
+                            <?php if (!$useIblock): ?>
+                            <p style="padding:20px;color:#888">
+                                Инфоблок компетенций не настроен.
+                                <?php if ($USER->IsAdmin()): ?><a href="/setup_competencies.php">Запустить настройку</a><?php endif; ?>
+                            </p>
+                            <?php elseif (empty($items)): ?>
+                            <p style="padding:20px;color:#888">Компетенции в этой категории пока не добавлены.</p>
+                            <?php else: ?>
+                            <?php foreach ($items as $comp):
+                                $imgSrc = '';
+                                if (!empty($comp['PREVIEW_PICTURE'])) {
+                                    $imgSrc = CFile::GetPath($comp['PREVIEW_PICTURE']);
+                                }
+                                $imgSrc = $imgSrc ?: (SITE_TEMPLATE_PATH . '/assets/img/competencies-img-1.png');
+                                $tagsRaw = $comp['PROPERTY_TAGS_VALUE'] ?? '';
+                                $tagList = array_filter(array_map('trim', preg_split('/[\s,]+/', $tagsRaw)));
+                                $pdfLink = $comp['PROPERTY_PDF_LINK_VALUE'] ?? '';
+                            ?>
                             <div class="competencies__card">
-                                <img src="<?=SITE_TEMPLATE_PATH?>/assets/img/competencies-img-1.png" alt="" class="competencies__card-image">
+                                <img src="<?= htmlspecialchars($imgSrc) ?>" alt="<?= htmlspecialchars($comp['NAME']) ?>" class="competencies__card-image">
+                                <?php if (!empty($tagList)): ?>
                                 <div class="competencies__card-tags">
-                                    <div>#ракетостроение</div>
-                                    <div>#космические_аппараты</div>
-                                    <div>#системный_анализ</div>
-                                    <div>#газодинамика</div>
-                                    <div>#прочность</div>
+                                    <?php foreach ($tagList as $tag): ?><div><?= htmlspecialchars($tag) ?></div><?php endforeach; ?>
                                 </div>
-                                <p class="competencies__card-subtext main-text">
-                                    Защита данных и цифровых систем, участие в кибербезопасности.
-                                </p>
-                                <h2 class="competencies__card-title">
-                                    НОЦ «Перспективные исследования в ракетно-космической технике» (ПИРТ)
-                                </h2>
-                                <p class="main-text competencies__card-text">
-                                    Центр занимается комплексными научными исследованиями и разработками в области проектирования перспективных образцов ракетно-космической техники. 
-                                </p>
-                                <a href="#" class="competencies__card-link">Скачать подробное описание в PDF</a>
-                                <div class="competencies__card-overlay">
-                                    <h3>
-                                        Компетенции
-                                    </h3>
-                                    <ul>
-                                        <li>
-                                            Системное проектирование ракетно-космических комплексов;
-                                        </li>
-                                        <li>
-                                            Газодинамические и тепловые расчёты двигательных установок;
-                                        </li>
-                                        <li>
-                                            Прочностной анализ конструкций летательных аппаратов;
-                                        </li>
-                                        <li>
-                                            Баллистическое проектирование и оптимизация траекторий;
-                                        </li>
-                                        <li>
-                                            Создание математических моделей динамики полёта.
-                                        </li>
-                                    </ul>
-                                </div>
+                                <?php endif; ?>
+                                <p class="competencies__card-subtext main-text"><?= htmlspecialchars($comp['PREVIEW_TEXT'] ?? '') ?></p>
+                                <h2 class="competencies__card-title"><?= htmlspecialchars($comp['NAME']) ?></h2>
+                                <?php if (!empty($comp['DETAIL_TEXT'])): ?>
+                                <p class="main-text competencies__card-text"><?= strip_tags($comp['DETAIL_TEXT']) ?></p>
+                                <?php endif; ?>
+                                <?php if ($pdfLink): ?>
+                                <a href="<?= htmlspecialchars($pdfLink) ?>" class="competencies__card-link" target="_blank" rel="noopener">Скачать подробное описание в PDF</a>
+                                <?php endif; ?>
                                 <button class="btn" data-fancybox data-src="#form-competencies">Отправить запрос</button>
                             </div>
-                            <div class="competencies__card">
-                                <img src="<?=SITE_TEMPLATE_PATH?>/assets/img/competencies-img-1.png" alt="" class="competencies__card-image">
-                                <div class="competencies__card-tags">
-                                    <div>#ракетостроение</div>
-                                    <div>#космические_аппараты</div>
-                                    <div>#системный_анализ</div>
-                                    <div>#газодинамика</div>
-                                    <div>#прочность</div>
-                                </div>
-                                <p class="competencies__card-subtext main-text">
-                                    Защита данных и цифровых систем, участие в кибербезопасности.
-                                </p>
-                                <h2 class="competencies__card-title">
-                                    НОЦ «Перспективные исследования в ракетно-космической технике» (ПИРТ)
-                                </h2>
-                                <p class="main-text competencies__card-text">
-                                    Центр занимается комплексными научными исследованиями и разработками в области проектирования перспективных образцов ракетно-космической техники. 
-                                </p>
-                                <a href="#" class="competencies__card-link">Скачать подробное описание в PDF</a>
-                                <div class="competencies__card-overlay">
-                                    <h3>
-                                        Компетенции
-                                    </h3>
-                                    <ul>
-                                        <li>
-                                            Системное проектирование ракетно-космических комплексов;
-                                        </li>
-                                        <li>
-                                            Газодинамические и тепловые расчёты двигательных установок;
-                                        </li>
-                                        <li>
-                                            Прочностной анализ конструкций летательных аппаратов;
-                                        </li>
-                                        <li>
-                                            Баллистическое проектирование и оптимизация траекторий;
-                                        </li>
-                                        <li>
-                                            Создание математических моделей динамики полёта.
-                                        </li>
-                                    </ul>
-                                </div>
-                                <button class="btn" data-fancybox data-src="#form-competencies">Отправить запрос</button>
-                            </div>
+                            <?php endforeach; ?>
+                            <?php endif; ?>
                         </div>
                     </div>
+                    <?php endforeach; ?>
                 </div>
             </div>
         </section>

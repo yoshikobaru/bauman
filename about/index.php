@@ -1,6 +1,7 @@
-﻿<?php
+<?php
 require($_SERVER["DOCUMENT_ROOT"]."/bitrix/header.php");
 $APPLICATION->SetTitle("О нас");
+$APPLICATION->SetPageProperty('description', 'О Политехническом обществе выпускников МГТУ им. Н.Э. Баумана: миссия, история, члены правления и цели организации.');
 ?>
 
 <main>

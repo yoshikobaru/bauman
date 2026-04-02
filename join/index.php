@@ -1,6 +1,10 @@
 <?php
 require($_SERVER["DOCUMENT_ROOT"]."/bitrix/header.php");
 $APPLICATION->SetTitle("Вступить в общество");
+$APPLICATION->SetPageProperty('description', 'Вступите в Политехническое общество выпускников МГТУ им. Н.Э. Баумана. Выберите тип членства: Базовое, Профессиональное, Партнёрское или Почётное.');
+
+use Bitrix\Main\Loader;
+$hlOk = Loader::includeModule('highloadblock');
 
 $_ug      = $USER->IsAuthorized() ? $USER->GetUserGroupArray() : [];
 $isMember = defined('PO_MEMBER_BASIC_ID') && (
@@ -10,8 +14,28 @@ $isMember = defined('PO_MEMBER_BASIC_ID') && (
 );
 $isAuthorized = $USER->IsAuthorized();
 
-$errors   = [];
-$joinDone = false;
+$errors      = [];
+$joinDone    = false;
+$joinType    = 'basic'; // тип выбранного членства для сообщения
+
+// Типы членства требующие модерации (без прямой оплаты)
+$moderationTypes = ['premium', 'partner', 'honorary'];
+
+// Вспомогательная функция: сохранить заявку на членство в HL-блок
+function po_saveMembershipApplication(int $userId, string $type, array $data): void
+{
+    if (!defined('HL_APPLICATIONS_ID') || HL_APPLICATIONS_ID <= 0) return;
+    $hlEntityData = \Bitrix\Highloadblock\HighloadBlockTable::getById(HL_APPLICATIONS_ID)->fetch();
+    if (!$hlEntityData) return;
+    $hlClass = \Bitrix\Highloadblock\HighloadBlockTable::compileEntity($hlEntityData)->getDataClass();
+    $hlClass::add([
+        'UF_USER_ID'     => $userId,
+        'UF_TYPE'        => 'membership',
+        'UF_STATUS'      => in_array($type, ['premium', 'partner', 'honorary']) ? 'in_review' : 'new',
+        'UF_DATE_CREATE' => new \Bitrix\Main\Type\DateTime(),
+        'UF_DATA'        => json_encode(array_merge($data, ['membership_type' => $type]), JSON_UNESCAPED_UNICODE),
+    ]);
+}
 
 // — Обработчик формы вступления —
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['join_action'])) {
@@ -28,19 +52,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['join_action'])) {
     $diplomaNumber  = trim($_POST['diploma_number'] ?? '');
     $diplomaDate    = trim($_POST['diploma_date'] ?? '');
     $membershipType = trim($_POST['membership_type'] ?? 'basic');
-    $agreeCharter   = ($_POST['agree_charter'] ?? '') === 'yes';
-    $agreePd        = ($_POST['agree_pd'] ?? '') === 'yes';
+    if (!in_array($membershipType, ['basic', 'premium', 'partner', 'honorary'])) {
+        $membershipType = 'basic';
+    }
+    $joinType     = $membershipType;
+    $agreeCharter = ($_POST['agree_charter'] ?? '') === 'yes';
+    $agreePd      = ($_POST['agree_pd']      ?? '') === 'yes';
 
     if (!$agreeCharter || !$agreePd) {
         $errors[] = 'Необходимо согласие с Уставом и политикой ПДн';
     }
 
     if (!$isAuthorized) {
-        // Новый пользователь — регистрация
-        if (!$email)              $errors[] = 'Введите email';
+        if (!$email)               $errors[] = 'Введите email';
         if (strlen($password) < 6) $errors[] = 'Пароль должен содержать не менее 6 символов';
-        if (!$lastName)           $errors[] = 'Введите фамилию';
-        if (!$firstName)          $errors[] = 'Введите имя';
+        if (!$lastName)            $errors[] = 'Введите фамилию';
+        if (!$firstName)           $errors[] = 'Введите имя';
 
         if (empty($errors)) {
             $oUser  = new CUser();
@@ -66,16 +93,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['join_action'])) {
 
             if ($userId) {
                 $USER->Login($email, $password, 'N');
-                LocalRedirect('/profile/?joined=1');
+                // Сохраняем заявку в HL-блок
+                if ($hlOk) {
+                    po_saveMembershipApplication((int)$userId, $membershipType, [
+                        'first_name' => $firstName, 'last_name' => $lastName,
+                        'email'      => $email,
+                    ]);
+                }
+                // Email модератору если требуется модерация
+                if (in_array($membershipType, $moderationTypes)) {
+                    po_sendAdminEmail('membership', [
+                        'membership_type' => $membershipType,
+                        'first_name' => $firstName, 'last_name' => $lastName,
+                        'email' => $email,
+                    ]);
+                }
+                $joinDone = true;
             } else {
                 $errors[] = $oUser->LAST_ERROR ?: 'Ошибка при создании аккаунта';
             }
         }
     } else {
         // Авторизованный не-член — обновляем UF_ поля
-        $userId = $USER->GetID();
-        $oUser  = new CUser();
-        $result = $oUser->Update($userId, [
+        $userId  = (int)$USER->GetID();
+        $dbUser  = CUser::GetByID($userId);
+        $arCurr  = $dbUser->Fetch() ?: [];
+        $oUser   = new CUser();
+        $result  = $oUser->Update($userId, [
             'UF_MEMBERSHIP_STATUS' => 'pending',
             'UF_MEMBERSHIP_TYPE'   => $membershipType,
             'UF_GRADUATE_YEAR'     => $isGraduate ? $gradYear : '',
@@ -87,7 +131,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['join_action'])) {
         ]);
 
         if ($result) {
-            LocalRedirect('/profile/?joined=1');
+            if ($hlOk) {
+                po_saveMembershipApplication($userId, $membershipType, [
+                    'first_name' => $arCurr['NAME'] ?? '',
+                    'last_name'  => $arCurr['LAST_NAME'] ?? '',
+                    'email'      => $arCurr['EMAIL'] ?? '',
+                ]);
+            }
+            if (in_array($membershipType, $moderationTypes)) {
+                po_sendAdminEmail('membership', [
+                    'membership_type' => $membershipType,
+                    'first_name' => $arCurr['NAME']      ?? '',
+                    'last_name'  => $arCurr['LAST_NAME'] ?? '',
+                    'email'      => $arCurr['EMAIL']      ?? '',
+                ]);
+            }
+            $joinDone = true;
         } else {
             $errors[] = $oUser->LAST_ERROR ?: 'Ошибка сохранения данных';
         }
@@ -96,7 +155,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['join_action'])) {
 
 // Данные текущего пользователя для предзаполнения
 $arCurrentUser = [];
-if ($isAuthorized && !$isMember) {
+if ($isAuthorized) {
     $dbUser = CUser::GetByID($USER->GetID());
     $arCurrentUser = $dbUser->Fetch() ?: [];
 }
@@ -112,7 +171,30 @@ if ($isAuthorized && !$isMember) {
                 </div>
             <?php endif; ?>
 
-            <?php if ($isMember): ?>
+            <?php if ($joinDone): ?>
+                <div class="join__wrapper" style="text-align:center;padding:60px 20px">
+                    <?php if ($joinType === 'basic'): ?>
+                        <div style="font-size:48px;margin-bottom:16px">✅</div>
+                        <h2 class="account__title main-title" style="margin-bottom:12px">Заявка принята!</h2>
+                        <p style="font-size:16px;color:#555;max-width:480px;margin:0 auto 24px">
+                            Ваша заявка на <strong>Базовое членство</strong> зарегистрирована.
+                            В течение 1–2 рабочих дней на ваш email придёт письмо с реквизитами для оплаты взноса (5 000 ₽/год).
+                        </p>
+                        <a href="/profile/" class="btn">Перейти в личный кабинет</a>
+                    <?php else:
+                        $typeLabelsD = ['premium'=>'Профессиональное','partner'=>'Партнёрское','honorary'=>'Почётное'];
+                        $tLabel = $typeLabelsD[$joinType] ?? $joinType;
+                    ?>
+                        <div style="font-size:48px;margin-bottom:16px">📋</div>
+                        <h2 class="account__title main-title" style="margin-bottom:12px">Заявка передана на рассмотрение</h2>
+                        <p style="font-size:16px;color:#555;max-width:480px;margin:0 auto 24px">
+                            Ваша заявка на <strong><?= htmlspecialchars($tLabel) ?> членство</strong> принята и передана модераторам.
+                            Мы свяжемся с вами по email в течение 3–5 рабочих дней.
+                        </p>
+                        <a href="/profile/" class="btn">Перейти в личный кабинет</a>
+                    <?php endif; ?>
+                </div>
+            <?php elseif ($isMember): ?>
             <!-- Сценарий 3: уже член общества -->
             <div class="join__wrapper">
                 <h2 class="account__title main-title">Вы уже член общества</h2>
@@ -143,7 +225,7 @@ if ($isAuthorized && !$isMember) {
             <div class="join__wrapper">
                 <h2 class="account__title main-title">Вступить в общество</h2>
                 <p style="margin-bottom:16px;color:#666">
-                    Ваши данные предзаполнены из профиля. Проверьте и отправьте заявку.
+                    Ваши данные предзаполнены из профиля. Выберите тариф и отправьте заявку.
                 </p>
                 <form method="POST" action="/join/">
                     <input type="hidden" name="join_action" value="1">
@@ -177,6 +259,50 @@ if ($isAuthorized && !$isMember) {
                                 <span class="account__graduate-box"></span>Нет
                             </label>
                         </div>
+                    </div>
+                    <!-- Выбор тарифа (авторизованный пользователь) -->
+                    <div class="account__chapter" style="margin-top:24px">
+                        <h3 class="account__subtitle">Выберите тариф</h3>
+                    </div>
+                    <div class="membership-slider swiper">
+                        <div class="swiper-wrapper">
+                            <div class="swiper-slide membership-slider__card">
+                                <h3 class="membership-slider__title">Базовое</h3>
+                                <p class="membership-slider__name">5 000 Р</p>
+                                <p class="membership-slider__time">ежегодно</p>
+                                <ul class="membership-slider__list">
+                                    <li class="membership-slider__item">Возможность размещения резюме на карьерной платформе;</li>
+                                    <li class="membership-slider__item">Доступ в закрытый карьерный канал с вакансиями;</li>
+                                    <li class="membership-slider__item">Участие в активностях и мероприятиях общества;</li>
+                                    <li class="membership-slider__item">Доступ к витрине компетенций партнёров.</li>
+                                </ul>
+                                <button type="button" class="membership-slider__join btn btn-empty select-plan btn--active" data-plan="basic">Выбрать</button>
+                            </div>
+                            <div class="swiper-slide membership-slider__card membership-slider__card--proffesional">
+                                <h3 class="membership-slider__title">Профессиональное</h3>
+                                <p class="membership-slider__name">50 000 Р</p>
+                                <p class="membership-slider__time">ежегодно</p>
+                                <button class="membership-slider__advantages">+ Возможности Базового</button>
+                                <ul class="membership-slider__list">
+                                    <li class="membership-slider__item">Участие в закрытом чате членов уровня «Бизнес»;</li>
+                                    <li class="membership-slider__item">Размещение информации о компании на площадках общества;</li>
+                                    <li class="membership-slider__item">Доступ к базе резюме выпускников.</li>
+                                </ul>
+                                <button type="button" class="membership-slider__join btn btn-empty select-plan" data-plan="premium">Выбрать</button>
+                            </div>
+                            <div class="swiper-slide membership-slider__card membership-slider__card--honorary">
+                                <h3 class="membership-slider__title">Партнёрское</h3>
+                                <p class="membership-slider__name membership-slider__name--small">Индивидуальные условия</p>
+                                <p class="membership-slider__time">обсуждается индивидуально</p>
+                                <button class="membership-slider__advantages">+ Возможности профессионального</button>
+                                <ul class="membership-slider__list">
+                                    <li class="membership-slider__item">Участие в закрытых мероприятиях;</li>
+                                    <li class="membership-slider__item">Право стать членом правления.</li>
+                                </ul>
+                                <button type="button" class="membership-slider__join btn btn-empty select-plan" data-plan="partner">Выбрать</button>
+                            </div>
+                        </div>
+                        <div class="swiper-pagination"></div>
                     </div>
                     <div class="join__politic">
                         <div class="join__politic-question">

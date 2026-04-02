@@ -76,6 +76,70 @@ function po_sendAdminEmail(string $type, array $data): void
 }
 
 /**
+ * Добавить раздел «Политех» в левое меню административной панели.
+ */
+AddEventHandler('main', 'OnBuildGlobalMenu', function (&$globalMenu, &$moduleMenu) {
+    if (!defined('HL_APPLICATIONS_ID')) return;
+
+    // Считаем новые заявки для бейджа
+    $newCount = 0;
+    try {
+        if (\Bitrix\Main\Loader::includeModule('highloadblock')) {
+            $hlData = \Bitrix\Highloadblock\HighloadBlockTable::getById(HL_APPLICATIONS_ID)->fetch();
+            if ($hlData) {
+                $hlClass  = \Bitrix\Highloadblock\HighloadBlockTable::compileEntity($hlData)->getDataClass();
+                $newCount = $hlClass::getList(['filter' => ['UF_STATUS' => 'new'], 'count_total' => true])->getCount();
+            }
+        }
+    } catch (\Exception $e) {}
+
+    $badge = $newCount > 0 ? ' <span style="background:#e74c3c;color:#fff;border-radius:10px;padding:1px 6px;font-size:10px;font-weight:700;">' . $newCount . '</span>' : '';
+
+    $globalMenu['global_menu_politeh'] = [
+        'menu_id'   => 'politeh',
+        'text'      => 'Политех',
+        'title'     => 'Управление Политехническим обществом',
+        'icon'      => 'main_menu_group',
+        'page_icon' => 'main_menu_group',
+        'sort'      => 50,
+        'items_id'  => 'menu_politeh_items',
+        'items'     => [
+            [
+                'text'      => 'Заявки' . $badge,
+                'title'     => 'Модерация заявок с форм сайта (D1–D7)',
+                'url'       => '/local/admin/po_moderation.php',
+                'icon'      => 'main_menu_comment',
+                'more_url'  => ['/local/admin/po_moderation.php'],
+            ],
+            [
+                'text'  => 'Только новые',
+                'title' => 'Показать только новые заявки',
+                'url'   => '/local/admin/po_moderation.php?filter_status=new',
+                'icon'  => 'main_menu_search',
+            ],
+            [
+                'text'  => 'На рассмотрении',
+                'title' => 'Заявки в работе',
+                'url'   => '/local/admin/po_moderation.php?filter_status=in_review',
+                'icon'  => 'main_menu_search',
+            ],
+            [
+                'text'  => '— Пользователи сайта',
+                'title' => 'Список всех пользователей',
+                'url'   => '/bitrix/admin/user_list.php?lang=ru',
+                'icon'  => 'main_menu_user',
+            ],
+            [
+                'text'  => '— Инфоблоки (контент)',
+                'title' => 'Новости, события, проекты, правление',
+                'url'   => '/bitrix/admin/iblock_list.php?lang=ru',
+                'icon'  => 'main_menu_content',
+            ],
+        ],
+    ];
+});
+
+/**
  * CRM: создать Лид по данным заявки.
  * Вызывается напрямую из каждого обработчика формы после успешного сохранения в HL-блок.
  *

@@ -1,6 +1,7 @@
 <?php
 require($_SERVER["DOCUMENT_ROOT"]."/bitrix/header.php");
 $APPLICATION->SetTitle("Новости и события");
+$APPLICATION->SetPageProperty('description', 'Новости и события Политехнического общества выпускников МГТУ им. Н.Э. Баумана: конференции, встречи, лекции и другие мероприятия.');
 
 use Bitrix\Main\Loader;
 $iblockOk = Loader::includeModule('iblock');

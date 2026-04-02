@@ -1,6 +1,7 @@
 <?php
 require($_SERVER["DOCUMENT_ROOT"]."/bitrix/header.php");
 $APPLICATION->SetTitle("Проекты");
+$APPLICATION->SetPageProperty('description', 'Проекты Политехнического общества выпускников МГТУ: инициативы по развитию науки, технологий и связей с индустрией.');
 
 use Bitrix\Main\Loader;
 $iblockOk = Loader::includeModule('iblock');

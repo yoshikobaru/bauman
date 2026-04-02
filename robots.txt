@@ -1,0 +1,17 @@
+User-agent: *
+Disallow: /bitrix/
+Disallow: /local/admin/
+Disallow: /profile/
+Disallow: /authorization/
+Disallow: /join/
+Disallow: /auth/
+Disallow: /profile/security/
+
+Allow: /bitrix/js/
+Allow: /bitrix/css/
+Allow: /bitrix/images/
+Allow: /bitrix/fonts/
+Allow: /bitrix/templates/
+Allow: /local/templates/
+
+Sitemap: https://bauman-polytech.ru/sitemap.xml

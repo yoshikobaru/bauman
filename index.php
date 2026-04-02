@@ -1,6 +1,7 @@
 <?php
 require($_SERVER["DOCUMENT_ROOT"]."/bitrix/header.php");
 $APPLICATION->SetTitle("Политехническое Общество Выпускников");
+$APPLICATION->SetPageProperty('description', 'Политехническое общество выпускников МГТУ им. Н.Э. Баумана — объединение выпускников, партнёров и друзей университета. Проекты, события, карьера, референс-визиты.');
 ?>
 
 	<main>
