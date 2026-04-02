@@ -143,11 +143,93 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['d5_action'])) {
             <!-- /.container -->
         </section>
         <!-- /.banner-other -->
-        <!-- visits -->
+        <!-- visits dynamic -->
+        <?php
+        $iblockRefOk = \Bitrix\Main\Loader::includeModule('iblock');
+        $arActiveVisits = [];
+        $arPastVisits   = [];
+        $today = date('Y-m-d');
+
+        if ($iblockRefOk && defined('IBLOCK_EVENTS_ID') && IBLOCK_EVENTS_ID > 0) {
+            $dbRef = CIBlockElement::GetList(
+                ['DATE_ACTIVE_TO' => 'DESC'],
+                [
+                    'IBLOCK_ID' => IBLOCK_EVENTS_ID,
+                    'ACTIVE'    => 'Y',
+                    'PROPERTY_TYPE' => 'reference',
+                ],
+                false, false,
+                ['ID', 'NAME', 'PREVIEW_TEXT', 'PREVIEW_PICTURE', 'DATE_ACTIVE_FROM', 'DATE_ACTIVE_TO', 'DETAIL_PAGE_URL']
+            );
+            while ($el = $dbRef->GetNext()) {
+                $dateTo = $el['DATE_ACTIVE_TO'] ?? '';
+                if ($dateTo && strtotime($dateTo) < strtotime($today)) {
+                    $arPastVisits[]   = $el;
+                } else {
+                    $arActiveVisits[] = $el;
+                }
+            }
+        }
+
+        $visitsTab = $_GET['visits_tab'] ?? 'active';
+        ?>
+        <?php if (!empty($arActiveVisits) || !empty($arPastVisits)): ?>
+        <section style="padding:40px 0;background:#f8f8f8">
+            <div class="container">
+                <h2 class="main-title" style="margin-bottom:24px">Визиты</h2>
+                <div style="display:flex;gap:12px;margin-bottom:32px;flex-wrap:wrap">
+                    <a href="?visits_tab=active" class="btn <?= $visitsTab !== 'active' ? 'btn-empty' : '' ?>"
+                       style="padding:10px 24px">Активные визиты (<?= count($arActiveVisits) ?>)</a>
+                    <a href="?visits_tab=past" class="btn <?= $visitsTab !== 'past' ? 'btn-empty' : '' ?>"
+                       style="padding:10px 24px">Завершённые (<?= count($arPastVisits) ?>)</a>
+                </div>
+                <?php $visitsToShow = ($visitsTab === 'past') ? $arPastVisits : $arActiveVisits; ?>
+                <?php if (empty($visitsToShow)): ?>
+                <p style="color:#888">
+                    <?= $visitsTab === 'past' ? 'Завершённых визитов пока нет.' : 'Активных визитов пока нет.' ?>
+                </p>
+                <?php else: ?>
+                <div class="visits__list">
+                    <?php foreach ($visitsToShow as $visit):
+                        $imgSrc = !empty($visit['PREVIEW_PICTURE'])
+                            ? CFile::GetPath($visit['PREVIEW_PICTURE'])
+                            : SITE_TEMPLATE_PATH . '/assets/img/reference-page/reference-main-img-1.png';
+                        $dateFrom = !empty($visit['DATE_ACTIVE_FROM']) ? date('d.m.Y', strtotime($visit['DATE_ACTIVE_FROM'])) : '';
+                        $dateTo   = !empty($visit['DATE_ACTIVE_TO'])   ? date('d.m.Y', strtotime($visit['DATE_ACTIVE_TO']))   : '';
+                    ?>
+                    <div class="visits__card">
+                        <img src="<?= htmlspecialchars($imgSrc) ?>" alt="<?= htmlspecialchars($visit['NAME']) ?>" class="visits__image">
+                        <div class="visits__content">
+                            <div class="visits__date">
+                                <div class="visits__date-current">
+                                    <?php if ($dateFrom): ?>
+                                    <p><span>Дата: </span><?= $dateFrom ?><?= $dateTo && $dateTo !== $dateFrom ? ' — ' . $dateTo : '' ?></p>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
+                            <h3 class="visits__title"><?= htmlspecialchars($visit['NAME']) ?></h3>
+                            <?php if (!empty($visit['PREVIEW_TEXT'])): ?>
+                            <p class="visits__text"><?= htmlspecialchars($visit['PREVIEW_TEXT']) ?></p>
+                            <?php endif; ?>
+                            <?php if ($visitsTab === 'active' && $_isMember): ?>
+                            <a href="#" class="btn" data-fancybox data-src="#form-d4-modal" style="margin-top:16px">
+                                Записаться на визит
+                            </a>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                    <?php endforeach; ?>
+                </div>
+                <?php endif; ?>
+            </div>
+        </section>
+        <?php endif; ?>
+
+        <!-- visits (статичные заглушки, если инфоблок не настроен) -->
         <section class="visits">
             <div class="container">
                 <h2 class="main-title visits__title">
-                    Визиты
+                    <?= (empty($arActiveVisits) && empty($arPastVisits)) ? 'Визиты' : 'Ближайшие мероприятия (из шаблона)' ?>
                 </h2>
                  <div class="visits__list">
                     <div class="visits__card">

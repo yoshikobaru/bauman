@@ -50,12 +50,14 @@ define('PO_ADMIN_EMAIL', 'admin@bauman-polytech.ru');
 function po_sendAdminEmail(string $type, array $data): void
 {
     $typeLabels = [
-        'project_support'  => 'Поддержка проекта (D2)',
-        'event_reg'        => 'Запись на событие (D3)',
-        'reference_visit'  => 'Участие в референс-визите (D4)',
-        'reference_org'    => 'Организация референс-визита (D5)',
+        'project_support'    => 'Поддержка проекта (D2)',
+        'event_reg'          => 'Запись на событие (D3)',
+        'reference_visit'    => 'Участие в референс-визите (D4)',
+        'reference_org'      => 'Организация референс-визита (D5)',
         'competency_request' => 'Компетенция/Витрина (D6)',
-        'partnership'      => 'Промышленное партнёрство (D7)',
+        'partnership'        => 'Промышленное партнёрство (D7)',
+        'vacancy'            => 'Вакансия (карьерная платформа)',
+        'resume'             => 'Резюме выпускника (карьерная платформа)',
     ];
     $label = $typeLabels[$type] ?? $type;
 
@@ -157,6 +159,8 @@ function po_createCrmLead(string $type, array $data): void
         'reference_org'      => 'Организация референс-визита (D5)',
         'competency_request' => 'Компетенция/Витрина (D6)',
         'partnership'        => 'Промышленное партнёрство (D7)',
+        'vacancy'            => 'Вакансия (карьерная платформа)',
+        'resume'             => 'Резюме выпускника (карьерная платформа)',
     ];
     $title = 'Заявка: ' . ($typeLabels[$type] ?? $type);
 

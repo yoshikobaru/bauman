@@ -81,7 +81,15 @@ if (!empty($arElement['DETAIL_PICTURE'])) {
                     </p>
                     <?php endif; ?>
                     <p style="margin-top:24px">
-                        <a href="/support/" class="btn">Поддержать проект</a>
+                        <?php
+                        $projectStatus = mb_strtolower($arProps['PROJECT_STATUS']['VALUE'] ?? '');
+                        $isActiveProject = in_array($projectStatus, ['active', 'активный', 'в работе', 'активен']);
+                        ?>
+                        <?php if ($isActiveProject || empty($projectStatus)): ?>
+                        <a href="/support/?project=<?= urlencode($arElement['NAME']) ?>" class="btn">
+                            Поддержать проект
+                        </a>
+                        <?php endif; ?>
                         <a href="/projects/" class="btn btn-transparent" style="margin-left:12px">← К списку проектов</a>
                     </p>
                 </div>
@@ -94,5 +102,29 @@ if (!empty($arElement['DETAIL_PICTURE'])) {
     </div></section>
     <?php endif; ?>
 </main>
+
+<?php if ($arElement): ?>
+<?php
+$_projName  = htmlspecialchars($arElement['NAME'], ENT_QUOTES);
+$_projDesc  = htmlspecialchars(strip_tags($arElement['PREVIEW_TEXT'] ?? ''), ENT_QUOTES);
+$_projUrl   = 'https://bauman-polytech.ru/projects/detail/?id=' . $arElement['ID'];
+$_projDate  = !empty($arElement['DATE_ACTIVE_FROM']) ? date('c', strtotime($arElement['DATE_ACTIVE_FROM'])) : date('c', strtotime($arElement['TIMESTAMP_X']));
+?>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "CreativeWork",
+  "name": "<?= $_projName ?>",
+  "description": "<?= $_projDesc ?>",
+  "dateCreated": "<?= $_projDate ?>",
+  "url": "<?= $_projUrl ?>",
+  "creator": {
+    "@type": "Organization",
+    "name": "Политехническое общество выпускников МГТУ им. Н.Э. Баумана",
+    "url": "https://bauman-polytech.ru"
+  }
+}
+</script>
+<?php endif; ?>
 
 <?php require($_SERVER["DOCUMENT_ROOT"]."/bitrix/footer.php"); ?>

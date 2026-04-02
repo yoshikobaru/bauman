@@ -335,9 +335,92 @@ $prefill = [
             </div>
         </div>
     </section>
+
+    <!-- Раздел фондов -->
+    <?php
+    $arFunds = [];
+    if ($iblockOk && defined('IBLOCK_FUNDS_ID') && IBLOCK_FUNDS_ID > 0) {
+        $dbFunds = CIBlockElement::GetList(
+            ['SORT' => 'ASC'],
+            ['IBLOCK_ID' => IBLOCK_FUNDS_ID, 'ACTIVE' => 'Y'],
+            false, false,
+            ['ID', 'NAME', 'PREVIEW_TEXT', 'PREVIEW_PICTURE']
+        );
+        while ($row = $dbFunds->GetNext()) {
+            $arFunds[] = $row;
+        }
+    }
+    if (!empty($arFunds)):
+    ?>
+    <section style="padding:60px 0;background:#f8f8f8">
+        <div class="container">
+            <h2 class="main-title" style="margin-bottom:8px">Наши фонды</h2>
+            <p style="color:#666;margin-bottom:32px">Каждое пожертвование идёт в конкретный фонд. Выберите направление поддержки.</p>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:24px">
+                <?php foreach ($arFunds as $fund):
+                    $fundImg = !empty($fund['PREVIEW_PICTURE']) ? CFile::GetPath($fund['PREVIEW_PICTURE']) : '';
+                ?>
+                <div style="background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.07)">
+                    <?php if ($fundImg): ?>
+                    <img src="<?= htmlspecialchars($fundImg) ?>" alt="<?= htmlspecialchars($fund['NAME']) ?>"
+                         style="width:100%;height:180px;object-fit:cover">
+                    <?php endif; ?>
+                    <div style="padding:24px">
+                        <h3 style="font-size:18px;font-weight:700;margin-bottom:10px"><?= htmlspecialchars($fund['NAME']) ?></h3>
+                        <p style="color:#555;font-size:14px;line-height:1.6;margin-bottom:20px"><?= htmlspecialchars($fund['PREVIEW_TEXT'] ?? '') ?></p>
+                        <button type="button" class="btn" style="width:100%"
+                                onclick="po_selectFund(<?= htmlspecialchars(json_encode($fund['NAME'])) ?>)">
+                            Поддержать этот фонд
+                        </button>
+                    </div>
+                </div>
+                <?php endforeach; ?>
+            </div>
+        </div>
+    </section>
+    <?php endif; ?>
 </main>
 
 <script>
+// Выбрать фонд из карточки — скроллит к форме и подставляет название
+function po_selectFund(fundName) {
+    var sel = document.getElementById('d2_project_select');
+    if (sel) {
+        // Ищем опцию с совпадающим текстом или value
+        for (var i = 0; i < sel.options.length; i++) {
+            if (sel.options[i].text === fundName || sel.options[i].value === fundName) {
+                sel.selectedIndex = i;
+                break;
+            }
+        }
+    }
+    var pf = document.getElementById('d2_project');
+    if (pf) pf.value = fundName;
+    var form = document.getElementById('form-d2');
+    if (form) form.scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+// Авто-выбор проекта/фонда из URL (?project=...)
+(function() {
+    var urlProject = new URLSearchParams(location.search).get('project');
+    if (urlProject) {
+        var pf = document.getElementById('d2_project');
+        if (pf) pf.value = urlProject;
+        var sel = document.getElementById('d2_project_select');
+        if (sel) {
+            for (var i = 0; i < sel.options.length; i++) {
+                if (sel.options[i].text === urlProject || sel.options[i].value === urlProject) {
+                    sel.selectedIndex = i;
+                    break;
+                }
+            }
+        }
+        // Сразу переключаем на шаг «Программы»
+        var prog = document.querySelector('.main-tabs-click[data-tab="programm"]');
+        if (prog) prog.click();
+    }
+})();
+
 // D2 multi-step form logic
 (function() {
     var priceList = document.getElementById('d2_price_list');

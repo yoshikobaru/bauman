@@ -190,6 +190,62 @@ $currentStatus = $statusLabels[$membershipStatus] ?? null;
                     <!-- Мои активности -->
                     <div class="account__block">
                         <h2 class="account__title">Мои активности</h2>
+
+                        <!-- Telegram-чаты по уровню членства -->
+                        <?php
+                        $_userGroupsProfile = $USER->GetUserGroupArray();
+                        $tgChats = [
+                            PO_MEMBER_BASIC_ID   => [
+                                'title' => 'Общий чат Политехнического общества',
+                                'desc'  => 'Обсуждения, новости, анонсы для всех членов общества',
+                                'url'   => '#',
+                                'icon'  => '💬',
+                            ],
+                            PO_MEMBER_PREMIUM_ID => [
+                                'title' => 'VIP-канал для почётных членов',
+                                'desc'  => 'Закрытый канал с эксклюзивными материалами и нетворкингом',
+                                'url'   => '#',
+                                'icon'  => '⭐',
+                            ],
+                            PO_PARTNER_ID        => [
+                                'title' => 'Канал для партнёров',
+                                'desc'  => 'Совместные проекты, вакансии и партнёрские предложения',
+                                'url'   => '#',
+                                'icon'  => '🤝',
+                            ],
+                        ];
+                        $myTgChats = [];
+                        foreach ($tgChats as $groupId => $chatInfo) {
+                            if (in_array($groupId, $_userGroupsProfile)) {
+                                $myTgChats[] = $chatInfo;
+                            }
+                        }
+                        ?>
+                        <?php if (!empty($myTgChats)): ?>
+                        <div style="margin-bottom:32px">
+                            <h3 class="account__subtitle" style="margin-bottom:16px">Мои Telegram-чаты</h3>
+                            <div style="display:grid;gap:12px">
+                                <?php foreach ($myTgChats as $chat): ?>
+                                <div style="display:flex;align-items:center;gap:16px;background:#f0f8ff;border-radius:10px;padding:16px 20px;border-left:3px solid #2980b9">
+                                    <span style="font-size:28px"><?= $chat['icon'] ?></span>
+                                    <div style="flex:1">
+                                        <div style="font-weight:600;font-size:15px;margin-bottom:2px"><?= htmlspecialchars($chat['title']) ?></div>
+                                        <div style="color:#666;font-size:13px"><?= htmlspecialchars($chat['desc']) ?></div>
+                                    </div>
+                                    <?php if ($chat['url'] !== '#'): ?>
+                                    <a href="<?= htmlspecialchars($chat['url']) ?>" target="_blank" rel="noopener"
+                                       class="btn" style="white-space:nowrap;font-size:13px;padding:8px 16px">
+                                        Открыть
+                                    </a>
+                                    <?php else: ?>
+                                    <span style="color:#aaa;font-size:12px;white-space:nowrap">Скоро</span>
+                                    <?php endif; ?>
+                                </div>
+                                <?php endforeach; ?>
+                            </div>
+                        </div>
+                        <?php endif; ?>
+
                         <?php
                         $arEvents   = [];
                         $arDonations = [];

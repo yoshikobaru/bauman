@@ -5,31 +5,47 @@ $APPLICATION->SetPageProperty('description', 'Члены Политехниче�
 
 /**
  * Страница каталога участников общества (по ТЗ).
- * 4 вкладки: Почётные (group 7), Профессиональные (group 6),
- *            Компании-партнёры (group 8), Правление/Модераторы (group 9)
+ * Вкладки: Почётные (premium group + badge Правление для модераторов),
+ *          Профессиональные (basic group), Безвозмездные (honorary type),
+ *          Компании-партнёры (partner group)
  */
 
 $tabs = [
-    'premium'   => ['label' => 'Почётные члены',       'group_id' => PO_MEMBER_PREMIUM_ID],
-    'basic'     => ['label' => 'Профессиональные',      'group_id' => PO_MEMBER_BASIC_ID],
-    'partner'   => ['label' => 'Компании-партнёры',     'group_id' => PO_PARTNER_ID],
-    'moderator' => ['label' => 'Правление / Модераторы','group_id' => PO_MODERATOR_ID],
+    'honorary'     => ['label' => 'Почётные члены',      'mode' => 'group',  'group_id' => PO_MEMBER_PREMIUM_ID],
+    'professional' => ['label' => 'Профессиональные',    'mode' => 'group',  'group_id' => PO_MEMBER_BASIC_ID],
+    'free'         => ['label' => 'Безвозмездные члены', 'mode' => 'type',   'type_val' => 'honorary'],
+    'partner'      => ['label' => 'Компании-партнёры',   'mode' => 'group',  'group_id' => PO_PARTNER_ID],
 ];
 
 $activeTab = isset($_GET['tab']) && array_key_exists($_GET['tab'], $tabs)
     ? $_GET['tab']
-    : 'premium';
+    : 'honorary';
 
-// Load users for each tab
+$_moderatorGroupId = defined('PO_MODERATOR_ID') ? PO_MODERATOR_ID : 0;
+
+// Load users by group
 function po_getGroupMembers($groupId) {
-    $arFilter = ['GROUPS_ID' => $groupId, 'ACTIVE' => 'Y'];
     $arSelect = ['ID', 'NAME', 'LAST_NAME', 'SECOND_NAME', 'PHOTO', 'UF_GRADUATE_YEAR', 'UF_GRADUATE_DEPT', 'UF_MEMBERSHIP_TYPE'];
-    $rsUsers = CUser::GetList('last_name', 'asc', $arFilter, ['SELECT' => $arSelect]);
+    $rsUsers = CUser::GetList('last_name', 'asc', ['GROUPS_ID' => $groupId, 'ACTIVE' => 'Y'], ['SELECT' => $arSelect]);
     $members = [];
-    while ($u = $rsUsers->Fetch()) {
-        $members[] = $u;
-    }
+    while ($u = $rsUsers->Fetch()) { $members[] = $u; }
     return $members;
+}
+
+// Load users by UF_MEMBERSHIP_TYPE value
+function po_getMembersByType($typeVal) {
+    $arSelect = ['ID', 'NAME', 'LAST_NAME', 'SECOND_NAME', 'PHOTO', 'UF_GRADUATE_YEAR', 'UF_GRADUATE_DEPT', 'UF_MEMBERSHIP_TYPE'];
+    $rsUsers = CUser::GetList('last_name', 'asc', ['UF_MEMBERSHIP_TYPE' => $typeVal, 'ACTIVE' => 'Y'], ['SELECT' => $arSelect]);
+    $members = [];
+    while ($u = $rsUsers->Fetch()) { $members[] = $u; }
+    return $members;
+}
+
+// Check if user is in moderator/board group (for badge)
+function po_isBoardMember($userId, $moderatorGroupId) {
+    if (!$moderatorGroupId || !$userId) return false;
+    $groups = CUser::GetUserGroup((int)$userId);
+    return in_array($moderatorGroupId, $groups);
 }
 ?>
 
@@ -72,7 +88,9 @@ function po_getGroupMembers($groupId) {
 <?php foreach ($tabs as $key => $tab): ?>
             <div class="main-tabs-pane" id="tab-<?= $key ?>" <?= $key !== $activeTab ? 'style="display:none;"' : '' ?>>
 <?php
-    $members = po_getGroupMembers($tab['group_id']);
+    $members = ($tab['mode'] === 'type')
+        ? po_getMembersByType($tab['type_val'])
+        : po_getGroupMembers($tab['group_id']);
     if (empty($members)):
 ?>
                 <p class="main-text" style="color:#888;">Участников в этой категории пока нет.</p>
@@ -86,11 +104,15 @@ function po_getGroupMembers($groupId) {
     $dept = $member['UF_GRADUATE_DEPT'] ?? '';
     $year = $member['UF_GRADUATE_YEAR'] ?? '';
     $subText = implode(', ', array_filter([$dept, $year ? 'выпуск ' . $year : '']));
+    $isBoard = ($key === 'honorary') && po_isBoardMember($member['ID'], $_moderatorGroupId);
 ?>
                     <div class="boards__item">
                         <img src="<?= htmlspecialchars($photoSrc) ?>" alt="<?= htmlspecialchars($fullName) ?>" class="boards__item-image">
                         <h3 class="boards__item-title">
                             <?= htmlspecialchars($fullName) ?>
+                            <?php if ($isBoard): ?>
+                            <span style="display:inline-block;font-size:11px;font-weight:600;background:#1a3a6b;color:#fff;padding:2px 8px;border-radius:4px;margin-left:6px;vertical-align:middle">Правление</span>
+                            <?php endif; ?>
                         </h3>
                         <?php if ($subText): ?>
                         <p class="boards__item-text">

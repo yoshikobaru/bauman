@@ -57,7 +57,7 @@ if ($isEvent && $hlOk && defined('HL_APPLICATIONS_ID') && HL_APPLICATIONS_ID > 0
 
                 $res = $hlClass::add([
                     'UF_USER_ID'    => $USER->IsAuthorized() ? (int)$USER->GetID() : 0,
-                    'UF_TYPE'       => 'event_registration',
+                    'UF_TYPE'       => 'event_reg',
                     'UF_STATUS'     => 'new',
                     'UF_DATE_CREATE'=> new \Bitrix\Main\Type\DateTime(),
                     'UF_DATA'       => $data,
@@ -175,5 +175,57 @@ if (!empty($arElement['DATE_ACTIVE_FROM'])) {
         </div>
     </section>
 </main>
+
+<?php if ($arElement): ?>
+<?php
+$_schemaType   = $isEvent ? 'Event' : 'NewsArticle';
+$_schemaName   = htmlspecialchars($arElement['NAME'], ENT_QUOTES);
+$_schemaDesc   = htmlspecialchars(strip_tags($arElement['PREVIEW_TEXT'] ?? ''), ENT_QUOTES);
+$_schemaDate   = !empty($arElement['DATE_ACTIVE_FROM']) ? date('c', strtotime($arElement['DATE_ACTIVE_FROM'])) : date('c', strtotime($arElement['TIMESTAMP_X']));
+$_schemaUrl    = 'https://bauman-polytech.ru/news/detail/?id=' . $arElement['ID'];
+if ($isEvent):
+?>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Event",
+  "name": "<?= $_schemaName ?>",
+  "description": "<?= $_schemaDesc ?>",
+  "startDate": "<?= $_schemaDate ?>",
+  "url": "<?= $_schemaUrl ?>",
+  "organizer": {
+    "@type": "Organization",
+    "name": "Политехническое общество выпускников МГТУ им. Н.Э. Баумана",
+    "url": "https://bauman-polytech.ru"
+  },
+  "location": {
+    "@type": "Place",
+    "name": "Москва",
+    "address": {
+      "@type": "PostalAddress",
+      "addressLocality": "Москва",
+      "addressCountry": "RU"
+    }
+  }
+}
+</script>
+<?php else: ?>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "NewsArticle",
+  "headline": "<?= $_schemaName ?>",
+  "description": "<?= $_schemaDesc ?>",
+  "datePublished": "<?= $_schemaDate ?>",
+  "url": "<?= $_schemaUrl ?>",
+  "publisher": {
+    "@type": "Organization",
+    "name": "Политехническое общество выпускников МГТУ им. Н.Э. Баумана",
+    "url": "https://bauman-polytech.ru"
+  }
+}
+</script>
+<?php endif; ?>
+<?php endif; ?>
 
 <?php require($_SERVER["DOCUMENT_ROOT"]."/bitrix/footer.php"); ?>

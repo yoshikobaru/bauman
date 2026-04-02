@@ -555,4 +555,33 @@ endif;
 		<!-- /.news -->
 	</main>
 
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "Политехническое общество выпускников МГТУ им. Н.Э. Баумана",
+  "url": "https://bauman-polytech.ru",
+  "logo": "https://bauman-polytech.ru<?= SITE_TEMPLATE_PATH ?>/assets/img/logo.svg",
+  "description": "Политехническое общество выпускников МГТУ им. Н.Э. Баумана — объединение выпускников, партнёров и друзей университета.",
+  "sameAs": [],
+  "contactPoint": {
+    "@type": "ContactPoint",
+    "contactType": "customer support",
+    "email": "info@bauman-polytech.ru"
+  },
+  "address": {
+    "@type": "PostalAddress",
+    "addressCountry": "RU",
+    "addressLocality": "Москва",
+    "streetAddress": "ул. 2-я Бауманская, 5"
+  },
+  "foundingDate": "2020",
+  "parentOrganization": {
+    "@type": "EducationalOrganization",
+    "name": "МГТУ им. Н.Э. Баумана",
+    "url": "https://bmstu.ru"
+  }
+}
+</script>
+
 <?php require($_SERVER["DOCUMENT_ROOT"]."/bitrix/footer.php");?>
