@@ -1,6 +1,83 @@
 <?php
 require($_SERVER["DOCUMENT_ROOT"]."/bitrix/header.php");
 $APPLICATION->SetTitle("Референс-визиты");
+
+use Bitrix\Main\Loader;
+$hlOk = Loader::includeModule('highloadblock');
+
+$_userGroups = $USER->IsAuthorized() ? $USER->GetUserGroupArray() : [];
+$_isMember   = defined('PO_MEMBER_BASIC_ID') && (
+    in_array(PO_MEMBER_BASIC_ID,   $_userGroups) ||
+    in_array(PO_MEMBER_PREMIUM_ID, $_userGroups) ||
+    in_array(PO_PARTNER_ID,        $_userGroups)
+);
+
+// Вспомогательная функция: записать заявку в HL-блок
+function po_hlSave($type, $userId, array $data, $elementId = 0)
+{
+    if (!defined('HL_APPLICATIONS_ID') || HL_APPLICATIONS_ID <= 0) return false;
+    $hlEntity = \Bitrix\Highloadblock\HighloadBlockTable::getById(HL_APPLICATIONS_ID)->fetch();
+    if (!$hlEntity) return false;
+    $hlClass = \Bitrix\Highloadblock\HighloadBlockTable::compileEntity($hlEntity)->getDataClass();
+    $res = $hlClass::add([
+        'UF_USER_ID'     => (int)$userId,
+        'UF_TYPE'        => $type,
+        'UF_STATUS'      => 'new',
+        'UF_DATE_CREATE' => new \Bitrix\Main\Type\DateTime(),
+        'UF_DATA'        => json_encode($data, JSON_UNESCAPED_UNICODE),
+        'UF_ELEMENT_ID'  => (int)$elementId,
+    ]);
+    return $res->isSuccess();
+}
+
+$d4Done  = false; $d4Error  = '';
+$d5Done  = false; $d5Error  = '';
+
+// D4: Участие в референс-визите (только члены)
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['d4_action'])) {
+    if (!$_isMember) {
+        $d4Error = 'Участие в референс-визитах доступно только членам общества.';
+    } else {
+        $fn = trim($_POST['first_name'] ?? '');
+        $ln = trim($_POST['last_name']  ?? '');
+        $em = trim($_POST['email']      ?? '');
+        if (!$fn || !$ln || !$em) {
+            $d4Error = 'Заполните обязательные поля: Имя, Фамилия, Email.';
+        } else {
+            $saved = $hlOk ? po_hlSave('reference_visit', $USER->GetID(), [
+                'last_name'  => $ln, 'first_name' => $fn,
+                'email'      => $em, 'phone'      => trim($_POST['phone'] ?? ''),
+                'telegram'   => trim($_POST['telegram'] ?? ''),
+            ]) : false;
+            if (!$hlOk || $saved) $d4Done = true;
+            else $d4Error = 'Ошибка сохранения. Попробуйте позже.';
+        }
+    }
+}
+
+// D5: Организация референс-визита (все)
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['d5_action'])) {
+    $company = trim($_POST['company']     ?? '');
+    $about   = trim($_POST['about']       ?? '');
+    $show    = trim($_POST['what_show']   ?? '');
+    $audience= trim($_POST['audience']    ?? '');
+    $fn      = trim($_POST['d5_first_name']?? '');
+    $ln      = trim($_POST['d5_last_name'] ?? '');
+    $em      = trim($_POST['d5_email']     ?? '');
+    if (!$company || !$fn || !$em) {
+        $d5Error = 'Заполните обязательные поля: Компания, Имя, Email.';
+    } else {
+        $saved = $hlOk ? po_hlSave('reference_org', $USER->IsAuthorized() ? $USER->GetID() : 0, [
+            'company'    => $company, 'about'     => $about,
+            'what_show'  => $show,   'audience'  => $audience,
+            'last_name'  => $ln,     'first_name'=> $fn,
+            'email'      => $em,     'phone'     => trim($_POST['d5_phone'] ?? ''),
+            'site'       => trim($_POST['d5_site']  ?? ''),
+        ]) : false;
+        if (!$hlOk || $saved) $d5Done = true;
+        else $d5Error = 'Ошибка сохранения. Попробуйте позже.';
+    }
+}
 ?>
 
 <main>
@@ -91,6 +168,49 @@ $APPLICATION->SetTitle("Референс-визиты");
             <!-- /.container -->
         </section>
         <!-- /.visits -->
+
+        <!-- D4: Участие в референс-визите (только члены) -->
+        <?php if ($USER->IsAuthorized()): ?>
+        <section class="account" style="padding-top:0">
+            <div class="container">
+                <div class="account__block" style="max-width:700px;margin:0 auto 60px">
+                    <h3 class="account__subtitle">
+                        <?= $_isMember ? 'Записаться на референс-визит' : 'Доступно для членов общества' ?>
+                    </h3>
+                    <?php if ($d4Done): ?>
+                        <div class="authorization__alert authorization__alert--success" style="margin-top:16px">
+                            <p>Заявка принята! Мы свяжемся с вами для подтверждения.</p>
+                        </div>
+                    <?php elseif ($_isMember): ?>
+                        <?php if ($d4Error): ?>
+                        <div class="authorization__alert authorization__alert--error" style="margin-top:16px">
+                            <p><?= htmlspecialchars($d4Error) ?></p>
+                        </div>
+                        <?php endif; ?>
+                        <form method="POST" action="/reference/">
+                            <input type="hidden" name="d4_action" value="1">
+                            <div class="account__personal-list account__grid" style="margin-top:16px">
+                                <input type="text"  name="last_name"  placeholder="Фамилия *" required
+                                       value="<?= htmlspecialchars($USER->GetParam('LAST_NAME')) ?>">
+                                <input type="text"  name="first_name" placeholder="Имя *" required
+                                       value="<?= htmlspecialchars($USER->GetParam('NAME')) ?>">
+                                <input type="email" name="email"      placeholder="Электропочта *" required
+                                       value="<?= htmlspecialchars($USER->GetParam('EMAIL')) ?>">
+                                <input type="tel"   name="phone"      placeholder="Телефон">
+                                <input type="text"  name="telegram"   placeholder="Telegram">
+                            </div>
+                            <button type="submit" class="btn authorization__btn" style="margin-top:16px">Подать заявку на участие</button>
+                        </form>
+                    <?php else: ?>
+                        <p style="color:#888;margin-top:12px">
+                            Запись на референс-визиты доступна только членам Политехнического общества.
+                            <a href="/join/">Вступить</a>
+                        </p>
+                    <?php endif; ?>
+                </div>
+            </div>
+        </section>
+        <?php endif; ?>
 
         <!-- culture -->
 		<section class="culture culture-reference" id="culture">
@@ -398,60 +518,69 @@ $APPLICATION->SetTitle("Референс-визиты");
 		</section>
 	</main>
 <div class="form-reference-visits" id="form-reference-visits" style="display:none;">
-		<div class="join__wrapper">
-			<h2 class="account__title main-title">Заявка на организацию референс-визита</h2>
+	<div class="join__wrapper">
+		<?php if ($d5Done): ?>
+			<h2 class="account__title main-title">Заявка принята!</h2>
+			<p style="margin-top:16px">Мы свяжемся с вами в ближайшее время.</p>
+		<?php else: ?>
+		<h2 class="account__title main-title">Заявка на организацию референс-визита</h2>
+		<?php if ($d5Error): ?>
+		<div class="authorization__alert authorization__alert--error" style="margin:12px 0">
+			<p><?= htmlspecialchars($d5Error) ?></p>
+		</div>
+		<?php endif; ?>
+		<form method="POST" action="/reference/#form-reference-visits" id="form-d5">
+			<input type="hidden" name="d5_action" value="1">
 			<div class="account__personal">
 				<div class="account__chapter">
-					<h3 class="account__subtitle">
-						Данные о компании
-					</h3>
+					<h3 class="account__subtitle">Данные о компании</h3>
 				</div>
 				<div class="account__personal-list account__personal-list--form">
-					<input type="text" placeholder=" Компания">
-					<input type="text" placeholder="Чем занимается компания?">
-					<input type="text" placeholder="Что хотите показать?">
-					<input type="text" placeholder="Для какой аудитории?">
-					
+					<input type="text" name="company"   placeholder="Компания *" required>
+					<input type="text" name="about"     placeholder="Чем занимается компания?">
+					<input type="text" name="what_show" placeholder="Что хотите показать?">
+					<input type="text" name="audience"  placeholder="Для какой аудитории?">
 				</div>
 			</div>
 			<div class="account__personal">
 				<div class="account__chapter">
-					<h3 class="account__subtitle">
-						Образование
-					</h3>
+					<h3 class="account__subtitle">Контактное лицо</h3>
 				</div>
-				<div class="account__personal-list account__personal-list account__grid">
-					<input type="text" placeholder="Фамилия">
-					<input type="text" placeholder="Имя">
-					<input type="text" placeholder="Отчество">
-					<input type="tel" placeholder="Номер телефона">
-					<input type="email" placeholder="Електропочта">
-					<input type="text" placeholder="Сайт">
+				<div class="account__personal-list account__grid">
+					<input type="text"  name="d5_last_name"  placeholder="Фамилия">
+					<input type="text"  name="d5_first_name" placeholder="Имя *" required>
+					<input type="tel"   name="d5_phone"      placeholder="Номер телефона">
+					<input type="email" name="d5_email"      placeholder="Электропочта *" required>
+					<input type="text"  name="d5_site"       placeholder="Сайт">
 				</div>
 			</div>
-			
 			<div class="join__politic">
 				<div class="join__politic-question">
-					<p class="join__politic-link">
-						Согласен с <a href="#">политикой обработки ПДн</a>
-					</p>
+					<p class="join__politic-link">Согласен с <a href="#">политикой обработки ПДн</a></p>
 					<div class="account__graduate-choice">
 						<label class="account__graduate-item">
-							<input type="radio" name="subscribe" value="yes" class="account__graduate-input">
-							<span class="account__graduate-box"></span>
-							Да
+							<input type="radio" name="d5_agree" value="yes" class="account__graduate-input" required>
+							<span class="account__graduate-box"></span>Да
 						</label>
-
 						<label class="account__graduate-item">
-							<input type="radio" name="subscribe" value="no" class="account__graduate-input">
-							<span class="account__graduate-box"></span>
-							Нет
+							<input type="radio" name="d5_agree" value="no" class="account__graduate-input">
+							<span class="account__graduate-box"></span>Нет
 						</label>
 					</div>
-				</div>                        
+				</div>
 			</div>
-			<button class="btn authorization__btn">Отправить</button>
-		</div>
+			<button type="submit" class="btn authorization__btn">Отправить</button>
+		</form>
+		<?php endif; ?>
 	</div>
+</div>
+
+<?php if ($d5Done): ?>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    if (window.Fancybox) Fancybox.show([{src: '#form-reference-visits', type: 'inline'}]);
+});
+</script>
+<?php endif; ?>
 
 <?php require($_SERVER["DOCUMENT_ROOT"]."/bitrix/footer.php");?>

@@ -89,17 +89,51 @@
 						?>
 							<a href="/join/" class="btn header-wrapper__btn header-wrapper--join">Вступить</a>
 							<button class="btn header-wrapper__btn header-wrapper__btn--sign btn-empty" data-fancybox data-src="#form-login">Войти</button>
-						<?php elseif ($_isMember): ?>
-							<a href="/profile/" class="btn header-wrapper__btn header-wrapper__btn--sign btn-empty">
-								<?= htmlspecialchars($USER->GetParam('NAME') . ' ' . $USER->GetParam('LAST_NAME')) ?>
-							</a>
-						<?php else: ?>
+						<?php else:
+							$_displayName = $_isMember
+								? htmlspecialchars(trim($USER->GetParam('NAME') . ' ' . $USER->GetParam('LAST_NAME')) ?: $USER->GetParam('EMAIL'))
+								: htmlspecialchars($USER->GetParam('EMAIL'));
+							$_logoutUrl = '/auth/?logout=yes&sessid=' . bitrix_sessid();
+						?>
+							<?php if (!$_isMember): ?>
 							<a href="/join/" class="btn header-wrapper__btn header-wrapper--join">Вступить</a>
-							<a href="/profile/" class="btn header-wrapper__btn header-wrapper__btn--sign btn-empty">
-								<?= htmlspecialchars($USER->GetParam('EMAIL')) ?>
-							</a>
+							<?php endif; ?>
+							<div class="header-user-dropdown" style="position:relative;display:inline-block">
+								<button class="btn header-wrapper__btn header-wrapper__btn--sign btn-empty header-user-btn" type="button" aria-expanded="false">
+									<?= $_displayName ?>
+									<svg style="margin-left:6px;vertical-align:middle" width="10" height="6" viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg">
+										<path d="M1 1L5 5L9 1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+									</svg>
+								</button>
+								<div class="header-user-menu" style="display:none;position:absolute;right:0;top:calc(100% + 8px);min-width:200px;background:#fff;border:1px solid #e0e0e0;border-radius:4px;box-shadow:0 4px 16px rgba(0,0,0,.12);z-index:1000;padding:8px 0">
+									<a href="/profile/" style="display:block;padding:10px 16px;color:#333;text-decoration:none;font-size:14px" class="header-user-menu__item">Настройки профиля</a>
+									<a href="/profile/security/" style="display:block;padding:10px 16px;color:#333;text-decoration:none;font-size:14px" class="header-user-menu__item">Безопасность</a>
+									<a href="/profile/?tab=applications" style="display:block;padding:10px 16px;color:#333;text-decoration:none;font-size:14px" class="header-user-menu__item">Мои заявки</a>
+									<hr style="margin:4px 0;border:none;border-top:1px solid #f0f0f0">
+									<a href="<?= $_logoutUrl ?>" style="display:block;padding:10px 16px;color:#c0392b;text-decoration:none;font-size:14px" class="header-user-menu__item">Выйти</a>
+								</div>
+							</div>
 						<?php endif; ?>
 					</div>
+
+					<script>
+					(function() {
+						var btn  = document.querySelector('.header-user-btn');
+						var menu = document.querySelector('.header-user-menu');
+						if (!btn || !menu) return;
+						btn.addEventListener('click', function(e) {
+							e.stopPropagation();
+							var open = menu.style.display !== 'none';
+							menu.style.display = open ? 'none' : 'block';
+							btn.setAttribute('aria-expanded', String(!open));
+						});
+						document.addEventListener('click', function() {
+							menu.style.display = 'none';
+							btn.setAttribute('aria-expanded', 'false');
+						});
+						menu.addEventListener('click', function(e) { e.stopPropagation(); });
+					})();
+					</script>
 				</div>				
 			</div>
 		</div>

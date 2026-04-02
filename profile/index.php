@@ -6,6 +6,9 @@ if (!$USER->IsAuthorized()) {
     LocalRedirect('/authorization/?back_url=/profile/');
 }
 
+use Bitrix\Main\Loader;
+$hlOk = Loader::includeModule('highloadblock');
+
 $userId = $USER->GetID();
 $saveError = '';
 $saveOk    = !empty($_GET['saved']);
@@ -85,14 +88,78 @@ $currentStatus = $statusLabels[$membershipStatus] ?? null;
             <div class="account__wrapper">
                 <div class="account__sidebar">
                     <div class="account__menu">
-                        <a href="/profile/" class="account__menu-item account__menu-item--active">Мой профиль</a>
-                        <a href="#" class="account__menu-item">Безопасность</a>
-                        <a href="#" class="account__menu-item">Мои активности</a>
-                        <a href="#" class="account__menu-item">Мои заявки</a>
+                        <?php $tab = $_GET['tab'] ?? 'profile'; ?>
+                        <a href="/profile/" class="account__menu-item <?= $tab === 'profile' ? 'account__menu-item--active' : '' ?>">Мой профиль</a>
+                        <a href="/profile/security/" class="account__menu-item">Безопасность</a>
+                        <a href="/profile/?tab=applications" class="account__menu-item <?= $tab === 'applications' ? 'account__menu-item--active' : '' ?>">Мои заявки</a>
                     </div>
                 </div>
 
                 <div class="account__main">
+
+                    <?php if ($tab === 'applications'): ?>
+                    <!-- Мои заявки -->
+                    <div class="account__block">
+                        <h2 class="account__title">Мои заявки</h2>
+                        <?php
+                        $typeLabelsHL = [
+                            'event_registration' => 'Регистрация на событие',
+                            'reference_visit'    => 'Участие в референс-визите',
+                            'reference_org'      => 'Организация референс-визита',
+                            'competency_request' => 'Запрос в витрине компетенций',
+                            'partnership'        => 'Индустриальное партнёрство',
+                            'project_support'    => 'Поддержка проекта',
+                        ];
+                        $statusLabelsHL = [
+                            'new'        => 'Новая',
+                            'in_progress'=> 'В обработке',
+                            'approved'   => 'Одобрено',
+                            'rejected'   => 'Отклонено',
+                        ];
+                        $arApplications = [];
+                        if ($hlOk && defined('HL_APPLICATIONS_ID') && HL_APPLICATIONS_ID > 0) {
+                            $hlEntity = \Bitrix\Highloadblock\HighloadBlockTable::getById(HL_APPLICATIONS_ID)->fetch();
+                            if ($hlEntity) {
+                                $hlClass = \Bitrix\Highloadblock\HighloadBlockTable::compileEntity($hlEntity)->getDataClass();
+                                $dbApps  = $hlClass::getList([
+                                    'filter' => ['UF_USER_ID' => (int)$userId],
+                                    'order'  => ['UF_DATE_CREATE' => 'DESC'],
+                                ]);
+                                while ($row = $dbApps->fetch()) {
+                                    $arApplications[] = $row;
+                                }
+                            }
+                        }
+                        if (empty($arApplications)):
+                        ?>
+                        <p style="color:#888;margin-top:16px">У вас пока нет заявок.</p>
+                        <?php else: ?>
+                        <table style="width:100%;border-collapse:collapse;margin-top:16px;font-size:14px">
+                            <thead>
+                                <tr style="background:#f5f5f5">
+                                    <th style="padding:10px;text-align:left;border-bottom:1px solid #eee">Тип</th>
+                                    <th style="padding:10px;text-align:left;border-bottom:1px solid #eee">Дата</th>
+                                    <th style="padding:10px;text-align:left;border-bottom:1px solid #eee">Статус</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            <?php foreach ($arApplications as $app):
+                                $appType   = $typeLabelsHL[$app['UF_TYPE']] ?? htmlspecialchars($app['UF_TYPE']);
+                                $appDate   = !empty($app['UF_DATE_CREATE']) ? $app['UF_DATE_CREATE']->format('d.m.Y H:i') : '';
+                                $appStatus = $statusLabelsHL[$app['UF_STATUS']] ?? htmlspecialchars($app['UF_STATUS'] ?? 'новая');
+                            ?>
+                            <tr style="border-bottom:1px solid #f0f0f0">
+                                <td style="padding:10px"><?= $appType ?></td>
+                                <td style="padding:10px"><?= htmlspecialchars($appDate) ?></td>
+                                <td style="padding:10px"><?= $appStatus ?></td>
+                            </tr>
+                            <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                        <?php endif; ?>
+                    </div>
+
+                    <?php else: ?>
                     <div class="account__block">
                         <h2 class="account__title">Мой профиль</h2>
 
@@ -255,6 +322,8 @@ $currentStatus = $statusLabels[$membershipStatus] ?? null;
                             </div>
                         </div>
                     </div>
+                    <?php endif; ?>
+
                 </div>
             </div>
         </div>

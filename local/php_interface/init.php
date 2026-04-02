@@ -21,3 +21,18 @@ define('PO_MEMBER_BASIC_ID',   6); // Член общества — Базово
 define('PO_MEMBER_PREMIUM_ID', 7); // Член общества — Привилегированное
 define('PO_PARTNER_ID',        8); // Партнёр (юр. лицо)
 define('PO_MODERATOR_ID',      9); // Модератор / Сотрудник
+
+/**
+ * Константы инфоблоков.
+ * Заполнить реальными ID после запуска /setup_iblocks.php
+ */
+define('IBLOCK_NEWS_ID',     0); // Новости
+define('IBLOCK_EVENTS_ID',   0); // События
+define('IBLOCK_PROJECTS_ID', 0); // Проекты
+define('IBLOCK_BOARD_ID',    0); // Правление
+
+/**
+ * HL-блок заявок.
+ * Заполнить после запуска /setup_hlblock.php
+ */
+define('HL_APPLICATIONS_ID', 0);
