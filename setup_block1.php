@@ -33,7 +33,7 @@ $userFields = [
 
 // — Существующие группы —
 $existingGroups = [];
-$dbGroups = CGroup::GetList([], []);
+$dbGroups = CGroup::GetList('id', 'asc');
 while ($g = $dbGroups->Fetch()) {
     $existingGroups[$g['STRING_ID']] = (int)$g['ID'];
 }
