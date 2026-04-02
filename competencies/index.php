@@ -47,6 +47,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['d6_action'])) {
                     ]);
                     if ($res->isSuccess()) {
                         $d6Done = true;
+                        po_logAction('form_submit', 'application', 0, 'D6 запрос в витрине компетенций');
                         $d6Data = [
                             'first_name' => $fn,     'last_name' => trim($_POST['last_name'] ?? ''),
                             'email'      => $em,     'phone'     => trim($_POST['phone'] ?? ''),

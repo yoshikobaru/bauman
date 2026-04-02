@@ -13,6 +13,7 @@ $d2Error = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['d2_action'])) {
     $amount    = trim($_POST['amount']     ?? '');
     $project   = trim($_POST['project']   ?? '');
+    $frequency = in_array($_POST['frequency'] ?? '', ['month', 'once']) ? $_POST['frequency'] : 'once';
     $donorType = trim($_POST['donor_type'] ?? 'fiz');
     $fn        = trim($_POST['first_name'] ?? '');
     $ln        = trim($_POST['last_name']  ?? '');
@@ -40,10 +41,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['d2_action'])) {
                     'UF_DATE_CREATE' => new \Bitrix\Main\Type\DateTime(),
                     'UF_DATA'        => json_encode([
                         'amount'     => $amount,    'project'    => $project,
-                        'donor_type' => $donorType, 'first_name' => $fn,
-                        'last_name'  => $ln,        'email'      => $email,
-                        'phone'      => $phone,     'company'    => $company,
-                        'site'       => $site,
+                        'frequency'  => $frequency, 'donor_type' => $donorType,
+                        'first_name' => $fn,        'last_name'  => $ln,
+                        'email'      => $email,     'phone'      => $phone,
+                        'company'    => $company,   'site'       => $site,
                     ], JSON_UNESCAPED_UNICODE),
                 ]);
                 if ($res->isSuccess()) $saved = true;
@@ -54,6 +55,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['d2_action'])) {
         }
         if ($saved) {
             $d2Done = true;
+            po_logAction('form_submit', 'application', 0, 'D2 поддержка проекта: ' . $project . ', ' . $amount);
             $d2Data = [
                 'first_name' => $fn,    'last_name'  => $ln,
                 'email'      => $email, 'phone'      => $phone,
@@ -172,6 +174,7 @@ $prefill = [
                         <input type="hidden" name="amount"     id="d2_amount"     value="">
                         <input type="hidden" name="project"    id="d2_project"    value="">
                         <input type="hidden" name="donor_type" id="d2_donor_type" value="fiz">
+                        <input type="hidden" name="frequency"  id="d2_frequency"  value="month">
 
                         <div class="project-programm__tabs">
                             <ul class="project-programm__navs">
@@ -423,13 +426,23 @@ function po_selectFund(fundName) {
 
 // D2 multi-step form logic
 (function() {
-    var priceList = document.getElementById('d2_price_list');
+    var priceList    = document.getElementById('d2_price_list');
     var amountField  = document.getElementById('d2_amount');
     var projectField = document.getElementById('d2_project');
     var donorField   = document.getElementById('d2_donor_type');
     var customInput  = document.getElementById('d2_custom_amount');
+    var freqField    = document.getElementById('d2_frequency');
 
     if (!priceList) return;
+
+    // Period selector (Ежемесячное / Разовое)
+    document.querySelectorAll('[data-period]').forEach(function(el) {
+        el.addEventListener('click', function() {
+            document.querySelectorAll('[data-period]').forEach(function(e) { e.classList.remove('active'); });
+            el.classList.add('active');
+            if (freqField) freqField.value = el.getAttribute('data-period') === 'once' ? 'once' : 'month';
+        });
+    });
 
     // Select price
     priceList.querySelectorAll('[data-val]').forEach(function(el) {

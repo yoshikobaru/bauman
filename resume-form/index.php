@@ -58,6 +58,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['vacancy_action'])) {
             }
             if ($saved) {
                 $vacDone = true;
+                po_logAction('form_submit', 'application', 0, 'Вакансия: ' . $position . ' (' . $company . ')');
                 po_sendAdminEmail('vacancy', [
                     'company'  => $company, 'position' => $position,
                     'email'    => $contactEmail,
@@ -106,6 +107,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['resume_action'])) {
             }
             if ($saved) {
                 $resDone = true;
+                po_logAction('form_submit', 'application', 0, 'Резюме: ' . $position);
             } else {
                 $errors[] = 'Ошибка сохранения. Попробуйте позже.';
             }

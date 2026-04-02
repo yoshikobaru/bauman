@@ -37,6 +37,12 @@ define('IBLOCK_BOARD_ID',    4); // Правление
 define('HL_APPLICATIONS_ID', 2);
 
 /**
+ * HL-блок логов действий пользователей и администраторов.
+ * ID присваивается при запуске setup_logs.php
+ */
+define('HL_LOGS_ID', 5); // после setup_logs.php обновить реальным ID
+
+/**
  * HL-блоки карьерной платформы.
  * ID присваиваются при запуске setup_career.php
  */
@@ -72,6 +78,7 @@ function po_sendAdminEmail(string $type, array $data): void
         'partnership'        => 'Промышленное партнёрство (D7)',
         'vacancy'            => 'Вакансия (карьерная платформа)',
         'resume'             => 'Резюме выпускника (карьерная платформа)',
+        'access_recovery'   => 'Экстренное восстановление доступа',
     ];
     $label = $typeLabels[$type] ?? $type;
 
@@ -202,3 +209,56 @@ function po_createCrmLead(string $type, array $data): void
         'STATUS_ID' => 'NEW',
     ]);
 }
+
+/**
+ * Записать действие в лог (HL-блок Logs).
+ * Тихо завершается при любой ошибке — не должна ломать основной поток.
+ *
+ * @param string $action      Тип действия: login, logout, form_submit, profile_update, admin_status_change
+ * @param string $entityType  Тип сущности: application, user, page (необязательно)
+ * @param int    $entityId    ID сущности (необязательно)
+ * @param string $desc        Произвольное описание (необязательно)
+ */
+function po_logAction(string $action, string $entityType = '', int $entityId = 0, string $desc = ''): void
+{
+    try {
+        if (!defined('HL_LOGS_ID') || HL_LOGS_ID <= 0) return;
+        if (!\Bitrix\Main\Loader::includeModule('highloadblock')) return;
+
+        $hlData = \Bitrix\Highloadblock\HighloadBlockTable::getById(HL_LOGS_ID)->fetch();
+        if (!$hlData) return;
+
+        $hlClass = \Bitrix\Highloadblock\HighloadBlockTable::compileEntity($hlData)->getDataClass();
+
+        global $USER;
+        $userId = ($USER instanceof CUser && $USER->IsAuthorized()) ? (int)$USER->GetID() : 0;
+        $ip     = $_SERVER['REMOTE_ADDR'] ?? '';
+        $ua     = substr($_SERVER['HTTP_USER_AGENT'] ?? '', 0, 255);
+
+        $hlClass::add([
+            'UF_USER_ID'     => $userId,
+            'UF_ACTION'      => $action,
+            'UF_ENTITY_TYPE' => $entityType,
+            'UF_ENTITY_ID'   => $entityId,
+            'UF_IP'          => $ip,
+            'UF_USER_AGENT'  => $ua,
+            'UF_DESCRIPTION' => substr($desc, 0, 500),
+            'UF_DATE_CREATE' => new \Bitrix\Main\Type\DateTime(),
+        ]);
+    } catch (\Exception $e) {
+        // Молча игнорируем — логирование не должно ломать сайт
+    }
+}
+
+// Логирование входа пользователя
+AddEventHandler('main', 'OnAfterUserLogin', function (&$arFields) {
+    $login = $arFields['LOGIN'] ?? '';
+    po_logAction('login', 'user', 0, 'Вход: ' . $login);
+});
+
+// Логирование выхода пользователя
+AddEventHandler('main', 'OnUserLogout', function () {
+    global $USER;
+    $userId = ($USER instanceof CUser && $USER->IsAuthorized()) ? (int)$USER->GetID() : 0;
+    po_logAction('logout', 'user', $userId, 'Выход из системы');
+});

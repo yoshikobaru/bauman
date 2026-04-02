@@ -51,6 +51,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['d4_action'])) {
             ]) : false;
             if (!$hlOk || $saved) {
                 $d4Done = true;
+                po_logAction('form_submit', 'application', 0, 'D4 участие в референс-визите');
                 $d4Data = [
                     'first_name' => $fn, 'last_name' => $ln,
                     'email'      => $em, 'phone'     => trim($_POST['phone'] ?? ''),
@@ -86,6 +87,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['d5_action'])) {
         ]) : false;
         if (!$hlOk || $saved) {
             $d5Done = true;
+            po_logAction('form_submit', 'application', 0, 'D5 организация референс-визита');
             $d5Data = [
                 'first_name' => $fn,      'last_name' => $ln,
                 'email'      => $em,      'phone'     => trim($_POST['d5_phone'] ?? ''),

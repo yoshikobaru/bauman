@@ -65,6 +65,7 @@ if ($isEvent && $hlOk && defined('HL_APPLICATIONS_ID') && HL_APPLICATIONS_ID > 0
                 ]);
                 if ($res->isSuccess()) {
                     $regDone = true;
+                    po_logAction('form_submit', 'application', $elementId, 'D3 регистрация на событие: ' . ($arElement['NAME'] ?? $elementId));
                     $d3Data = [
                         'first_name' => $firstName, 'last_name' => $lastName,
                         'email'      => $email,     'phone'     => $phone,

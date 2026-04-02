@@ -101,10 +101,28 @@ function po_isBoardMember($userId, $moderatorGroupId) {
     $photoSrc = !empty($member['PHOTO'])
         ? CFile::GetPath($member['PHOTO'])
         : SITE_TEMPLATE_PATH . '/assets/img/board-placeholder.png';
-    $dept = $member['UF_GRADUATE_DEPT'] ?? '';
-    $year = $member['UF_GRADUATE_YEAR'] ?? '';
-    $subText = implode(', ', array_filter([$dept, $year ? 'выпуск ' . $year : '']));
     $isBoard = ($key === 'honorary') && po_isBoardMember($member['ID'], $_moderatorGroupId);
+
+    if ($key === 'partner'):
+        // Для партнёров — показываем компанию
+        $companyName = $member['UF_COMPANY_NAME'] ?? ($member['UF_GRADUATE_DEPT'] ?? '');
+        $companyDesc = $member['UF_COMPANY_DESC'] ?? '';
+        $displayName = $companyName ?: $fullName;
+?>
+                    <div class="boards__item" style="display:flex;flex-direction:column;align-items:center;text-align:center">
+                        <img src="<?= htmlspecialchars($photoSrc) ?>" alt="<?= htmlspecialchars($displayName) ?>" class="boards__item-image">
+                        <h3 class="boards__item-title" style="margin-top:12px"><?= htmlspecialchars($displayName) ?></h3>
+                        <?php if ($fullName && $companyName && $fullName !== $companyName): ?>
+                        <p class="boards__item-text" style="color:#666;font-size:13px"><?= htmlspecialchars($fullName) ?></p>
+                        <?php endif; ?>
+                        <?php if ($companyDesc): ?>
+                        <p class="boards__item-text" style="font-size:13px;color:#555;margin-top:6px;line-height:1.5"><?= htmlspecialchars($companyDesc) ?></p>
+                        <?php endif; ?>
+                    </div>
+<?php else:
+        $dept = $member['UF_GRADUATE_DEPT'] ?? '';
+        $year = $member['UF_GRADUATE_YEAR'] ?? '';
+        $subText = implode(', ', array_filter([$dept, $year ? 'выпуск ' . $year : '']));
 ?>
                     <div class="boards__item">
                         <img src="<?= htmlspecialchars($photoSrc) ?>" alt="<?= htmlspecialchars($fullName) ?>" class="boards__item-image">
@@ -115,11 +133,10 @@ function po_isBoardMember($userId, $moderatorGroupId) {
                             <?php endif; ?>
                         </h3>
                         <?php if ($subText): ?>
-                        <p class="boards__item-text">
-                            <?= htmlspecialchars($subText) ?>
-                        </p>
+                        <p class="boards__item-text"><?= htmlspecialchars($subText) ?></p>
                         <?php endif; ?>
                     </div>
+<?php endif; ?>
 <?php endforeach; ?>
                 </div>
 <?php endif; ?>

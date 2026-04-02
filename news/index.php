@@ -12,6 +12,13 @@ if (!in_array($typeFilter, ['news', 'events', 'all'])) {
     $typeFilter = 'all';
 }
 
+// ?when=upcoming | past (only for events)
+$whenFilter = $_GET['when'] ?? 'upcoming';
+if (!in_array($whenFilter, ['upcoming', 'past'])) {
+    $whenFilter = 'upcoming';
+}
+$today = date('Y-m-d');
+
 // Собираем ID нужных инфоблоков
 $iblockIds = [];
 if ($iblockOk) {
@@ -22,6 +29,16 @@ if ($iblockOk) {
     if ($typeFilter === 'all' || $typeFilter === 'events') {
         if (defined('IBLOCK_EVENTS_ID') && IBLOCK_EVENTS_ID > 0)
             $iblockIds[] = IBLOCK_EVENTS_ID;
+    }
+}
+
+// Строим фильтр по дате для событий
+$arDateFilter = ['ACTIVE' => 'Y', 'IBLOCK_ID' => $iblockIds];
+if ($typeFilter === 'events') {
+    if ($whenFilter === 'upcoming') {
+        $arDateFilter['>=DATE_ACTIVE_FROM'] = $today;
+    } else {
+        $arDateFilter['<DATE_ACTIVE_FROM'] = $today;
     }
 }
 
@@ -42,9 +59,9 @@ $filterLabels = ['all' => 'Все', 'news' => 'Новости', 'events' => 'С�
             <h2 class="main-title news__title">Новости и события</h2>
 
             <!-- Фильтр по типу -->
-            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:32px;">
+            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;">
                 <?php foreach ($filterLabels as $key => $label): ?>
-                <a href="/news/?type=<?= $key ?>"
+                <a href="/news/?type=<?= $key ?><?= $key === 'events' ? '&when=' . $whenFilter : '' ?>"
                    class="btn <?= $typeFilter === $key ? '' : 'btn-transparent' ?>"
                    style="<?= $typeFilter === $key ? '' : 'opacity:0.7;' ?>">
                     <?= $label ?>
@@ -52,11 +69,26 @@ $filterLabels = ['all' => 'Все', 'news' => 'Новости', 'events' => 'С�
                 <?php endforeach; ?>
             </div>
 
+            <!-- Фильтр предстоящие/прошедшие (только для событий) -->
+            <?php if ($typeFilter === 'events'): ?>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:28px;">
+                <a href="/news/?type=events&when=upcoming"
+                   class="btn <?= $whenFilter === 'upcoming' ? '' : 'btn-empty' ?>"
+                   style="font-size:13px;padding:8px 18px">Предстоящие</a>
+                <a href="/news/?type=events&when=past"
+                   class="btn <?= $whenFilter === 'past' ? '' : 'btn-empty' ?>"
+                   style="font-size:13px;padding:8px 18px">Прошедшие</a>
+            </div>
+            <?php endif; ?>
+
             <div class="news__wrapper">
                 <?php if ($iblockOk && !empty($iblockIds)):
+                    $sortOrder = ($typeFilter === 'events' && $whenFilter === 'upcoming')
+                        ? ['DATE_ACTIVE_FROM' => 'ASC', 'ID' => 'ASC']
+                        : ['DATE_ACTIVE_FROM' => 'DESC', 'ID' => 'DESC'];
                     $dbItems = CIBlockElement::GetList(
-                        ['DATE_ACTIVE_FROM' => 'DESC', 'ID' => 'DESC'],
-                        ['IBLOCK_ID' => $iblockIds, 'ACTIVE' => 'Y'],
+                        $sortOrder,
+                        $arDateFilter,
                         false,
                         ['nPageSize' => 12],
                         ['ID', 'IBLOCK_ID', 'NAME', 'CODE', 'DATE_ACTIVE_FROM', 'PREVIEW_TEXT', 'PREVIEW_PICTURE']

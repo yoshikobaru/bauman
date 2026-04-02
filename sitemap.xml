@@ -1,0 +1,71 @@
+<?php
+header('Content-Type: text/xml; charset=UTF-8');
+require($_SERVER['DOCUMENT_ROOT'] . '/bitrix/modules/main/include/prolog_before.php');
+
+\Bitrix\Main\Loader::includeModule('iblock');
+
+$domain  = 'https://bauman-polytech.ru';
+$today   = date('Y-m-d');
+
+$staticUrls = [
+    ['loc' => '/',               'priority' => '1.0', 'changefreq' => 'weekly'],
+    ['loc' => '/about/',         'priority' => '0.8', 'changefreq' => 'monthly'],
+    ['loc' => '/news/',          'priority' => '0.9', 'changefreq' => 'daily'],
+    ['loc' => '/projects/',      'priority' => '0.8', 'changefreq' => 'weekly'],
+    ['loc' => '/members/',       'priority' => '0.7', 'changefreq' => 'weekly'],
+    ['loc' => '/join/',          'priority' => '0.8', 'changefreq' => 'monthly'],
+    ['loc' => '/support/',       'priority' => '0.7', 'changefreq' => 'monthly'],
+    ['loc' => '/reference/',     'priority' => '0.7', 'changefreq' => 'weekly'],
+    ['loc' => '/competencies/',  'priority' => '0.6', 'changefreq' => 'weekly'],
+    ['loc' => '/resume-form/',   'priority' => '0.6', 'changefreq' => 'weekly'],
+    ['loc' => '/contacts/',      'priority' => '0.5', 'changefreq' => 'yearly'],
+];
+
+// Динамические URL из инфоблоков
+$dynamicUrls = [];
+
+$dynBlocks = [];
+if (defined('IBLOCK_NEWS_ID')     && IBLOCK_NEWS_ID > 0)     $dynBlocks[] = ['id' => IBLOCK_NEWS_ID,     'base' => '/news/detail/?id='];
+if (defined('IBLOCK_EVENTS_ID')   && IBLOCK_EVENTS_ID > 0)   $dynBlocks[] = ['id' => IBLOCK_EVENTS_ID,   'base' => '/news/detail/?id='];
+if (defined('IBLOCK_PROJECTS_ID') && IBLOCK_PROJECTS_ID > 0) $dynBlocks[] = ['id' => IBLOCK_PROJECTS_ID, 'base' => '/projects/detail/?id='];
+
+foreach ($dynBlocks as $block) {
+    $db = CIBlockElement::GetList(
+        ['DATE_ACTIVE_FROM' => 'DESC'],
+        ['IBLOCK_ID' => $block['id'], 'ACTIVE' => 'Y'],
+        false, false,
+        ['ID', 'TIMESTAMP_X', 'DATE_ACTIVE_FROM']
+    );
+    while ($el = $db->Fetch()) {
+        $lastmod = !empty($el['DATE_ACTIVE_FROM'])
+            ? date('Y-m-d', strtotime($el['DATE_ACTIVE_FROM']))
+            : date('Y-m-d', strtotime($el['TIMESTAMP_X']));
+        $dynamicUrls[] = [
+            'loc'        => $block['base'] . (int)$el['ID'],
+            'lastmod'    => $lastmod,
+            'priority'   => '0.6',
+            'changefreq' => 'monthly',
+        ];
+    }
+}
+
+echo '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
+?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<?php foreach ($staticUrls as $url): ?>
+    <url>
+        <loc><?= $domain . $url['loc'] ?></loc>
+        <lastmod><?= $today ?></lastmod>
+        <changefreq><?= $url['changefreq'] ?></changefreq>
+        <priority><?= $url['priority'] ?></priority>
+    </url>
+<?php endforeach; ?>
+<?php foreach ($dynamicUrls as $url): ?>
+    <url>
+        <loc><?= $domain . htmlspecialchars($url['loc']) ?></loc>
+        <lastmod><?= $url['lastmod'] ?></lastmod>
+        <changefreq><?= $url['changefreq'] ?></changefreq>
+        <priority><?= $url['priority'] ?></priority>
+    </url>
+<?php endforeach; ?>
+</urlset>

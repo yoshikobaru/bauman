@@ -45,6 +45,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['update_action'])) {
     ]);
 
     if ($result) {
+        po_logAction('profile_update', 'user', (int)$userId, 'Обновление профиля');
         LocalRedirect('/profile/?saved=1');
     } else {
         $saveError = $oUser->LAST_ERROR ?: 'Ошибка сохранения';
@@ -94,6 +95,9 @@ $currentStatus = $statusLabels[$membershipStatus] ?? null;
                         <a href="/profile/?tab=membership" class="account__menu-item <?= $tab === 'membership' ? 'account__menu-item--active' : '' ?>">Моё членство</a>
                         <a href="/profile/?tab=activities" class="account__menu-item <?= $tab === 'activities' ? 'account__menu-item--active' : '' ?>">Мои активности</a>
                         <a href="/profile/?tab=applications" class="account__menu-item <?= $tab === 'applications' ? 'account__menu-item--active' : '' ?>">Мои заявки</a>
+                        <?php if (defined('PO_PARTNER_ID') && in_array(PO_PARTNER_ID, $USER->GetUserGroupArray())): ?>
+                        <a href="/profile/?tab=company" class="account__menu-item <?= $tab === 'company' ? 'account__menu-item--active' : '' ?>">Моя компания</a>
+                        <?php endif; ?>
                     </div>
                 </div>
 
@@ -349,18 +353,23 @@ $currentStatus = $statusLabels[$membershipStatus] ?? null;
                         <h2 class="account__title">Мои заявки</h2>
                         <?php
                         $typeLabelsHL = [
-                            'event_registration' => 'Регистрация на событие',
-                            'reference_visit'    => 'Участие в референс-визите',
-                            'reference_org'      => 'Организация референс-визита',
-                            'competency_request' => 'Запрос в витрине компетенций',
-                            'partnership'        => 'Индустриальное партнёрство',
-                            'project_support'    => 'Поддержка проекта',
+                            'membership'         => 'Вступление в общество (D1)',
+                            'project_support'    => 'Поддержка проекта (D2)',
+                            'event_reg'          => 'Регистрация на событие (D3)',
+                            'event_registration' => 'Регистрация на событие (D3)',
+                            'reference_visit'    => 'Участие в референс-визите (D4)',
+                            'reference_org'      => 'Организация референс-визита (D5)',
+                            'competency_request' => 'Запрос в витрине компетенций (D6)',
+                            'partnership'        => 'Индустриальное партнёрство (D7)',
+                            'vacancy'            => 'Вакансия (карьерная платформа)',
+                            'resume'             => 'Резюме (карьерная платформа)',
+                            'access_recovery'    => 'Восстановление доступа',
                         ];
                         $statusLabelsHL = [
-                            'new'        => 'Новая',
-                            'in_progress'=> 'В обработке',
-                            'approved'   => 'Одобрено',
-                            'rejected'   => 'Отклонено',
+                            'new'       => ['label' => 'Новая',            'color' => '#888'],
+                            'in_review' => ['label' => 'На рассмотрении',  'color' => '#2980b9'],
+                            'approved'  => ['label' => 'Одобрено',         'color' => '#27ae60'],
+                            'rejected'  => ['label' => 'Отклонено',        'color' => '#e74c3c'],
                         ];
                         $arApplications = [];
                         if ($hlOk && defined('HL_APPLICATIONS_ID') && HL_APPLICATIONS_ID > 0) {
@@ -383,25 +392,145 @@ $currentStatus = $statusLabels[$membershipStatus] ?? null;
                         <table style="width:100%;border-collapse:collapse;margin-top:16px;font-size:14px">
                             <thead>
                                 <tr style="background:#f5f5f5">
-                                    <th style="padding:10px;text-align:left;border-bottom:1px solid #eee">Тип</th>
+                                    <th style="padding:10px;text-align:left;border-bottom:1px solid #eee">Тип заявки</th>
+                                    <th style="padding:10px;text-align:left;border-bottom:1px solid #eee">Дата подачи</th>
+                                    <th style="padding:10px;text-align:left;border-bottom:1px solid #eee">Статус</th>
+                                    <th style="padding:10px;text-align:left;border-bottom:1px solid #eee">Комментарий</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            <?php foreach ($arApplications as $app):
+                                $appType    = $typeLabelsHL[$app['UF_TYPE'] ?? ''] ?? htmlspecialchars($app['UF_TYPE'] ?? '—');
+                                $appDate    = !empty($app['UF_DATE_CREATE']) ? $app['UF_DATE_CREATE']->format('d.m.Y H:i') : '—';
+                                $stKey      = $app['UF_STATUS'] ?? 'new';
+                                $stInfo     = $statusLabelsHL[$stKey] ?? ['label' => htmlspecialchars($stKey), 'color' => '#888'];
+                                $appData    = json_decode($app['UF_DATA'] ?? '{}', true) ?: [];
+                                $appComment = htmlspecialchars($appData['admin_comment'] ?? '');
+                            ?>
+                            <tr style="border-bottom:1px solid #f0f0f0">
+                                <td style="padding:10px"><?= $appType ?></td>
+                                <td style="padding:10px;white-space:nowrap"><?= htmlspecialchars($appDate) ?></td>
+                                <td style="padding:10px;font-weight:600;color:<?= $stInfo['color'] ?>"><?= $stInfo['label'] ?></td>
+                                <td style="padding:10px;color:#555;font-size:13px"><?= $appComment ?: '<span style="color:#ccc">—</span>' ?></td>
+                            </tr>
+                            <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                        <?php endif; ?>
+                    </div>
+
+                    <?php elseif ($tab === 'company'): ?>
+                    <!-- Для представителей компаний -->
+                    <div class="account__block">
+                        <h2 class="account__title">Моя компания</h2>
+                        <?php
+                        $isPartner = defined('PO_PARTNER_ID') && in_array(PO_PARTNER_ID, $USER->GetUserGroupArray());
+                        if (!$isPartner):
+                        ?>
+                        <p style="color:#888;margin-top:16px">Этот раздел доступен только представителям компаний-партнёров.</p>
+                        <?php else: ?>
+
+                        <!-- Статус партнёрства -->
+                        <?php
+                        $partnerStatus = $arUser['UF_MEMBERSHIP_STATUS'] ?? '';
+                        $partnerStatusLabels = [
+                            'pending'   => ['label' => 'Заявка на рассмотрении', 'color' => '#2980b9'],
+                            'approved'  => ['label' => 'Партнёр общества',       'color' => '#27ae60'],
+                            'rejected'  => ['label' => 'Отклонено',              'color' => '#e74c3c'],
+                        ];
+                        $pst = $partnerStatusLabels[$partnerStatus] ?? ['label' => 'Партнёр общества', 'color' => '#27ae60'];
+                        ?>
+                        <div style="background:#f0f8ff;border-radius:10px;padding:20px 24px;margin-bottom:24px;display:flex;align-items:center;gap:16px">
+                            <span style="font-size:32px">🏢</span>
+                            <div>
+                                <div style="font-weight:700;font-size:16px;color:<?= $pst['color'] ?>"><?= $pst['label'] ?></div>
+                                <?php
+                                $companyName = $arUser['UF_COMPANY_NAME'] ?? '';
+                                if ($companyName):
+                                ?>
+                                <div style="color:#555;font-size:14px;margin-top:4px"><?= htmlspecialchars($companyName) ?></div>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+
+                        <!-- Действия -->
+                        <div class="account__chapter">
+                            <h3 class="account__subtitle">Доступные возможности</h3>
+                        </div>
+                        <div style="display:grid;gap:12px;margin-top:16px">
+                            <div style="background:#fff;border:1px solid #e8e8e8;border-radius:10px;padding:18px 20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
+                                <div>
+                                    <div style="font-weight:600;margin-bottom:4px">Вакансии</div>
+                                    <div style="color:#666;font-size:13px">Разместите вакансии вашей компании для выпускников</div>
+                                </div>
+                                <a href="/resume-form/?form=vacancy" class="btn" style="font-size:13px;padding:10px 20px">Разместить вакансию</a>
+                            </div>
+                            <div style="background:#fff;border:1px solid #e8e8e8;border-radius:10px;padding:18px 20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
+                                <div>
+                                    <div style="font-weight:600;margin-bottom:4px">База резюме</div>
+                                    <div style="color:#666;font-size:13px">Просматривайте резюме выпускников МГТУ</div>
+                                </div>
+                                <a href="/resume-form/" class="btn btn-empty" style="font-size:13px;padding:10px 20px">Перейти к платформе</a>
+                            </div>
+                            <div style="background:#fff;border:1px solid #e8e8e8;border-radius:10px;padding:18px 20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
+                                <div>
+                                    <div style="font-weight:600;margin-bottom:4px">Витрина компетенций</div>
+                                    <div style="color:#666;font-size:13px">Отправьте запрос в НОЦ, СКБ или кафедры МГТУ</div>
+                                </div>
+                                <a href="/competencies/" class="btn btn-empty" style="font-size:13px;padding:10px 20px">Открыть витрину</a>
+                            </div>
+                            <div style="background:#fff;border:1px solid #e8e8e8;border-radius:10px;padding:18px 20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
+                                <div>
+                                    <div style="font-weight:600;margin-bottom:4px">Организовать референс-визит</div>
+                                    <div style="color:#666;font-size:13px">Показать ваше производство выпускникам и партнёрам</div>
+                                </div>
+                                <a href="/reference/" class="btn btn-empty" style="font-size:13px;padding:10px 20px">Подать заявку</a>
+                            </div>
+                        </div>
+
+                        <!-- Мои вакансии из HL -->
+                        <?php
+                        $arMyVacancies = [];
+                        if (defined('HL_VACANCIES_ID') && HL_VACANCIES_ID > 0) {
+                            $hlVacEntity = \Bitrix\Highloadblock\HighloadBlockTable::getById(HL_VACANCIES_ID)->fetch();
+                            if ($hlVacEntity) {
+                                $hlVacClass = \Bitrix\Highloadblock\HighloadBlockTable::compileEntity($hlVacEntity)->getDataClass();
+                                $dbMyVac = $hlVacClass::getList([
+                                    'filter' => ['UF_USER_ID' => (int)$userId],
+                                    'order'  => ['UF_DATE_CREATE' => 'DESC'],
+                                ]);
+                                while ($vrow = $dbMyVac->fetch()) $arMyVacancies[] = $vrow;
+                            }
+                        }
+                        ?>
+                        <?php if (!empty($arMyVacancies)): ?>
+                        <div class="account__chapter" style="margin-top:32px">
+                            <h3 class="account__subtitle">Мои вакансии</h3>
+                        </div>
+                        <table style="width:100%;border-collapse:collapse;margin-top:12px;font-size:14px">
+                            <thead>
+                                <tr style="background:#f5f5f5">
+                                    <th style="padding:10px;text-align:left;border-bottom:1px solid #eee">Должность</th>
                                     <th style="padding:10px;text-align:left;border-bottom:1px solid #eee">Дата</th>
                                     <th style="padding:10px;text-align:left;border-bottom:1px solid #eee">Статус</th>
                                 </tr>
                             </thead>
                             <tbody>
-                            <?php foreach ($arApplications as $app):
-                                $appType   = $typeLabelsHL[$app['UF_TYPE']] ?? htmlspecialchars($app['UF_TYPE']);
-                                $appDate   = !empty($app['UF_DATE_CREATE']) ? $app['UF_DATE_CREATE']->format('d.m.Y H:i') : '';
-                                $appStatus = $statusLabelsHL[$app['UF_STATUS']] ?? htmlspecialchars($app['UF_STATUS'] ?? 'новая');
+                            <?php
+                            $vacStatuses = ['pending' => 'На модерации', 'approved' => 'Опубликована', 'rejected' => 'Отклонена'];
+                            foreach ($arMyVacancies as $vac):
+                                $vacDate = !empty($vac['UF_DATE_CREATE']) ? $vac['UF_DATE_CREATE']->format('d.m.Y') : '—';
                             ?>
                             <tr style="border-bottom:1px solid #f0f0f0">
-                                <td style="padding:10px"><?= $appType ?></td>
-                                <td style="padding:10px"><?= htmlspecialchars($appDate) ?></td>
-                                <td style="padding:10px"><?= $appStatus ?></td>
+                                <td style="padding:10px"><?= htmlspecialchars($vac['UF_POSITION'] ?? '—') ?></td>
+                                <td style="padding:10px"><?= $vacDate ?></td>
+                                <td style="padding:10px;color:#888"><?= $vacStatuses[$vac['UF_STATUS'] ?? 'pending'] ?? htmlspecialchars($vac['UF_STATUS']) ?></td>
                             </tr>
                             <?php endforeach; ?>
                             </tbody>
                         </table>
+                        <?php endif; ?>
+
                         <?php endif; ?>
                     </div>
 

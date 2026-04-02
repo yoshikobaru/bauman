@@ -63,6 +63,54 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'login
     }
 }
 
+// — Экстренное восстановление (нет доступа к email) —
+$emergencyDone = false;
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'emergency_recovery') {
+    $activeSection = 'emergency';
+    $emName   = trim($_POST['em_name']   ?? '');
+    $emEmail  = trim($_POST['em_email']  ?? '');
+    $emDesc   = trim($_POST['em_desc']   ?? '');
+    $emAgreePd = ($_POST['em_agree_pd'] ?? '') === 'yes';
+    if (!$emName || !$emEmail || !$emDesc) {
+        $errors[] = 'Заполните все обязательные поля.';
+    } elseif (!$emAgreePd) {
+        $errors[] = 'Необходимо согласие с политикой ПДн.';
+    } else {
+        $saved = false;
+        $hlOk = \Bitrix\Main\Loader::includeModule('highloadblock');
+        if ($hlOk && defined('HL_APPLICATIONS_ID') && HL_APPLICATIONS_ID > 0) {
+            $hlEntity = \Bitrix\Highloadblock\HighloadBlockTable::getById(HL_APPLICATIONS_ID)->fetch();
+            if ($hlEntity) {
+                $hlClass = \Bitrix\Highloadblock\HighloadBlockTable::compileEntity($hlEntity)->getDataClass();
+                $res = $hlClass::add([
+                    'UF_USER_ID'     => 0,
+                    'UF_TYPE'        => 'access_recovery',
+                    'UF_STATUS'      => 'new',
+                    'UF_DATE_CREATE' => new \Bitrix\Main\Type\DateTime(),
+                    'UF_DATA'        => json_encode([
+                        'name'        => $emName,
+                        'old_email'   => $emEmail,
+                        'description' => $emDesc,
+                    ], JSON_UNESCAPED_UNICODE),
+                ]);
+                $saved = $res->isSuccess();
+            }
+        } else {
+            $saved = true;
+        }
+        if ($saved) {
+            po_sendAdminEmail('access_recovery', [
+                'name'        => $emName,
+                'old_email'   => $emEmail,
+                'description' => $emDesc,
+            ]);
+            $emergencyDone = true;
+        } else {
+            $errors[] = 'Ошибка сохранения. Попробуйте позже.';
+        }
+    }
+}
+
 // — Восстановление пароля —
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'forgot') {
     $activeSection = 'forgot';
@@ -134,6 +182,55 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'forgo
                     <a href="#" class="authorization__link" data-show="login">← Вернуться к входу</a>
                     <button type="submit" class="btn authorization__btn">Отправить ссылку</button>
                 </form>
+                <p style="margin-top:20px;font-size:13px;color:#888">
+                    Нет доступа к email?
+                    <a href="#" class="authorization__link" data-show="emergency" style="color:#e31e24">Обратиться к администратору →</a>
+                </p>
+            </div>
+
+            <!-- Секция: Экстренное восстановление -->
+            <div class="authorization__wrapper" id="section-emergency"<?= $activeSection !== 'emergency' ? ' style="display:none"' : '' ?>>
+                <h2 class="authorization-title main-title">Обращение к администратору</h2>
+                <?php if ($emergencyDone): ?>
+                <div class="authorization__alert authorization__alert--success">
+                    <p>Ваша заявка принята. Администратор свяжется с вами после проверки личности.</p>
+                </div>
+                <a href="/authorization/" class="btn" style="margin-top:16px">Вернуться ко входу</a>
+                <?php else: ?>
+                <p style="color:#666;margin-bottom:20px;font-size:14px">
+                    Заполните форму. После ручной проверки личности администратор сбросит привязки и выдаст временный пароль.
+                </p>
+                <form method="POST" action="/authorization/">
+                    <input type="hidden" name="action" value="emergency_recovery">
+                    <div class="authorization__row">
+                        <input type="text" name="em_name" placeholder="ФИО *" required
+                               value="<?= htmlspecialchars($_POST['em_name'] ?? '') ?>">
+                        <input type="email" name="em_email" placeholder="Старый email от аккаунта *" required
+                               value="<?= htmlspecialchars($_POST['em_email'] ?? '') ?>">
+                    </div>
+                    <div style="margin-top:12px">
+                        <textarea name="em_desc" placeholder="Опишите ситуацию: когда утратили доступ, через какие каналы можно связаться *"
+                                  required style="width:100%;min-height:100px;padding:12px;border:1px solid #ccc;border-radius:4px;font-size:14px"><?= htmlspecialchars($_POST['em_desc'] ?? '') ?></textarea>
+                    </div>
+                    <div class="join__politic" style="margin-top:16px">
+                        <div class="join__politic-question">
+                            <p class="join__politic-link">Согласен с <a href="#">политикой обработки ПДн</a></p>
+                            <div class="account__graduate-choice">
+                                <label class="account__graduate-item">
+                                    <input type="radio" name="em_agree_pd" value="yes" class="account__graduate-input">
+                                    <span class="account__graduate-box"></span>Да
+                                </label>
+                                <label class="account__graduate-item">
+                                    <input type="radio" name="em_agree_pd" value="no" class="account__graduate-input">
+                                    <span class="account__graduate-box"></span>Нет
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <a href="#" class="authorization__link" data-show="forgot" style="display:block;margin-top:12px">← Назад</a>
+                    <button type="submit" class="btn authorization__btn" style="margin-top:16px">Отправить заявку</button>
+                </form>
+                <?php endif; ?>
             </div>
 
             <!-- Секция: Новый пароль (по ссылке из письма) -->
