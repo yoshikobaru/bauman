@@ -46,11 +46,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['d6_action'])) {
                     ]);
                     if ($res->isSuccess()) {
                         $d6Done = true;
-                        po_sendAdminEmail('competency_request', [
-                            'Компания' => $company, 'Имя'   => $fn,
-                            'Фамилия'  => trim($_POST['last_name'] ?? ''),
-                            'Email'    => $em,      'Запрос' => trim($_POST['request'] ?? ''),
-                        ]);
+                        $d6Data = [
+                            'first_name' => $fn,     'last_name' => trim($_POST['last_name'] ?? ''),
+                            'email'      => $em,     'phone'     => trim($_POST['phone'] ?? ''),
+                            'company'    => $company,'request'   => trim($_POST['request'] ?? ''),
+                        ];
+                        po_sendAdminEmail('competency_request', $d6Data);
+                        po_createCrmLead('competency_request', $d6Data);
                     } else {
                         $d6Error = 'Ошибка сохранения. Попробуйте позже.';
                     }

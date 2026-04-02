@@ -54,12 +54,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['d2_action'])) {
         }
         if ($saved) {
             $d2Done = true;
-            po_sendAdminEmail('project_support', [
-                'Имя'      => $fn,    'Фамилия'  => $ln,
-                'Email'    => $email, 'Телефон'  => $phone,
-                'Проект'   => $project, 'Сумма'  => $amount,
-                'Тип'      => $donorType, 'Компания' => $company,
-            ]);
+            $d2Data = [
+                'first_name' => $fn,    'last_name'  => $ln,
+                'email'      => $email, 'phone'      => $phone,
+                'project'    => $project, 'amount'   => $amount,
+                'donor_type' => $donorType, 'company' => $company,
+            ];
+            po_sendAdminEmail('project_support', $d2Data);
+            po_createCrmLead('project_support', $d2Data);
         }
     }
 }

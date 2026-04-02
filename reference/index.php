@@ -51,10 +51,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['d4_action'])) {
             ]) : false;
             if (!$hlOk || $saved) {
                 $d4Done = true;
-                po_sendAdminEmail('reference_visit', [
-                    'Имя'     => $fn, 'Фамилия' => $ln,
-                    'Email'   => $em, 'Телефон' => trim($_POST['phone'] ?? ''),
-                ]);
+                $d4Data = [
+                    'first_name' => $fn, 'last_name' => $ln,
+                    'email'      => $em, 'phone'     => trim($_POST['phone'] ?? ''),
+                    'telegram'   => trim($_POST['telegram'] ?? ''),
+                ];
+                po_sendAdminEmail('reference_visit', $d4Data);
+                po_createCrmLead('reference_visit', $d4Data);
             } else {
                 $d4Error = 'Ошибка сохранения. Попробуйте позже.';
             }
@@ -83,11 +86,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['d5_action'])) {
         ]) : false;
         if (!$hlOk || $saved) {
             $d5Done = true;
-            po_sendAdminEmail('reference_org', [
-                'Компания' => $company, 'О компании' => $about,
-                'Имя'      => $fn,     'Фамилия'    => $ln,
-                'Email'    => $em,
-            ]);
+            $d5Data = [
+                'first_name' => $fn,      'last_name' => $ln,
+                'email'      => $em,      'phone'     => trim($_POST['d5_phone'] ?? ''),
+                'company'    => $company, 'about'     => $about,
+                'what_show'  => $show,    'audience'  => $audience,
+            ];
+            po_sendAdminEmail('reference_org', $d5Data);
+            po_createCrmLead('reference_org', $d5Data);
         } else {
             $d5Error = 'Ошибка сохранения. Попробуйте позже.';
         }

@@ -76,56 +76,47 @@ function po_sendAdminEmail(string $type, array $data): void
 }
 
 /**
- * CRM: создать Лид при добавлении записи в HL-блок Applications.
+ * CRM: создать Лид по данным заявки.
+ * Вызывается напрямую из каждого обработчика формы после успешного сохранения в HL-блок.
+ *
+ * @param string $type  Тип заявки (project_support, event_reg, …)
+ * @param array  $data  Данные формы (first_name, last_name, email, phone, …)
  */
-AddEventHandler('main', 'OnProlog', function () {
-    static $registered = false;
-    if ($registered) return;
-    $registered = true;
+function po_createCrmLead(string $type, array $data): void
+{
+    if (!\Bitrix\Main\Loader::includeModule('crm')) return;
 
-    if (!\Bitrix\Main\Loader::includeModule('highloadblock')) return;
-    if (!defined('HL_APPLICATIONS_ID') || HL_APPLICATIONS_ID <= 0) return;
+    $typeLabels = [
+        'project_support'    => 'Поддержка проекта (D2)',
+        'event_reg'          => 'Запись на событие (D3)',
+        'reference_visit'    => 'Участие в референс-визите (D4)',
+        'reference_org'      => 'Организация референс-визита (D5)',
+        'competency_request' => 'Компетенция/Витрина (D6)',
+        'partnership'        => 'Промышленное партнёрство (D7)',
+    ];
+    $title = 'Заявка: ' . ($typeLabels[$type] ?? $type);
 
-    $hlEntity = \Bitrix\Highloadblock\HighloadBlockTable::getById(HL_APPLICATIONS_ID)->fetch();
-    if (!$hlEntity) return;
+    $emailValue = $data['email'] ?? '';
+    $emailField = $emailValue ? [['VALUE' => $emailValue, 'VALUE_TYPE' => 'WORK']] : [];
 
-    $entityEventClass = \Bitrix\Highloadblock\HighloadBlockTable::compileEntity($hlEntity)->getDataClass();
-    $entityEventName  = $entityEventClass::getEntity()->getEventName('OnAfterAdd');
+    $phoneValue = $data['phone'] ?? '';
+    $phoneField = $phoneValue ? [['VALUE' => $phoneValue, 'VALUE_TYPE' => 'WORK']] : [];
 
-    AddEventHandler('highloadblock', $entityEventName, function (&$arFields) {
-        if (!\Bitrix\Main\Loader::includeModule('crm')) return;
-
-        $data = [];
-        if (!empty($arFields['UF_DATA'])) {
-            $data = json_decode($arFields['UF_DATA'], true) ?: [];
+    $comments = '';
+    foreach ($data as $k => $v) {
+        if ($v !== '' && $v !== null) {
+            $comments .= mb_strtoupper($k) . ": {$v}\n";
         }
+    }
 
-        $typeLabels = [
-            'project_support'    => 'Поддержка проекта (D2)',
-            'event_reg'          => 'Запись на событие (D3)',
-            'reference_visit'    => 'Участие в референс-визите (D4)',
-            'reference_org'      => 'Организация референс-визита (D5)',
-            'competency_request' => 'Компетенция/Витрина (D6)',
-            'partnership'        => 'Промышленное партнёрство (D7)',
-        ];
-        $type  = $arFields['UF_TYPE'] ?? 'unknown';
-        $title = 'Заявка: ' . ($typeLabels[$type] ?? $type);
-
-        $emailValue = $data['email'] ?? '';
-        $emailField = $emailValue ? [['VALUE' => $emailValue, 'VALUE_TYPE' => 'WORK']] : [];
-
-        $phoneValue = $data['phone'] ?? '';
-        $phoneField = $phoneValue ? [['VALUE' => $phoneValue, 'VALUE_TYPE' => 'WORK']] : [];
-
-        \Bitrix\Crm\LeadTable::add([
-            'TITLE'      => $title,
-            'NAME'       => $data['first_name'] ?? ($data['contact_name'] ?? ''),
-            'LAST_NAME'  => $data['last_name']  ?? '',
-            'EMAIL'      => $emailField,
-            'PHONE'      => $phoneField,
-            'COMMENTS'   => $arFields['UF_DATA'] ?? '',
-            'SOURCE_ID'  => 'WEB',
-            'STATUS_ID'  => 'NEW',
-        ]);
-    });
-});
+    \Bitrix\Crm\LeadTable::add([
+        'TITLE'     => $title,
+        'NAME'      => $data['first_name']  ?? ($data['contact_name'] ?? ''),
+        'LAST_NAME' => $data['last_name']   ?? '',
+        'EMAIL'     => $emailField,
+        'PHONE'     => $phoneField,
+        'COMMENTS'  => $comments,
+        'SOURCE_ID' => 'WEB',
+        'STATUS_ID' => 'NEW',
+    ]);
+}

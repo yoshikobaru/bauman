@@ -52,11 +52,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['d7_action'])) {
         }
         if ($saved) {
             $d7Done = true;
-            po_sendAdminEmail('partnership', [
-                'Фамилия'  => $ln,     'Имя'      => $fn,
-                'Отчество' => $sn,     'Email'    => $email,
-                'Компания' => $company, 'Сайт'    => $site,
-            ]);
+            $d7Data = [
+                'first_name'  => $fn,     'last_name'  => $ln,
+                'second_name' => $sn,     'email'      => $email,
+                'company'     => $company,'site'       => $site,
+                'rep_count'   => $count,
+            ];
+            po_sendAdminEmail('partnership', $d7Data);
+            po_createCrmLead('partnership', $d7Data);
         }
     } else {
         $d7Error = implode('; ', $d7Errors);

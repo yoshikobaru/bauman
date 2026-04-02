@@ -65,11 +65,13 @@ if ($isEvent && $hlOk && defined('HL_APPLICATIONS_ID') && HL_APPLICATIONS_ID > 0
                 ]);
                 if ($res->isSuccess()) {
                     $regDone = true;
-                    po_sendAdminEmail('event_reg', [
-                        'Имя'      => $firstName, 'Фамилия'  => $lastName,
-                        'Email'    => $email,     'Телефон'  => $phone,
-                        'Telegram' => $telegram,  'Событие'  => $arElement['NAME'] ?? $elementId,
-                    ]);
+                    $d3Data = [
+                        'first_name' => $firstName, 'last_name' => $lastName,
+                        'email'      => $email,     'phone'     => $phone,
+                        'telegram'   => $telegram,  'event'     => $arElement['NAME'] ?? $elementId,
+                    ];
+                    po_sendAdminEmail('event_reg', $d3Data);
+                    po_createCrmLead('event_reg', $d3Data);
                 } else {
                     $regError = implode('; ', $res->getErrorMessages());
                 }
