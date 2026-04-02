@@ -57,11 +57,12 @@ $membershipType   = $arUser['UF_MEMBERSHIP_TYPE']   ?? '';
 $membershipStatus = $arUser['UF_MEMBERSHIP_STATUS'] ?? '';
 $membershipExpires = $arUser['UF_MEMBERSHIP_EXPIRES'] ?? '';
 $isGrad           = !empty($arUser['UF_GRADUATE_YEAR']);
-$isMember         = defined('PO_MEMBER_BASIC_ID') && $USER->IsInGroup([
-    PO_MEMBER_BASIC_ID,
-    PO_MEMBER_PREMIUM_ID,
-    PO_PARTNER_ID,
-]);
+$_ug      = $USER->GetUserGroupArray();
+$isMember = defined('PO_MEMBER_BASIC_ID') && (
+    in_array(PO_MEMBER_BASIC_ID,   $_ug) ||
+    in_array(PO_MEMBER_PREMIUM_ID, $_ug) ||
+    in_array(PO_PARTNER_ID,        $_ug)
+);
 
 $typeLabels = [
     'basic'   => ['label' => 'Базовое',         'price' => '5 000 Р',          'class' => ''],

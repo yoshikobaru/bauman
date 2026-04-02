@@ -79,11 +79,12 @@
 					</nav>
 					<div class="header-wrapper__buttons">
 						<?php
-						$_isMember = defined('PO_MEMBER_BASIC_ID') && $USER->IsInGroup([
-							PO_MEMBER_BASIC_ID,
-							PO_MEMBER_PREMIUM_ID,
-							PO_PARTNER_ID,
-						]);
+						$_userGroups = $USER->IsAuthorized() ? $USER->GetUserGroupArray() : [];
+						$_isMember   = defined('PO_MEMBER_BASIC_ID') && (
+							in_array(PO_MEMBER_BASIC_ID,   $_userGroups) ||
+							in_array(PO_MEMBER_PREMIUM_ID, $_userGroups) ||
+							in_array(PO_PARTNER_ID,        $_userGroups)
+						);
 						if (!$USER->IsAuthorized()):
 						?>
 							<a href="/join/" class="btn header-wrapper__btn header-wrapper--join">Вступить</a>

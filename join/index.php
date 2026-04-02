@@ -2,11 +2,12 @@
 require($_SERVER["DOCUMENT_ROOT"]."/bitrix/header.php");
 $APPLICATION->SetTitle("Вступить в общество");
 
-$isMember = defined('PO_MEMBER_BASIC_ID') && $USER->IsInGroup([
-    PO_MEMBER_BASIC_ID,
-    PO_MEMBER_PREMIUM_ID,
-    PO_PARTNER_ID,
-]);
+$_ug      = $USER->IsAuthorized() ? $USER->GetUserGroupArray() : [];
+$isMember = defined('PO_MEMBER_BASIC_ID') && (
+    in_array(PO_MEMBER_BASIC_ID,   $_ug) ||
+    in_array(PO_MEMBER_PREMIUM_ID, $_ug) ||
+    in_array(PO_PARTNER_ID,        $_ug)
+);
 $isAuthorized = $USER->IsAuthorized();
 
 $errors   = [];
