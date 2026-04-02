@@ -26,13 +26,12 @@ define('PO_MODERATOR_ID',      9); // Модератор / Сотрудник
  * Константы инфоблоков.
  * Заполнить реальными ID после запуска /setup_iblocks.php
  */
-define('IBLOCK_NEWS_ID',     0); // Новости
-define('IBLOCK_EVENTS_ID',   0); // События
-define('IBLOCK_PROJECTS_ID', 0); // Проекты
-define('IBLOCK_BOARD_ID',    0); // Правление
+define('IBLOCK_NEWS_ID',     1); // Новости
+define('IBLOCK_EVENTS_ID',   2); // События
+define('IBLOCK_PROJECTS_ID', 3); // Проекты
+define('IBLOCK_BOARD_ID',    4); // Правление
 
 /**
  * HL-блок заявок.
- * Заполнить после запуска /setup_hlblock.php
  */
-define('HL_APPLICATIONS_ID', 0);
+define('HL_APPLICATIONS_ID', 2);
