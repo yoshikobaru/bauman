@@ -126,13 +126,13 @@ AddEventHandler('main', 'OnBuildGlobalMenu', function (&$globalMenu, &$moduleMen
             [
                 'text'  => '— Пользователи сайта',
                 'title' => 'Список всех пользователей',
-                'url'   => '/bitrix/admin/user_list.php?lang=ru',
+                'url'   => '/bitrix/admin/user_admin.php?lang=ru',
                 'icon'  => 'main_menu_user',
             ],
             [
                 'text'  => '— Инфоблоки (контент)',
                 'title' => 'Новости, события, проекты, правление',
-                'url'   => '/bitrix/admin/iblock_list.php?lang=ru',
+                'url'   => '/bitrix/admin/iblock_type_admin.php?lang=ru',
                 'icon'  => 'main_menu_content',
             ],
         ],
