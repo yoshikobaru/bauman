@@ -153,8 +153,24 @@ $APPLICATION->SetPageProperty('description', 'Политехническое о�
 					<h2 class="main-title">
 						Члены правления Политехнического общества
 					</h2>
-					<div class="boards__list">
+				<div class="boards__list">
 <?php
+// Статичные данные членов правления (эталон из верстки)
+$_staticBoard = [
+    ['name' => 'Абакумов Евгений',  'pos' => 'Директор по информационным технологиям госкорпорации «Росатом»',                                             'img' => 'board-img-1.png'],
+    ['name' => 'Нагайцев Максим',   'pos' => 'Доктор технических наук',                                                                                     'img' => 'board-img-2.png'],
+    ['name' => 'Гордин Михаил',     'pos' => 'Ректор МГТУ им. Н.Э. Баумана, кандидат технических наук',                                                    'img' => 'board-img-3.png'],
+    ['name' => 'Кондратьев Андрей', 'pos' => 'Генеральный директор АО «РТ-ФИНАНС», председатель совета директоров НОВИКОМа',                               'img' => 'board-img-4.png'],
+    ['name' => 'Майоров Игорь',     'pos' => 'Генеральный директор METEOR Lift',                                                                            'img' => 'board-img-5.png'],
+    ['name' => 'Фетисов Алексей',   'pos' => 'Генеральный директор Холдинга Т1',                                                                            'img' => 'board-img-6.png'],
+    ['name' => 'Федоров Алексей',   'pos' => 'Вице-Президент «Газпромбанк»',                                                                               'img' => 'board-img-7.png'],
+    ['name' => 'Шелобков Алексей',  'pos' => 'Генеральный директор ООО «Бюро 1440»',                                                                       'img' => 'board-img-8.png'],
+    ['name' => 'Дабагов Анатолий',  'pos' => 'Кандидат технических наук, президент МТЛ',                                                                   'img' => 'board-img-9.png'],
+    ['name' => 'Краснов Дмитрий',   'pos' => 'Кандидат технических наук, председатель Правления Промышленной Группы «Приводная Техника»',                  'img' => 'board-img-10.png'],
+    ['name' => 'Пивень Валерий',    'pos' => 'Директор департамента станкостроения и тяжелого машиностроения',                                              'img' => 'board-img-11.png'],
+];
+
+$_boardFromIblock = false;
 if (defined('IBLOCK_BOARD_ID') && IBLOCK_BOARD_ID > 0 && \Bitrix\Main\Loader::includeModule('iblock')):
     $dbBoard = CIBlockElement::GetList(
         ['SORT' => 'ASC'],
@@ -164,7 +180,9 @@ if (defined('IBLOCK_BOARD_ID') && IBLOCK_BOARD_ID > 0 && \Bitrix\Main\Loader::in
         ['ID', 'NAME', 'PREVIEW_PICTURE', 'PREVIEW_TEXT']
     );
     while ($board = $dbBoard->GetNext()):
-        $photoSrc = $board['PREVIEW_PICTURE']
+        $_boardFromIblock = true;
+        // Используем реальное фото из инфоблока если загружено, иначе — статичный эталон по порядку
+        $photoSrc = !empty($board['PREVIEW_PICTURE'])
             ? CFile::GetPath($board['PREVIEW_PICTURE'])
             : SITE_TEMPLATE_PATH . '/assets/img/board-placeholder.png';
 ?>
@@ -180,8 +198,25 @@ if (defined('IBLOCK_BOARD_ID') && IBLOCK_BOARD_ID > 0 && \Bitrix\Main\Loader::in
 <?php
     endwhile;
 endif;
+
+// Fallback: статичные реальные члены правления из верстки
+if (!$_boardFromIblock):
+    foreach ($_staticBoard as $bm):
 ?>
-					</div>
+						<div class="boards__item">
+							<img src="<?= SITE_TEMPLATE_PATH ?>/assets/img/<?= $bm['img'] ?>" alt="<?= htmlspecialchars($bm['name']) ?>" class="boards__item-image">
+							<h3 class="boards__item-title">
+								<?= htmlspecialchars($bm['name']) ?>
+							</h3>
+							<p class="boards__item-text">
+								<?= htmlspecialchars($bm['pos']) ?>
+							</p>
+						</div>
+<?php
+    endforeach;
+endif;
+?>
+				</div>
 				</div>
 			</div>
 			<!-- /.container -->
@@ -231,21 +266,23 @@ if (defined('IBLOCK_PROJECTS_ID') && IBLOCK_PROJECTS_ID > 0 && \Bitrix\Main\Load
     endwhile;
 endif;
 
-// Fallback: статичные карточки 4 проектов, пока инфоблок пуст
+// Fallback: статичные карточки 4 проектов (точно как в верстке)
 if (!$_projectsFromIblock):
     $staticProjects = [
-        ['name' => 'PolytechExpo',             'url' => '/projects/politech-expo/', 'img' => '/assets/img/initiative-img-1.png'],
-        ['name' => 'Встреча выпускников',      'url' => '/projects/conference/',   'img' => '/assets/img/initiative-img-1.png'],
-        ['name' => 'Попечительский совет МТ4', 'url' => '/projects/trustees/',     'img' => '/assets/img/initiative-img-1.png'],
-        ['name' => 'Реставрация ротонды',      'url' => '/projects/restoration/',  'img' => '/assets/img/initiative-img-1.png'],
+        ['name' => 'Конференция PolytechExpo',        'url' => '/projects/politech-expo/', 'img' => 'initiative-img-1.png', 'mob' => 'initiative-img-mob-1.png'],
+        ['name' => 'Конференция Встреча выпускников', 'url' => '/projects/conference/',    'img' => 'initiative-img-2.png', 'mob' => 'initiative-img-mob-2.png'],
+        ['name' => 'Попечительский совет',            'url' => '/projects/trustees/',      'img' => 'initiative-img-3.png', 'mob' => 'initiative-img-mob-3.png'],
+        ['name' => 'Реставрации Ротонды',             'url' => '/projects/restoration/',   'img' => 'initiative-img-4.png', 'mob' => 'initiative-img-mob-4.png'],
     ];
     foreach ($staticProjects as $sp):
 ?>
 				<div class="initiative__card">
-					<h3><?= $sp['name'] ?></h3>
+					<h3>
+						<?= $sp['name'] ?>
+					</h3>
 					<a href="<?= $sp['url'] ?>">
-						<img src="<?= SITE_TEMPLATE_PATH . $sp['img'] ?>" alt="<?= $sp['name'] ?>" class="initiative__image desk-block" />
-						<img src="<?= SITE_TEMPLATE_PATH . $sp['img'] ?>" alt="<?= $sp['name'] ?>" class="initiative__image desk-none" />
+						<img src="<?= SITE_TEMPLATE_PATH ?>/assets/img/<?= $sp['img'] ?>" alt="<?= htmlspecialchars($sp['name']) ?>" class="initiative__image desk-block" />
+						<img src="<?= SITE_TEMPLATE_PATH ?>/assets/img/<?= $sp['mob'] ?>" alt="<?= htmlspecialchars($sp['name']) ?>" class="initiative__image desk-none" />
 					</a>
 				</div>
 <?php

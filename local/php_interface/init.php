@@ -28,8 +28,8 @@ define('PO_MODERATOR_ID',      9); // Модератор / Сотрудник
  */
 define('IBLOCK_NEWS_ID',     1); // Новости
 define('IBLOCK_EVENTS_ID',   2); // События
-define('IBLOCK_PROJECTS_ID', 3); // Проекты
-define('IBLOCK_BOARD_ID',    4); // Правление
+define('IBLOCK_PROJECTS_ID', 8); // Проекты
+define('IBLOCK_BOARD_ID',    7); // Правление
 
 /**
  * HL-блок заявок.

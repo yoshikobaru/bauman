@@ -88,10 +88,10 @@ if ($prop = $dbPs->Fetch()) {
 $dbCheck = CIBlockElement::GetList([], ['IBLOCK_ID' => $projId], false, ['nTopCount' => 1], ['ID']);
 if (!$dbCheck->Fetch()) {
     $projects = [
-        ['name' => 'PolytechExpo',            'preview' => 'Ежегодная конференция выпускников и партнёров МГТУ им. Н.Э. Баумана', 'url' => '/projects/politech-expo/'],
-        ['name' => 'Встреча выпускников',     'preview' => 'Традиционная встреча выпускников всех поколений Бауманки',           'url' => '/projects/conference/'],
-        ['name' => 'Попечительский совет МТ4','preview' => 'Поддержка развития кафедры МТ4 МГТУ им. Н.Э. Баумана',             'url' => '/projects/trustees/'],
-        ['name' => 'Реставрация ротонды',     'preview' => 'Проект по восстановлению исторической ротонды МГТУ',                 'url' => '/projects/restoration/'],
+        ['name' => 'Конференция PolytechExpo',        'preview' => 'Ежегодная конференция выпускников и партнёров МГТУ им. Н.Э. Баумана', 'url' => '/projects/politech-expo/'],
+        ['name' => 'Конференция Встреча выпускников', 'preview' => 'Традиционная встреча выпускников всех поколений Бауманки',           'url' => '/projects/conference/'],
+        ['name' => 'Попечительский совет',            'preview' => 'Поддержка развития кафедр и науки МГТУ им. Н.Э. Баумана',           'url' => '/projects/trustees/'],
+        ['name' => 'Реставрации Ротонды',             'preview' => 'Проект по восстановлению исторической ротонды МГТУ',                 'url' => '/projects/restoration/'],
     ];
     $el = new CIBlockElement();
     foreach ($projects as $i => $proj) {
