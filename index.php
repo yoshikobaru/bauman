@@ -235,60 +235,50 @@ endif;
 						</p>
 					</div>
 <?php
-$_projectsFromIblock = false;
-if (defined('IBLOCK_PROJECTS_ID') && IBLOCK_PROJECTS_ID > 0 && \Bitrix\Main\Loader::includeModule('iblock')):
+// Эталонные данные 4 проектов — изображения всегда из верстки (initiative-img-N)
+$_staticProjects = [
+    ['name' => 'Конференция PolytechExpo',        'url' => '/projects/politech-expo/', 'img' => 'initiative-img-1.png', 'mob' => 'initiative-img-mob-1.png'],
+    ['name' => 'Конференция Встреча выпускников', 'url' => '/projects/conference/',    'img' => 'initiative-img-2.png', 'mob' => 'initiative-img-mob-2.png'],
+    ['name' => 'Попечительский совет',            'url' => '/projects/trustees/',      'img' => 'initiative-img-3.png', 'mob' => 'initiative-img-mob-3.png'],
+    ['name' => 'Реставрации Ротонды',             'url' => '/projects/restoration/',   'img' => 'initiative-img-4.png', 'mob' => 'initiative-img-mob-4.png'],
+];
+
+// Пробуем переопределить имя и URL из инфоблока (по порядку)
+if (defined('IBLOCK_PROJECTS_ID') && IBLOCK_PROJECTS_ID > 0 && \Bitrix\Main\Loader::includeModule('iblock')) {
     $dbProjects = CIBlockElement::GetList(
         ['SORT' => 'ASC'],
         ['IBLOCK_ID' => IBLOCK_PROJECTS_ID, 'ACTIVE' => 'Y'],
         false,
         ['nTopCount' => 4],
-        ['ID', 'NAME', 'PREVIEW_PICTURE', 'PROPERTY_DETAIL_URL']
+        ['ID', 'NAME', 'PROPERTY_DETAIL_URL']
     );
-    while ($proj = $dbProjects->GetNext()):
-        $_projectsFromIblock = true;
-        $projImg  = $proj['PREVIEW_PICTURE']
-            ? CFile::GetPath($proj['PREVIEW_PICTURE'])
-            : SITE_TEMPLATE_PATH . '/assets/img/initiative-img-1.png';
-        $projLink = !empty($proj['PROPERTY_DETAIL_URL_VALUE'])
-            ? $proj['PROPERTY_DETAIL_URL_VALUE']
-            : '/projects/detail/?id=' . (int)$proj['ID'];
-?>
-				<div class="initiative__card">
-					<h3>
-						<?= htmlspecialchars($proj['NAME']) ?>
-					</h3>
-					<a href="<?= htmlspecialchars($projLink) ?>">
-						<img src="<?= htmlspecialchars($projImg) ?>" alt="<?= htmlspecialchars($proj['NAME']) ?>" class="initiative__image desk-block" />
-						<img src="<?= htmlspecialchars($projImg) ?>" alt="<?= htmlspecialchars($proj['NAME']) ?>" class="initiative__image desk-none" />
-					</a>
-				</div>
-<?php
-    endwhile;
-endif;
+    $i = 0;
+    while ($proj = $dbProjects->GetNext()) {
+        if (isset($_staticProjects[$i])) {
+            if (!empty($proj['NAME'])) {
+                $_staticProjects[$i]['name'] = $proj['NAME'];
+            }
+            if (!empty($proj['PROPERTY_DETAIL_URL_VALUE'])) {
+                $_staticProjects[$i]['url'] = $proj['PROPERTY_DETAIL_URL_VALUE'];
+            }
+        }
+        $i++;
+    }
+}
 
-// Fallback: статичные карточки 4 проектов (точно как в верстке)
-if (!$_projectsFromIblock):
-    $staticProjects = [
-        ['name' => 'Конференция PolytechExpo',        'url' => '/projects/politech-expo/', 'img' => 'initiative-img-1.png', 'mob' => 'initiative-img-mob-1.png'],
-        ['name' => 'Конференция Встреча выпускников', 'url' => '/projects/conference/',    'img' => 'initiative-img-2.png', 'mob' => 'initiative-img-mob-2.png'],
-        ['name' => 'Попечительский совет',            'url' => '/projects/trustees/',      'img' => 'initiative-img-3.png', 'mob' => 'initiative-img-mob-3.png'],
-        ['name' => 'Реставрации Ротонды',             'url' => '/projects/restoration/',   'img' => 'initiative-img-4.png', 'mob' => 'initiative-img-mob-4.png'],
-    ];
-    foreach ($staticProjects as $sp):
+// Рендерим карточки — структура точно как в верстке
+foreach ($_staticProjects as $sp):
 ?>
 				<div class="initiative__card">
 					<h3>
-						<?= $sp['name'] ?>
+						<?= htmlspecialchars($sp['name']) ?>
 					</h3>
 					<a href="<?= $sp['url'] ?>">
 						<img src="<?= SITE_TEMPLATE_PATH ?>/assets/img/<?= $sp['img'] ?>" alt="<?= htmlspecialchars($sp['name']) ?>" class="initiative__image desk-block" />
 						<img src="<?= SITE_TEMPLATE_PATH ?>/assets/img/<?= $sp['mob'] ?>" alt="<?= htmlspecialchars($sp['name']) ?>" class="initiative__image desk-none" />
 					</a>
 				</div>
-<?php
-    endforeach;
-endif;
-?>
+<?php endforeach; ?>
 				</div>
 			</div>
 			<!-- /.container -->
