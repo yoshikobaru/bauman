@@ -1,7 +1,7 @@
 <?php
 require($_SERVER['DOCUMENT_ROOT'] . '/bitrix/header.php');
-$APPLICATION->SetTitle('Реставрация ротонды');
-$tplPath = $_SERVER['DOCUMENT_ROOT'] . '/local/templates/my_template/project_restoration.html';
+$APPLICATION->SetTitle('Завершённый проект');
+$tplPath = $_SERVER['DOCUMENT_ROOT'] . '/local/templates/my_template/details-project.html';
 $html = file_get_contents($tplPath);
 if (preg_match('/<main>(.*?)<\/main>/si', $html, $m)) {
     $content = $m[1];

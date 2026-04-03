@@ -211,15 +211,13 @@ $prefill = [
                             <!-- Шаг 2: Проект -->
                             <div class="project-programm__item main-tabs-pane" data-tab="programm">
                                 <div class="project-programm__all">
-                                    <select id="d2_project_select">
-                                        <option value="">— Выберите проект —</option>
-                                        <?php if (!empty($arProjects)):
-                                            foreach ($arProjects as $proj): ?>
-                                        <option value="<?= htmlspecialchars($proj['NAME']) ?>"><?= htmlspecialchars($proj['NAME']) ?></option>
-                                        <?php endforeach;
-                                        else: ?>
-                                        <option value="Общий фонд">Общий фонд поддержки</option>
-                                        <?php endif; ?>
+                                    <select id="d2_project_select" name="project">
+                                        <option value="">— Выберите программу —</option>
+                                        <option value="Пожертвование на ведение уставной деятельности">Пожертвование на ведение уставной деятельности</option>
+                                        <option value="Реставрация Ротонды">Реставрация Ротонды</option>
+                                        <option value="Конференция PolytechExpo">Конференция PolytechExpo</option>
+                                        <option value="Конференция Встреча выпускников">Конференция Встреча выпускников</option>
+                                        <option value="Попечительский совет МТ4">Попечительский совет МТ4</option>
                                     </select>
                                 </div>
                                 <div class="project-programm__buttons">
@@ -253,7 +251,7 @@ $prefill = [
                                     </div>
                                     <div class="join__politic">
                                         <div class="join__politic-question">
-                                            <p class="join__politic-link">Ознакомлен с <a href="#">Уставом</a> и <a href="#">Офертой</a></p>
+                                            <p class="join__politic-link">Ознакомлен с <a href="<?= defined('DOC_USTAV_URL') ? DOC_USTAV_URL : '#' ?>" target="_blank">Уставом</a> и <a href="<?= defined('DOC_POLITIKA_URL') ? DOC_POLITIKA_URL : '#' ?>" target="_blank">политикой обработки ПДн</a></p>
                                             <div class="account__graduate-choice">
                                                 <label class="account__graduate-item">
                                                     <input type="radio" name="agree_doc" value="yes" class="account__graduate-input">
@@ -261,19 +259,6 @@ $prefill = [
                                                 </label>
                                                 <label class="account__graduate-item">
                                                     <input type="radio" name="agree_doc" value="no" class="account__graduate-input">
-                                                    <span class="account__graduate-box"></span>Нет
-                                                </label>
-                                            </div>
-                                        </div>
-                                        <div class="join__politic-question">
-                                            <p class="join__politic-link">Согласен с <a href="#">политикой обработки ПДн</a></p>
-                                            <div class="account__graduate-choice">
-                                                <label class="account__graduate-item">
-                                                    <input type="radio" name="agree_pd" value="yes" class="account__graduate-input">
-                                                    <span class="account__graduate-box"></span>Да
-                                                </label>
-                                                <label class="account__graduate-item">
-                                                    <input type="radio" name="agree_pd" value="no" class="account__graduate-input">
                                                     <span class="account__graduate-box"></span>Нет
                                                 </label>
                                             </div>
@@ -298,20 +283,7 @@ $prefill = [
                                     </div>
                                     <div class="join__politic">
                                         <div class="join__politic-question">
-                                            <p class="join__politic-link">Согласен с <a href="#">политикой обработки ПДн</a></p>
-                                            <div class="account__graduate-choice">
-                                                <label class="account__graduate-item">
-                                                    <input type="radio" name="agree_doc" value="yes" class="account__graduate-input">
-                                                    <span class="account__graduate-box"></span>Да
-                                                </label>
-                                                <label class="account__graduate-item">
-                                                    <input type="radio" name="agree_doc" value="no" class="account__graduate-input">
-                                                    <span class="account__graduate-box"></span>Нет
-                                                </label>
-                                            </div>
-                                        </div>
-                                        <div class="join__politic-question">
-                                            <p class="join__politic-link">Согласен с <a href="#">политикой обработки ПДн</a></p>
+                                            <p class="join__politic-link">Согласен с <a href="<?= defined('DOC_POLITIKA_URL') ? DOC_POLITIKA_URL : '#' ?>" target="_blank">политикой обработки ПДн</a></p>
                                             <div class="account__graduate-choice">
                                                 <label class="account__graduate-item">
                                                     <input type="radio" name="agree_pd" value="yes" class="account__graduate-input">

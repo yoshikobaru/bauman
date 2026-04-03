@@ -24,7 +24,7 @@ if ($iblockOk && defined('IBLOCK_PROJECTS_ID') && IBLOCK_PROJECTS_ID > 0) {
         $arFilter,
         false,
         false,
-        ['ID', 'NAME', 'CODE', 'DATE_ACTIVE_FROM', 'PREVIEW_TEXT', 'PREVIEW_PICTURE', 'DETAIL_PAGE_URL']
+        ['ID', 'NAME', 'CODE', 'DATE_ACTIVE_FROM', 'PREVIEW_TEXT', 'PREVIEW_PICTURE', 'DETAIL_PAGE_URL', 'PROPERTY_DETAIL_URL']
     );
 }
 
@@ -65,26 +65,36 @@ $statusLabels = ['all' => 'Все', 'active' => 'Активные', 'completed' 
             </div>
 
             <div class="visits__list">
-                <?php if ($dbProjects):
-                    $hasItems = false;
-                    while ($row = $dbProjects->GetNext()):
+<?php
+// Статичные активные проекты (fallback если инфоблок пуст)
+$_staticActive = [
+    ['name' => 'PolytechExpo',             'text' => 'Ежегодная конференция выпускников и партнёров МГТУ им. Н.Э. Баумана', 'url' => '/projects/politech-expo/',  'img' => '/assets/img/projects-page/current-project-img-1.png'],
+    ['name' => 'Встреча выпускников',      'text' => 'Традиционная встреча выпускников всех поколений Бауманки',            'url' => '/projects/conference/',    'img' => '/assets/img/projects-page/current-project-img-1.png'],
+    ['name' => 'Попечительский совет МТ4', 'text' => 'Поддержка развития кафедры МТ4 МГТУ им. Н.Э. Баумана',              'url' => '/projects/trustees/',      'img' => '/assets/img/projects-page/current-project-img-1.png'],
+    ['name' => 'Реставрация ротонды',      'text' => 'Проект по восстановлению исторической ротонды МГТУ',                  'url' => '/projects/restoration/',   'img' => '/assets/img/projects-page/current-project-img-1.png'],
+];
+?>
+                <?php
+                $hasItems = false;
+                if ($dbProjects) {
+                    while ($row = $dbProjects->GetNext()) {
                         $hasItems = true;
                         $imgSrc = SITE_TEMPLATE_PATH . '/assets/img/projects-page/current-project-img-1.png';
                         if (!empty($row['PREVIEW_PICTURE'])) {
                             $img = CFile::GetPath($row['PREVIEW_PICTURE']);
                             if ($img) $imgSrc = $img;
                         }
-                        $link = '/projects/detail/?id=' . (int)$row['ID'];
-                ?>
+                        $link = !empty($row['PROPERTY_DETAIL_URL_VALUE'])
+                            ? $row['PROPERTY_DETAIL_URL_VALUE']
+                            : '/projects/detail/?id=' . (int)$row['ID'];
+                        ?>
                 <div class="visits__card">
                     <img src="<?= htmlspecialchars($imgSrc) ?>" alt="" class="visits__image">
                     <div class="visits__content">
                         <?php if (!empty($row['DATE_ACTIVE_FROM'])): ?>
-                        <div class="visits__date">
-                            <div class="visits__date-current">
-                                <p><span>Дата:</span> <?= date('d F Y', strtotime($row['DATE_ACTIVE_FROM'])) ?></p>
-                            </div>
-                        </div>
+                        <div class="visits__date"><div class="visits__date-current">
+                            <p><span>Дата:</span> <?= date('d F Y', strtotime($row['DATE_ACTIVE_FROM'])) ?></p>
+                        </div></div>
                         <?php endif; ?>
                         <h3 class="visits__subtitle"><?= htmlspecialchars($row['NAME']) ?></h3>
                         <?php if (!empty($row['PREVIEW_TEXT'])): ?>
@@ -92,16 +102,42 @@ $statusLabels = ['all' => 'Все', 'active' => 'Активные', 'completed' 
                         <?php endif; ?>
                         <div class="visits__buttons">
                             <a href="/support/" class="btn visits__btn visits__btn--help">Поддержать</a>
-                            <a href="<?= $link ?>" class="btn visits__btn btn-transparent">Подробнее</a>
+                            <a href="<?= htmlspecialchars($link) ?>" class="btn visits__btn btn-transparent">Подробнее</a>
                         </div>
                     </div>
                 </div>
-                <?php endwhile;
-                    if (!$hasItems): ?>
-                    <p style="color:#888">Проекты по выбранному фильтру не найдены.</p>
-                <?php endif;
-                else: ?>
-                    <p style="color:#888">Контент из CMS недоступен — настройте инфоблоки в <code>local/php_interface/init.php</code>.</p>
+                <?php
+                    }
+                }
+
+                // Fallback — статичные карточки активных проектов
+                if (!$hasItems && $statusFilter !== 'completed') {
+                    foreach ($_staticActive as $sp): ?>
+                <div class="visits__card">
+                    <img src="<?= SITE_TEMPLATE_PATH . $sp['img'] ?>" alt="" class="visits__image">
+                    <div class="visits__content">
+                        <h3 class="visits__subtitle"><?= $sp['name'] ?></h3>
+                        <p class="visits__text"><?= $sp['text'] ?></p>
+                        <div class="visits__buttons">
+                            <a href="/support/" class="btn visits__btn visits__btn--help">Поддержать</a>
+                            <a href="<?= $sp['url'] ?>" class="btn visits__btn btn-transparent">Подробнее</a>
+                        </div>
+                    </div>
+                </div>
+                <?php endforeach; }
+
+                // Архивная карточка при фильтре completed
+                if ($statusFilter === 'completed' && !$hasItems): ?>
+                <div class="visits__card">
+                    <img src="<?= SITE_TEMPLATE_PATH ?>/assets/img/projects-page/current-project-img-1.png" alt="" class="visits__image">
+                    <div class="visits__content">
+                        <h3 class="visits__subtitle">Завершённые проекты</h3>
+                        <p class="visits__text">Архив инициатив и реализованных программ Политехнического общества.</p>
+                        <div class="visits__buttons">
+                            <a href="/projects/archive-template/" class="btn visits__btn btn-transparent">Подробнее</a>
+                        </div>
+                    </div>
+                </div>
                 <?php endif; ?>
             </div>
         </div>

@@ -310,46 +310,23 @@ endif;
 				<h2 class="main-title documents__title">Уставные документы</h2>
 				<div class="documents__table">
 					<div class="documents__head">
-						<div class="documents__number">
-							<p>
-								Номер
-							</p>
-						</div>
-						<div class="documents__name">
-							<p>
-								Наименование документа
-							</p>
-						</div>
+						<div class="documents__number"><p>Номер</p></div>
+						<div class="documents__name"><p>Наименование документа</p></div>
 						<div class="documents__date">
-							<p>
-								Дата публикации
+							<p>Дата публикации
 								<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
 									<path d="M18 9L12 15L6 9" stroke="black" stroke-linecap="round" stroke-linejoin="round"/>
 								</svg>
 							</p>
 						</div>
-						<div class="documents__icon">
-							
-						</div>
+						<div class="documents__icon"></div>
 					</div>
 					<div class="documents__body">
-						<div class="documents__number">
-							<p class="main-text">
-								№1234587
-							</p>
-						</div>
-						<div class="documents__name">
-							<p>
-								Распоряжение № 1234587 от 11.01.2025 «Об отмене изменений в наименование уставного документа»
-							</p>
-						</div>
-						<div class="documents__date">
-							<p class="main-text">
-								11.01.2025
-							</p>
-						</div>
+						<div class="documents__number"><p class="main-text">№1</p></div>
+						<div class="documents__name"><p>Устав Регионального общественного объединения «Политехническое общество выпускников МВТУ (МГТУ) им. Н.Э. Баумана»</p></div>
+						<div class="documents__date"><p class="main-text">04.09.1996</p></div>
 						<div class="documents__icon">
-							<a href="#">
+							<a href="<?= defined('DOC_USTAV_URL') ? DOC_USTAV_URL : '#' ?>" target="_blank">
 								<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
 									<path d="M12 15V3M12 15L7 10M12 15L17 10M21 15V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V15" stroke="black" stroke-linecap="round" stroke-linejoin="round"/>
 								</svg>
@@ -357,71 +334,11 @@ endif;
 						</div>
 					</div>
 					<div class="documents__body">
-						<div class="documents__number">
-							<p class="main-text">
-								№1234587
-							</p>
-						</div>
-						<div class="documents__name">
-							<p>
-								Распоряжение № 1234587 от 11.01.2025 «Об отмене изменений в наименование уставного документа»
-							</p>
-						</div>
-						<div class="documents__date">
-							<p class="main-text">
-								11.01.2025
-							</p>
-						</div>
+						<div class="documents__number"><p class="main-text">№2</p></div>
+						<div class="documents__name"><p>Политика в отношении обработки персональных данных</p></div>
+						<div class="documents__date"><p class="main-text">2025</p></div>
 						<div class="documents__icon">
-							<a href="#">
-								<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
-									<path d="M12 15V3M12 15L7 10M12 15L17 10M21 15V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V15" stroke="black" stroke-linecap="round" stroke-linejoin="round"/>
-								</svg>
-							</a>
-						</div>
-					</div>
-					<div class="documents__body">
-						<div class="documents__number">
-							<p class="main-text">
-								№1234587
-							</p>
-						</div>
-						<div class="documents__name">
-							<p>
-								Распоряжение № 1234587 от 11.01.2025 «Об отмене изменений в наименование уставного документа»
-							</p>
-						</div>
-						<div class="documents__date">
-							<p class="main-text">
-								11.01.2025
-							</p>
-						</div>
-						<div class="documents__icon">
-							<a href="#">
-								<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
-									<path d="M12 15V3M12 15L7 10M12 15L17 10M21 15V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V15" stroke="black" stroke-linecap="round" stroke-linejoin="round"/>
-								</svg>
-							</a>
-						</div>
-					</div>
-					<div class="documents__body">
-						<div class="documents__number">
-							<p class="main-text">
-								№1234587
-							</p>
-						</div>
-						<div class="documents__name">
-							<p>
-								Распоряжение № 1234587 от 11.01.2025 «Об отмене изменений в наименование уставного документа»
-							</p>
-						</div>
-						<div class="documents__date">
-							<p class="main-text">
-								11.01.2025
-							</p>
-						</div>
-						<div class="documents__icon">
-							<a href="#">
+							<a href="<?= defined('DOC_POLITIKA_URL') ? DOC_POLITIKA_URL : '#' ?>" target="_blank">
 								<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
 									<path d="M12 15V3M12 15L7 10M12 15L17 10M21 15V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V15" stroke="black" stroke-linecap="round" stroke-linejoin="round"/>
 								</svg>

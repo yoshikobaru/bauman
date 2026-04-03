@@ -248,7 +248,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['d5_action'])) {
                             <p class="visits__text">
                                Авиастроение, машиностроение, медицина, приборка, робототехника, электроника — если вы внутри этих процессов, вам точно будет о чём поговорить.
                             </p>
-                            <a href="details-project.html" target="_blank" class="btn visits__btn btn-transparent">Подробнее</a>
+                            <a href="/reference/visit-semat/" class="btn visits__btn btn-transparent">Подробнее</a>
                         </div>
                     </div>
                     <div class="visits__card">
@@ -265,7 +265,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['d5_action'])) {
                             <p class="visits__text">
                                Едем к разработчикам отечественной электроники МАШ ЮНИТ — резиденту Сколково, который собирает ИТ-оборудование от платы до промышленного компьютера.
                             </p>
-                            <a href="details-project.html" target="_blank" class="btn visits__btn btn-transparent">Подробнее</a>
+                            <a href="/reference/visit-mash/" class="btn visits__btn btn-transparent">Подробнее</a>
                         </div>
                     </div>
                 </div>
@@ -661,7 +661,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['d5_action'])) {
 			</div>
 			<div class="join__politic">
 				<div class="join__politic-question">
-					<p class="join__politic-link">Согласен с <a href="#">политикой обработки ПДн</a></p>
+					<p class="join__politic-link">Согласен с <a href="<?= defined('DOC_POLITIKA_URL') ? DOC_POLITIKA_URL : '#' ?>" target="_blank">политикой обработки ПДн</a></p>
 					<div class="account__graduate-choice">
 						<label class="account__graduate-item">
 							<input type="radio" name="d5_agree" value="yes" class="account__graduate-input" required>

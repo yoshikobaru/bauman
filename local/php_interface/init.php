@@ -59,7 +59,13 @@ define('IBLOCK_FUNDS_ID',        6); // после setup_funds.php
 /**
  * Email администратора для уведомлений о новых заявках.
  */
-define('PO_ADMIN_EMAIL', 'admin@bauman-polytech.ru');
+define('PO_ADMIN_EMAIL', 'info@bauman-polytech.ru');
+
+/**
+ * Пути к уставным документам (публичный URL).
+ */
+define('DOC_USTAV_URL',    '/local/templates/my_template/assets/' . rawurlencode('УСТАВ ПОЛИТЕХ.pdf'));
+define('DOC_POLITIKA_URL', '/local/templates/my_template/assets/' . rawurlencode('Форма_Политика_в_отношении_обработки_персональных_данных_на.docx'));
 
 /**
  * Отправить уведомление администратору о новой заявке.

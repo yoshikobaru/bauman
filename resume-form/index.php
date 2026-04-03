@@ -36,6 +36,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['vacancy_action'])) {
         if (!$company || !$position) {
             $errors[] = 'Заполните обязательные поля: Компания, Должность.';
         } else {
+            // Обработка прикреплённого файла
+            $attachFileId = null;
+            if (!empty($_FILES['attachment']['name']) && $_FILES['attachment']['error'] === UPLOAD_ERR_OK) {
+                $attachFileId = CFile::SaveFile(CFile::MakeFileArray($_FILES['attachment']['tmp_name'], $_FILES['attachment']['name']), 'applications');
+            }
+
             $saved = false;
             if ($hlOk && defined('HL_VACANCIES_ID') && HL_VACANCIES_ID > 0) {
                 $hlEntity = \Bitrix\Highloadblock\HighloadBlockTable::getById(HL_VACANCIES_ID)->fetch();
@@ -50,6 +56,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['vacancy_action'])) {
                         'UF_CONTACT_EMAIL' => $contactEmail,
                         'UF_STATUS'        => 'pending',
                         'UF_DATE_CREATE'   => new \Bitrix\Main\Type\DateTime(),
+                        'UF_DATA'          => $attachFileId ? serialize(['file_id' => $attachFileId]) : '',
                     ]);
                     $saved = $res->isSuccess();
                 }
@@ -86,6 +93,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['resume_action'])) {
         if (!$agreePd)   $errors[] = 'Необходимо согласие с политикой ПДн.';
 
         if (empty($errors)) {
+            // Обработка прикреплённого файла резюме
+            $resumeFileId = null;
+            if (!empty($_FILES['attachment']['name']) && $_FILES['attachment']['error'] === UPLOAD_ERR_OK) {
+                $resumeFileId = CFile::SaveFile(CFile::MakeFileArray($_FILES['attachment']['tmp_name'], $_FILES['attachment']['name']), 'applications');
+            }
+
             $saved = false;
             if ($hlOk && defined('HL_RESUMES_ID') && HL_RESUMES_ID > 0) {
                 $hlEntity = \Bitrix\Highloadblock\HighloadBlockTable::getById(HL_RESUMES_ID)->fetch();
@@ -99,6 +112,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['resume_action'])) {
                         'UF_CONTACT_EMAIL' => $contact,
                         'UF_STATUS'        => 'pending',
                         'UF_DATE_CREATE'   => new \Bitrix\Main\Type\DateTime(),
+                        'UF_DATA'          => $resumeFileId ? serialize(['file_id' => $resumeFileId]) : '',
                     ]);
                     $saved = $res->isSuccess();
                 }
@@ -168,6 +182,19 @@ if ($_canViewRes && $hlOk && defined('HL_RESUMES_ID') && HL_RESUMES_ID > 0) {
         </div>
     </section>
 
+    <!-- Войти / Зарегистрироваться -->
+    <?php if (!$USER->IsAuthorized()): ?>
+    <section class="join" style="padding:24px 0 0">
+        <div class="container">
+            <div class="account__auth-block" style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;background:#f5f7fa;border-radius:12px;padding:16px 24px">
+                <p style="margin:0;color:#555;font-size:15px">Есть аккаунт?</p>
+                <a href="#" class="btn btn-empty" data-fancybox data-src="#form-login">Войти</a>
+                <a href="/join/" class="btn">Зарегистрироваться</a>
+            </div>
+        </div>
+    </section>
+    <?php endif; ?>
+
     <!-- Кнопки действий -->
     <section class="resume-select">
         <div class="container">
@@ -229,7 +256,7 @@ if ($_canViewRes && $hlOk && defined('HL_RESUMES_ID') && HL_RESUMES_ID > 0) {
                 </p>
                 <?php else: ?>
                 <h2 class="account__title main-title">Разместить вакансию</h2>
-                <form method="POST" action="/resume-form/?form=vacancy">
+                <form method="POST" action="/resume-form/?form=vacancy" enctype="multipart/form-data">
                     <input type="hidden" name="vacancy_action" value="1">
                     <div class="account__personal">
                         <div class="account__chapter"><h3 class="account__subtitle">Данные о компании</h3></div>
@@ -249,6 +276,13 @@ if ($_canViewRes && $hlOk && defined('HL_RESUMES_ID') && HL_RESUMES_ID > 0) {
                                   style="width:100%;min-height:100px;padding:12px;border:1px solid #ccc;border-radius:4px;margin-bottom:12px;font-size:14px"><?= htmlspecialchars($_POST['description'] ?? '') ?></textarea>
                         <textarea name="requirements" placeholder="Требования к кандидату"
                                   style="width:100%;min-height:80px;padding:12px;border:1px solid #ccc;border-radius:4px;font-size:14px"><?= htmlspecialchars($_POST['requirements'] ?? '') ?></textarea>
+                    </div>
+                    <div class="account__personal" style="margin-top:24px">
+                        <div class="account__chapter"><h3 class="account__subtitle">Прикрепить документ</h3></div>
+                        <label style="display:block;margin-top:8px;font-size:14px;color:#555">
+                            Прикрепить файл (PDF, DOCX, не более 10 МБ):
+                            <input type="file" name="attachment" accept=".pdf,.doc,.docx" style="display:block;margin-top:6px">
+                        </label>
                     </div>
                     <button type="submit" class="btn authorization__btn" style="margin-top:24px">Отправить на модерацию</button>
                 </form>
@@ -277,7 +311,7 @@ if ($_canViewRes && $hlOk && defined('HL_RESUMES_ID') && HL_RESUMES_ID > 0) {
                 <p style="margin-top:16px">Размещение резюме доступно только членам Политехнического общества. <a href="/join/">Вступить</a></p>
                 <?php else: ?>
                 <h2 class="account__title main-title">Разместить резюме</h2>
-                <form method="POST" action="/resume-form/?form=resume">
+                <form method="POST" action="/resume-form/?form=resume" enctype="multipart/form-data">
                     <input type="hidden" name="resume_action" value="1">
                     <div class="account__personal">
                         <div class="account__chapter"><h3 class="account__subtitle">О себе</h3></div>
@@ -295,9 +329,16 @@ if ($_canViewRes && $hlOk && defined('HL_RESUMES_ID') && HL_RESUMES_ID > 0) {
                         <textarea name="experience" placeholder="Опыт работы"
                                   style="width:100%;min-height:100px;padding:12px;border:1px solid #ccc;border-radius:4px;font-size:14px"><?= htmlspecialchars($_POST['experience'] ?? '') ?></textarea>
                     </div>
+                    <div class="account__personal" style="margin-top:24px">
+                        <div class="account__chapter"><h3 class="account__subtitle">Прикрепить резюме</h3></div>
+                        <label style="display:block;margin-top:8px;font-size:14px;color:#555">
+                            Прикрепить файл резюме (PDF, DOCX, не более 10 МБ):
+                            <input type="file" name="attachment" accept=".pdf,.doc,.docx" style="display:block;margin-top:6px">
+                        </label>
+                    </div>
                     <div class="join__politic" style="margin-top:24px">
                         <div class="join__politic-question">
-                            <p class="join__politic-link">Согласен с <a href="#">политикой обработки ПДн</a></p>
+                            <p class="join__politic-link">Согласен с <a href="<?= defined('DOC_POLITIKA_URL') ? DOC_POLITIKA_URL : '#' ?>" target="_blank">политикой обработки ПДн</a></p>
                             <div class="account__graduate-choice">
                                 <label class="account__graduate-item">
                                     <input type="radio" name="agree_pd" value="yes" class="account__graduate-input">

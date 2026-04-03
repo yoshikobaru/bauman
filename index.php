@@ -200,30 +200,56 @@ endif;
 						</p>
 					</div>
 <?php
+$_projectsFromIblock = false;
 if (defined('IBLOCK_PROJECTS_ID') && IBLOCK_PROJECTS_ID > 0 && \Bitrix\Main\Loader::includeModule('iblock')):
     $dbProjects = CIBlockElement::GetList(
         ['SORT' => 'ASC'],
         ['IBLOCK_ID' => IBLOCK_PROJECTS_ID, 'ACTIVE' => 'Y'],
         false,
         ['nTopCount' => 4],
-        ['ID', 'NAME', 'PREVIEW_PICTURE']
+        ['ID', 'NAME', 'PREVIEW_PICTURE', 'PROPERTY_DETAIL_URL']
     );
     while ($proj = $dbProjects->GetNext()):
-        $projImg = $proj['PREVIEW_PICTURE']
+        $_projectsFromIblock = true;
+        $projImg  = $proj['PREVIEW_PICTURE']
             ? CFile::GetPath($proj['PREVIEW_PICTURE'])
             : SITE_TEMPLATE_PATH . '/assets/img/initiative-img-1.png';
+        $projLink = !empty($proj['PROPERTY_DETAIL_URL_VALUE'])
+            ? $proj['PROPERTY_DETAIL_URL_VALUE']
+            : '/projects/detail/?id=' . (int)$proj['ID'];
 ?>
-					<div class="initiative__card">
-						<h3>
-							<?= htmlspecialchars($proj['NAME']) ?>
-						</h3>
-						<a href="/projects/detail/?id=<?= (int)$proj['ID'] ?>">
-							<img src="<?= htmlspecialchars($projImg) ?>" alt="<?= htmlspecialchars($proj['NAME']) ?>" class="initiative__image desk-block" />
-							<img src="<?= htmlspecialchars($projImg) ?>" alt="<?= htmlspecialchars($proj['NAME']) ?>" class="initiative__image desk-none" />
-						</a>
-					</div>
+				<div class="initiative__card">
+					<h3>
+						<?= htmlspecialchars($proj['NAME']) ?>
+					</h3>
+					<a href="<?= htmlspecialchars($projLink) ?>">
+						<img src="<?= htmlspecialchars($projImg) ?>" alt="<?= htmlspecialchars($proj['NAME']) ?>" class="initiative__image desk-block" />
+						<img src="<?= htmlspecialchars($projImg) ?>" alt="<?= htmlspecialchars($proj['NAME']) ?>" class="initiative__image desk-none" />
+					</a>
+				</div>
 <?php
     endwhile;
+endif;
+
+// Fallback: статичные карточки 4 проектов, пока инфоблок пуст
+if (!$_projectsFromIblock):
+    $staticProjects = [
+        ['name' => 'PolytechExpo',             'url' => '/projects/politech-expo/', 'img' => '/assets/img/initiative-img-1.png'],
+        ['name' => 'Встреча выпускников',      'url' => '/projects/conference/',   'img' => '/assets/img/initiative-img-1.png'],
+        ['name' => 'Попечительский совет МТ4', 'url' => '/projects/trustees/',     'img' => '/assets/img/initiative-img-1.png'],
+        ['name' => 'Реставрация ротонды',      'url' => '/projects/restoration/',  'img' => '/assets/img/initiative-img-1.png'],
+    ];
+    foreach ($staticProjects as $sp):
+?>
+				<div class="initiative__card">
+					<h3><?= $sp['name'] ?></h3>
+					<a href="<?= $sp['url'] ?>">
+						<img src="<?= SITE_TEMPLATE_PATH . $sp['img'] ?>" alt="<?= $sp['name'] ?>" class="initiative__image desk-block" />
+						<img src="<?= SITE_TEMPLATE_PATH . $sp['img'] ?>" alt="<?= $sp['name'] ?>" class="initiative__image desk-none" />
+					</a>
+				</div>
+<?php
+    endforeach;
 endif;
 ?>
 				</div>
@@ -378,12 +404,12 @@ endif;
 									Практика на основе исследований
 								</p>
 							</div>
-							<div class="new-project__card new-project__card--different">
-								<img src="<?=SITE_TEMPLATE_PATH?>/assets/img/new-project-bg.png" alt="">
-								<h3>
-									История и крепкое сообщество
-								</h3>
-							</div>
+						<a href="/about/" class="new-project__card new-project__card--different" style="text-decoration:none;color:inherit;display:block;">
+							<img src="<?=SITE_TEMPLATE_PATH?>/assets/img/new-project-bg.png" alt="">
+							<h3>
+								История и крепкое сообщество
+							</h3>
+						</a>
 						</div>
 						
 					</div>
@@ -402,7 +428,6 @@ endif;
 				<p class="main-text membership__text">
 					В зависимости от варианта участия резиденты получают определённые возможности и преференции, приведённые в таблице ниже.
 				</p>
-				<button class="membership__link">Подробнее</button>
 				<div class="membership-slider swiper">
 					<div class="swiper-wrapper">
 						<div class="swiper-slide membership-slider__card">
@@ -429,9 +454,9 @@ endif;
 									Доступ к витрине компетенций партнёров Политехнического общества, кафедр, студенческих конструкторских бюро и научно-образовательных центров МГТУ.
 								</li>
 							</ul>
-							<button class="membership-slider__join btn btn-empty" data-fancybox data-src="#form-membership">Вступить</button>
-						</div>
-						<div class="swiper-slide membership-slider__card membership-slider__card--proffesional">
+						<a href="/join/" class="membership-slider__join btn btn-empty">Вступить</a>
+					</div>
+					<div class="swiper-slide membership-slider__card membership-slider__card--proffesional">
 							<h3 class="membership-slider__title">
 								Профессиональное
 							</h3>
@@ -456,9 +481,9 @@ endif;
 									Доступ к базе резюме выпускников на карьерной платформе Политехнического общества.
 								</li>
 							</ul>
-							<button class="membership-slider__join btn btn-empty" data-fancybox data-src="#form-membership">Вступить</button>
-						</div>
-						<div class="swiper-slide membership-slider__card membership-slider__card--honorary">
+						<a href="/join/" class="membership-slider__join btn btn-empty">Вступить</a>
+					</div>
+					<div class="swiper-slide membership-slider__card membership-slider__card--honorary">
 							<h3 class="membership-slider__title">
 								Партнёрское
 							</h3>
@@ -477,9 +502,9 @@ endif;
 									Участие в закрытом чате почётных членов Политехнического общества.
 								</li>
 							</ul>
-							<button class="membership-slider__join btn btn-empty" data-fancybox data-src="#form-membership">Вступить</button>
-						</div>
-						<div class="swiper-slide membership-slider__card membership-slider__card--gratuitous">
+						<a href="/join/" class="membership-slider__join btn btn-empty">Вступить</a>
+					</div>
+					<div class="swiper-slide membership-slider__card membership-slider__card--gratuitous">
 							<h3 class="membership-slider__title">
 								Почётное
 							</h3>
@@ -492,15 +517,15 @@ endif;
 									Для тех, кто внёс значительный вклад в развитие технической науки, образования, технологий и деятельности Политехнического общества.
 								</li>
 							</ul>
-							<button class="membership-slider__join btn btn-empty" data-fancybox data-src="#form-membership">Вступить</button>
-						</div>
+						<a href="/join/" class="membership-slider__join btn btn-empty">Вступить</a>
 					</div>
-					<div class="swiper-pagination"></div>
 				</div>
+				<div class="swiper-pagination"></div>
 			</div>
-			<!-- /.container -->
-		</section>
-		<!-- /.membership -->
+		</div>
+		<!-- /.container -->
+	</section>
+	<!-- /.membership -->
 		<!-- news -->
 		<section class="news">
 			<div class="container">

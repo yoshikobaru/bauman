@@ -68,8 +68,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['join_action'])) {
         if (!$firstName)           $errors[] = 'Введите имя';
 
         if (empty($errors)) {
+            // Обработка аватара
+            $avatarFileId = false;
+            if (!empty($_FILES['avatar']['name']) && $_FILES['avatar']['error'] === UPLOAD_ERR_OK) {
+                $avatarFileId = CFile::SaveFile(CFile::MakeFileArray($_FILES['avatar']['tmp_name'], $_FILES['avatar']['name']), 'user_photo');
+            }
+
             $oUser  = new CUser();
-            $userId = $oUser->Add([
+            $userData = [
                 'LOGIN'            => $email,
                 'EMAIL'            => $email,
                 'PASSWORD'         => $password,
@@ -87,7 +93,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['join_action'])) {
                 'UF_DIPLOMA_SERIES'    => $diplomaSeries,
                 'UF_DIPLOMA_NUMBER'    => $diplomaNumber,
                 'UF_DIPLOMA_DATE'      => $diplomaDate,
-            ]);
+            ];
+            if ($avatarFileId) $userData['PERSONAL_PHOTO'] = $avatarFileId;
+            $userId = $oUser->Add($userData);
 
             if ($userId) {
                 $USER->Login($email, $password, 'N');
@@ -454,7 +462,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['d7_action'])) {
                     <div class="join__politic">
                         <div class="join__politic-question">
                             <p class="join__politic-link">
-                                Ознакомлен(а) и согласен(а) с <a href="#">Уставом</a> и <a href="#">Положением о членских взносах</a>
+                                Ознакомлен(а) и согласен(а) с <a href="<?= defined('DOC_USTAV_URL') ? DOC_USTAV_URL : '#' ?>" target="_blank">Уставом</a> и <a href="<?= defined('DOC_POLITIKA_URL') ? DOC_POLITIKA_URL : '#' ?>" target="_blank">политикой обработки ПДн</a>
                             </p>
                             <div class="account__graduate-choice">
                                 <label class="account__graduate-item">
@@ -468,7 +476,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['d7_action'])) {
                             </div>
                         </div>
                         <div class="join__politic-question">
-                            <p class="join__politic-link">Согласен с <a href="#">политикой обработки ПДн</a></p>
+                            <p class="join__politic-link">Согласен с <a href="<?= defined('DOC_POLITIKA_URL') ? DOC_POLITIKA_URL : '#' ?>" target="_blank">политикой обработки ПДн</a></p>
                             <div class="account__graduate-choice">
                                 <label class="account__graduate-item">
                                     <input type="radio" name="agree_pd" value="yes" class="account__graduate-input">
@@ -492,6 +500,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['d7_action'])) {
                 <form method="POST" action="/join/" enctype="multipart/form-data">
                     <input type="hidden" name="join_action" value="1">
                     <input type="hidden" name="membership_type" value="basic" id="membership_type">
+                    <!-- Аватар -->
+                    <div class="account__photo" style="margin-bottom:24px">
+                        <div class="account__chapter">
+                            <h3 class="account__subtitle">Фото профиля</h3>
+                        </div>
+                        <div style="display:flex;align-items:center;gap:16px;margin-top:12px">
+                            <div id="avatar-preview" style="width:80px;height:80px;border-radius:50%;background:#e0e0e0;overflow:hidden;flex-shrink:0">
+                                <img id="avatar-img" src="" alt="" style="width:100%;height:100%;object-fit:cover;display:none">
+                            </div>
+                            <label style="cursor:pointer">
+                                <span class="btn btn-empty" style="font-size:13px">Загрузить фото</span>
+                                <input type="file" name="avatar" accept="image/*" style="display:none" id="avatar-input">
+                            </label>
+                        </div>
+                    </div>
+
                     <div class="account__personal">
                         <div class="account__chapter">
                             <h3 class="account__subtitle">Личные данные</h3>
@@ -524,6 +548,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['d7_action'])) {
                                 <span class="account__graduate-box"></span>Нет
                             </label>
                         </div>
+                    </div>
+                    <!-- Баннер: если не выпускник -->
+                    <div id="join__dont" class="join__dont" style="display:<?= ($_POST['is_graduate'] ?? 'no') !== 'yes' ? 'block' : 'none' ?>;background:#fff8e1;border-radius:12px;padding:20px 24px;margin:16px 0;border-left:4px solid #f59e0b">
+                        <p style="font-size:15px;color:#555;line-height:1.6">
+                            Членство в Политехническом обществе доступно выпускникам МГТУ им. Н.Э. Баумана.<br>
+                            Если вы хотите сотрудничать в другом формате — свяжитесь с нами:
+                            <a href="mailto:info@bauman-polytech.ru" style="font-weight:600">info@bauman-polytech.ru</a>
+                        </p>
                     </div>
                     <div class="account__personal" id="graduate-data"
                          style="<?= ($_POST['is_graduate'] ?? 'no') !== 'yes' ? 'display:none' : '' ?>">
@@ -600,7 +632,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['d7_action'])) {
                     <div class="join__politic">
                         <div class="join__politic-question">
                             <p class="join__politic-link">
-                                Ознакомлен(а) и согласен(а) с <a href="#">Уставом</a> и <a href="#">Положением о членских взносах</a>
+                                Ознакомлен(а) и согласен(а) с <a href="<?= defined('DOC_USTAV_URL') ? DOC_USTAV_URL : '#' ?>" target="_blank">Уставом</a> и <a href="<?= defined('DOC_POLITIKA_URL') ? DOC_POLITIKA_URL : '#' ?>" target="_blank">политикой обработки ПДн</a>
                             </p>
                             <div class="account__graduate-choice">
                                 <label class="account__graduate-item">
@@ -614,7 +646,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['d7_action'])) {
                             </div>
                         </div>
                         <div class="join__politic-question">
-                            <p class="join__politic-link">Согласен с <a href="#">политикой обработки ПДн</a></p>
+                            <p class="join__politic-link">Согласен с <a href="<?= defined('DOC_POLITIKA_URL') ? DOC_POLITIKA_URL : '#' ?>" target="_blank">политикой обработки ПДн</a></p>
                             <div class="account__graduate-choice">
                                 <label class="account__graduate-item">
                                     <input type="radio" name="agree_pd" value="yes" class="account__graduate-input">
@@ -661,7 +693,7 @@ function po_switchJoinType(type) {
 po_switchJoinType('ur');
 <?php endif; ?>
 
-// Показать/скрыть поля выпускника
+// Показать/скрыть поля выпускника + баннер «не выпускник»
 document.querySelectorAll('[name="is_graduate"]').forEach(function(r) {
     r.addEventListener('change', function() {
         var show = this.value === 'yes';
@@ -669,9 +701,12 @@ document.querySelectorAll('[name="is_graduate"]').forEach(function(r) {
             var el = document.getElementById(id);
             if (el) el.style.display = show ? '' : 'none';
         });
+        // Баннер «Выпускник МГТУ = Нет»
+        var dontBlock = document.getElementById('join__dont');
+        if (dontBlock) dontBlock.style.display = show ? 'none' : 'block';
     });
 });
-// Выбор тарифа
+// Выбор тарифа; «Партнёрское» → скроллим к юр. блоку
 document.querySelectorAll('.select-plan').forEach(function(btn) {
     btn.addEventListener('click', function() {
         var plan = this.getAttribute('data-plan');
@@ -679,8 +714,29 @@ document.querySelectorAll('.select-plan').forEach(function(btn) {
         if (field) field.value = plan;
         document.querySelectorAll('.select-plan').forEach(function(b) { b.classList.remove('btn--active'); });
         this.classList.add('btn--active');
+        // Партнёрский тариф → юрлицо
+        if (plan === 'partner') {
+            po_switchJoinType('ur');
+            var urBlock = document.getElementById('join-ur-block');
+            if (urBlock) urBlock.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
     });
 });
+// Превью аватара
+(function() {
+    var inp = document.getElementById('avatar-input');
+    if (!inp) return;
+    inp.addEventListener('change', function() {
+        var file = this.files[0];
+        if (!file) return;
+        var reader = new FileReader();
+        reader.onload = function(e) {
+            var img = document.getElementById('avatar-img');
+            if (img) { img.src = e.target.result; img.style.display = 'block'; }
+        };
+        reader.readAsDataURL(file);
+    });
+})();
 </script>
 
 <?php require($_SERVER["DOCUMENT_ROOT"]."/bitrix/footer.php"); ?>
