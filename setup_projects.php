@@ -119,19 +119,6 @@ if (true) {
     }
 }
 
-// Обновить IBLOCK_PROJECTS_ID в init.php
-$initFile    = $_SERVER['DOCUMENT_ROOT'] . '/local/php_interface/init.php';
-$initContent = file_get_contents($initFile);
-$newContent  = preg_replace(
-    "/define\('IBLOCK_PROJECTS_ID',\s*\d+\);/",
-    "define('IBLOCK_PROJECTS_ID', {$projId}); // Проекты",
-    $initContent
-);
-if ($newContent !== $initContent) {
-    file_put_contents($initFile, $newContent);
-    echo "✓ IBLOCK_PROJECTS_ID={$projId} обновлена в init.php.\n";
-} else {
-    echo "• IBLOCK_PROJECTS_ID уже актуальна.\n";
-}
+echo "• IBLOCK_PROJECTS_ID={$projId} (init.php не трогаем — ID уже актуален).\n";
 
 echo "\nГотово. Удалите этот файл после выполнения.\n";

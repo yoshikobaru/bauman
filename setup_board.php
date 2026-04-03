@@ -75,19 +75,6 @@ if (true) {
     }
 }
 
-// Обновить IBLOCK_BOARD_ID в init.php
-$initFile    = $_SERVER['DOCUMENT_ROOT'] . '/local/php_interface/init.php';
-$initContent = file_get_contents($initFile);
-$newContent  = preg_replace(
-    "/define\('IBLOCK_BOARD_ID',\s*\d+\);/",
-    "define('IBLOCK_BOARD_ID', {$boardId}); // Правление",
-    $initContent
-);
-if ($newContent !== $initContent) {
-    file_put_contents($initFile, $newContent);
-    echo "✓ IBLOCK_BOARD_ID={$boardId} обновлена в init.php.\n";
-} else {
-    echo "• IBLOCK_BOARD_ID уже актуальна.\n";
-}
+echo "• IBLOCK_BOARD_ID={$boardId} (init.php не трогаем — ID уже актуален).\n";
 
 echo "\nГотово. Удалите этот файл после выполнения.\n";
