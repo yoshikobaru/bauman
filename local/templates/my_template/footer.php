@@ -62,7 +62,7 @@
 		</div>
 		<div class="form-login__buttons">
 			<button class="btn form-login__btn form-login__btn--sign" id="modal-login-btn">Войти</button>
-			<a href="/join/" class="btn form-login__btn form-login__btn--register btn-empty">Зарегистрироваться</a>
+			<a href="/authorization/" class="btn form-login__btn form-login__btn--register btn-empty">Зарегистрироваться</a>
 		</div>
 	</div>
 	<script>
