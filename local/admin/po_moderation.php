@@ -251,6 +251,122 @@ require_once($_SERVER['DOCUMENT_ROOT'] . '/bitrix/modules/main/include/prolog_ad
 </div>
 <?php endif; ?>
 
+<!-- Главные вкладки: Заявки / Логи -->
+<?php $mainSection = ($_GET['section'] ?? 'applications'); ?>
+<div style="display:flex;gap:0;margin-bottom:24px;border-bottom:2px solid #dee2e6">
+    <a href="?" style="padding:10px 22px;font-size:14px;font-weight:600;text-decoration:none;border-bottom:<?= $mainSection !== 'logs' ? '3px solid #1a1a2e;color:#1a1a2e' : '3px solid transparent;color:#888' ?>;margin-bottom:-2px">Заявки</a>
+    <a href="?section=logs" style="padding:10px 22px;font-size:14px;font-weight:600;text-decoration:none;border-bottom:<?= $mainSection === 'logs' ? '3px solid #1a1a2e;color:#1a1a2e' : '3px solid transparent;color:#888' ?>;margin-bottom:-2px">Логи действий</a>
+</div>
+
+<?php if ($mainSection === 'logs'): ?>
+<?php
+$logClass = null;
+if (defined('HL_LOGS_ID') && HL_LOGS_ID > 0) {
+    $logEntityData = \Bitrix\Highloadblock\HighloadBlockTable::getById(HL_LOGS_ID)->fetch();
+    if ($logEntityData) {
+        $logClass = \Bitrix\Highloadblock\HighloadBlockTable::compileEntity($logEntityData)->getDataClass();
+    }
+}
+if (!$logClass): ?>
+<div class="adm-info-message-wrap adm-info-message-red">
+    <div class="adm-info-message">
+        HL-блок логов не найден. Запустите <code>/setup_logs.php</code> и обновите <code>HL_LOGS_ID</code> в <code>init.php</code>.
+    </div>
+</div>
+<?php else: ?>
+<form method="GET" style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;background:#f8f9fa;padding:14px;border-radius:8px;margin-bottom:16px">
+    <input type="hidden" name="section" value="logs">
+    <div>
+        <label style="font-size:12px;color:#666;display:block;margin-bottom:4px">Тип действия</label>
+        <select name="log_action" style="padding:6px 10px;border:1px solid #ced4da;border-radius:4px;font-size:13px">
+            <option value="">— Все —</option>
+            <?php foreach (['login','logout','form_submit','profile_update','admin_status_change'] as $la): ?>
+            <option value="<?= $la ?>" <?= ($_GET['log_action'] ?? '') === $la ? 'selected' : '' ?>><?= $la ?></option>
+            <?php endforeach; ?>
+        </select>
+    </div>
+    <div>
+        <label style="font-size:12px;color:#666;display:block;margin-bottom:4px">Дата с</label>
+        <input type="date" name="log_from" value="<?= htmlspecialchars($_GET['log_from'] ?? '') ?>"
+               style="padding:6px 10px;border:1px solid #ced4da;border-radius:4px;font-size:13px">
+    </div>
+    <div>
+        <label style="font-size:12px;color:#666;display:block;margin-bottom:4px">Дата по</label>
+        <input type="date" name="log_to" value="<?= htmlspecialchars($_GET['log_to'] ?? '') ?>"
+               style="padding:6px 10px;border:1px solid #ced4da;border-radius:4px;font-size:13px">
+    </div>
+    <div>
+        <label style="font-size:12px;color:#666;display:block;margin-bottom:4px">User ID</label>
+        <input type="number" name="log_user" value="<?= (int)($_GET['log_user'] ?? 0) ?: '' ?>"
+               placeholder="любой" style="padding:6px 10px;border:1px solid #ced4da;border-radius:4px;font-size:13px;width:90px">
+    </div>
+    <button type="submit" class="po-btn po-btn-blue" style="padding:8px 16px">Применить</button>
+    <a href="?section=logs" class="po-btn po-btn-grey" style="padding:8px 16px">Сбросить</a>
+</form>
+<?php
+$logFilter = [];
+if (!empty($_GET['log_action']))  $logFilter['UF_ACTION']  = $_GET['log_action'];
+if (!empty($_GET['log_user']))    $logFilter['UF_USER_ID'] = (int)$_GET['log_user'];
+try {
+    if (!empty($_GET['log_from'])) $logFilter['>=UF_DATE_CREATE'] = \Bitrix\Main\Type\DateTime::createFromPhp(new DateTime($_GET['log_from'] . ' 00:00:00'));
+    if (!empty($_GET['log_to']))   $logFilter['<=UF_DATE_CREATE'] = \Bitrix\Main\Type\DateTime::createFromPhp(new DateTime($_GET['log_to'] . ' 23:59:59'));
+} catch (Exception $e) {}
+
+$logRows = [];
+$dbLogs = $logClass::getList([
+    'filter' => $logFilter,
+    'order'  => ['UF_DATE_CREATE' => 'DESC'],
+    'limit'  => 300,
+]);
+while ($lr = $dbLogs->fetch()) $logRows[] = $lr;
+?>
+<table class="po-table">
+    <thead>
+        <tr>
+            <th style="width:150px">Дата</th>
+            <th style="width:80px">User ID</th>
+            <th style="width:160px">Действие</th>
+            <th>Описание</th>
+            <th style="width:120px">IP</th>
+        </tr>
+    </thead>
+    <tbody>
+    <?php if (empty($logRows)): ?>
+    <tr><td colspan="5" class="po-empty">Логи не найдены.</td></tr>
+    <?php else: ?>
+    <?php
+    $actionColors = [
+        'login'               => '#27ae60',
+        'logout'              => '#7f8c8d',
+        'form_submit'         => '#2980b9',
+        'profile_update'      => '#8e44ad',
+        'admin_status_change' => '#e67e22',
+    ];
+    foreach ($logRows as $lr):
+        $lDate  = !empty($lr['UF_DATE_CREATE']) ? $lr['UF_DATE_CREATE']->format('d.m.Y H:i:s') : '—';
+        $lUser  = $lr['UF_USER_ID'] > 0
+            ? '<a href="/bitrix/admin/user_admin.php?ID=' . $lr['UF_USER_ID'] . '" target="_blank">#' . $lr['UF_USER_ID'] . '</a>'
+            : '<span style="color:#aaa">гость</span>';
+        $lColor = $actionColors[$lr['UF_ACTION'] ?? ''] ?? '#555';
+    ?>
+    <tr>
+        <td style="color:#666"><?= $lDate ?></td>
+        <td><?= $lUser ?></td>
+        <td><span class="po-badge" style="background:<?= $lColor ?>"><?= htmlspecialchars($lr['UF_ACTION'] ?? '') ?></span></td>
+        <td><?= htmlspecialchars($lr['UF_DESCRIPTION'] ?? '') ?></td>
+        <td style="color:#888;font-size:12px"><?= htmlspecialchars($lr['UF_IP'] ?? '') ?></td>
+    </tr>
+    <?php endforeach; ?>
+    <?php endif; ?>
+    </tbody>
+</table>
+<p style="margin-top:8px;font-size:12px;color:#999">Показано записей: <?= count($logRows) ?></p>
+<?php endif; ?>
+<?php endif; // section=logs ?>
+
+<!-- Заявки — показываем только если не в разделе логов -->
+<?php if ($mainSection !== 'logs'): ?>
+
 <!-- Бейджи статусов -->
 <div class="po-stat-bar">
     <a class="po-stat" style="background:#6c757d;" href="?">Все (<?= array_sum($counts) ?>)</a>
@@ -455,128 +571,9 @@ require_once($_SERVER['DOCUMENT_ROOT'] . '/bitrix/modules/main/include/prolog_ad
 <p style="margin-top:8px;font-size:12px;color:#999;">Показано: <?= count($applications) ?> заявок.</p>
 <?php endif; ?>
 
-<!-- ========== ВКЛАДКА: ЛОГИ ДЕЙСТВИЙ ========== -->
-<?php
-$showLogs = isset($_GET['section']) && $_GET['section'] === 'logs';
-$logClass = null;
-if (defined('HL_LOGS_ID') && HL_LOGS_ID > 0) {
-    $logEntityData = \Bitrix\Highloadblock\HighloadBlockTable::getById(HL_LOGS_ID)->fetch();
-    if ($logEntityData) {
-        $logClass = \Bitrix\Highloadblock\HighloadBlockTable::compileEntity($logEntityData)->getDataClass();
-    }
-}
-?>
+<?php endif; // конец секции заявок ($mainSection !== 'logs') ?>
 
-<div style="margin-top:40px;border-top:2px solid #dee2e6;padding-top:24px">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px">
-        <h2 style="font-size:18px;font-weight:700;color:#1a1a2e;margin:0">Логи действий</h2>
-        <a href="?section=<?= $showLogs ? 'applications' : 'logs' ?>" class="po-btn"
-           style="font-size:12px;padding:6px 14px">
-            <?= $showLogs ? '← К заявкам' : '📋 Открыть логи' ?>
-        </a>
-    </div>
-
-    <?php if ($showLogs): ?>
-    <?php if (!$logClass): ?>
-    <div class="adm-info-message-wrap adm-info-message-red">
-        <div class="adm-info-message">
-            HL-блок логов не найден. Запустите <code>/setup_logs.php</code> и обновите <code>HL_LOGS_ID</code> в <code>init.php</code>.
-        </div>
-    </div>
-    <?php else: ?>
-    <!-- Фильтры логов -->
-    <form method="GET" style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;background:#f8f9fa;padding:14px;border-radius:8px;margin-bottom:16px">
-        <input type="hidden" name="section" value="logs">
-        <div>
-            <label style="font-size:12px;color:#666;display:block;margin-bottom:4px">Тип действия</label>
-            <select name="log_action" style="padding:6px 10px;border:1px solid #ced4da;border-radius:4px;font-size:13px">
-                <option value="">— Все —</option>
-                <?php foreach (['login','logout','form_submit','profile_update','admin_status_change'] as $la): ?>
-                <option value="<?= $la ?>" <?= ($_GET['log_action'] ?? '') === $la ? 'selected' : '' ?>><?= $la ?></option>
-                <?php endforeach; ?>
-            </select>
-        </div>
-        <div>
-            <label style="font-size:12px;color:#666;display:block;margin-bottom:4px">Дата с</label>
-            <input type="date" name="log_from" value="<?= htmlspecialchars($_GET['log_from'] ?? '') ?>"
-                   style="padding:6px 10px;border:1px solid #ced4da;border-radius:4px;font-size:13px">
-        </div>
-        <div>
-            <label style="font-size:12px;color:#666;display:block;margin-bottom:4px">Дата по</label>
-            <input type="date" name="log_to" value="<?= htmlspecialchars($_GET['log_to'] ?? '') ?>"
-                   style="padding:6px 10px;border:1px solid #ced4da;border-radius:4px;font-size:13px">
-        </div>
-        <div>
-            <label style="font-size:12px;color:#666;display:block;margin-bottom:4px">User ID</label>
-            <input type="number" name="log_user" value="<?= (int)($_GET['log_user'] ?? 0) ?: '' ?>"
-                   placeholder="любой" style="padding:6px 10px;border:1px solid #ced4da;border-radius:4px;font-size:13px;width:90px">
-        </div>
-        <button type="submit" class="po-btn" style="padding:8px 16px">Применить</button>
-        <a href="?section=logs" class="po-btn po-btn-grey" style="padding:8px 16px">Сбросить</a>
-    </form>
-
-    <?php
-    $logFilter = [];
-    if (!empty($_GET['log_action']))  $logFilter['UF_ACTION']  = $_GET['log_action'];
-    if (!empty($_GET['log_user']))    $logFilter['UF_USER_ID'] = (int)$_GET['log_user'];
-    if (!empty($_GET['log_from']))    $logFilter['>=UF_DATE_CREATE'] = \Bitrix\Main\Type\DateTime::createFromPhp(new DateTime($_GET['log_from'] . ' 00:00:00'));
-    if (!empty($_GET['log_to']))      $logFilter['<=UF_DATE_CREATE'] = \Bitrix\Main\Type\DateTime::createFromPhp(new DateTime($_GET['log_to'] . ' 23:59:59'));
-
-    $logRows = [];
-    $dbLogs = $logClass::getList([
-        'filter' => $logFilter,
-        'order'  => ['UF_DATE_CREATE' => 'DESC'],
-        'limit'  => 300,
-    ]);
-    while ($lr = $dbLogs->fetch()) $logRows[] = $lr;
-    ?>
-
-    <table style="width:100%;border-collapse:collapse;font-size:13px;background:#fff">
-        <thead>
-            <tr style="background:#f5f5f5">
-                <th style="padding:10px;text-align:left;border-bottom:1px solid #e0e0e0;width:150px">Дата</th>
-                <th style="padding:10px;text-align:left;border-bottom:1px solid #e0e0e0;width:80px">User ID</th>
-                <th style="padding:10px;text-align:left;border-bottom:1px solid #e0e0e0;width:160px">Действие</th>
-                <th style="padding:10px;text-align:left;border-bottom:1px solid #e0e0e0">Описание</th>
-                <th style="padding:10px;text-align:left;border-bottom:1px solid #e0e0e0;width:120px">IP</th>
-            </tr>
-        </thead>
-        <tbody>
-        <?php if (empty($logRows)): ?>
-        <tr><td colspan="5" style="padding:20px;text-align:center;color:#999">Логи не найдены.</td></tr>
-        <?php else: ?>
-        <?php foreach ($logRows as $lr):
-            $lDate  = !empty($lr['UF_DATE_CREATE']) ? $lr['UF_DATE_CREATE']->format('d.m.Y H:i:s') : '—';
-            $lUser  = $lr['UF_USER_ID'] > 0
-                ? '<a href="/bitrix/admin/user_admin.php?ID=' . $lr['UF_USER_ID'] . '" target="_blank">#' . $lr['UF_USER_ID'] . '</a>'
-                : '<span style="color:#aaa">гость</span>';
-            $lAction = htmlspecialchars($lr['UF_ACTION'] ?? '');
-            $lDesc   = htmlspecialchars($lr['UF_DESCRIPTION'] ?? '');
-            $lIp     = htmlspecialchars($lr['UF_IP'] ?? '');
-            $actionColors = [
-                'login'               => '#27ae60',
-                'logout'              => '#7f8c8d',
-                'form_submit'         => '#2980b9',
-                'profile_update'      => '#8e44ad',
-                'admin_status_change' => '#e67e22',
-            ];
-            $lColor = $actionColors[$lr['UF_ACTION'] ?? ''] ?? '#555';
-        ?>
-        <tr style="border-bottom:1px solid #f0f0f0">
-            <td style="padding:8px 10px;color:#666"><?= $lDate ?></td>
-            <td style="padding:8px 10px"><?= $lUser ?></td>
-            <td style="padding:8px 10px"><span style="background:<?= $lColor ?>22;color:<?= $lColor ?>;font-weight:600;padding:2px 8px;border-radius:4px;font-size:12px"><?= $lAction ?></span></td>
-            <td style="padding:8px 10px"><?= $lDesc ?></td>
-            <td style="padding:8px 10px;color:#888;font-size:12px"><?= $lIp ?></td>
-        </tr>
-        <?php endforeach; ?>
-        <?php endif; ?>
-        </tbody>
-    </table>
-    <p style="margin-top:8px;font-size:12px;color:#999">Показано записей: <?= count($logRows) ?></p>
-    <?php endif; ?>
-    <?php endif; ?>
-</div>
+<!-- (старый блок логов удалён — логи теперь во вкладке выше) -->
 
 </div>
 

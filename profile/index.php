@@ -84,11 +84,11 @@ $currentStatus = $statusLabels[$membershipStatus] ?? null;
 ?>
 
 <main>
-    <section class="account">
-        <div class="container">
-            <div class="account__wrapper">
-                <div class="account__sidebar">
-                    <div class="account__menu">
+		<section class="account">
+            <div class="container">
+                <div class="account__wrapper">
+                    <div class="account__sidebar">
+                        <div class="account__menu">
                         <?php $tab = $_GET['tab'] ?? 'profile'; ?>
                         <a href="/profile/" class="account__menu-item <?= $tab === 'profile' ? 'account__menu-item--active' : '' ?>">Мой профиль</a>
                         <a href="/profile/security/" class="account__menu-item">Безопасность</a>
@@ -535,7 +535,7 @@ $currentStatus = $statusLabels[$membershipStatus] ?? null;
                     </div>
 
                     <?php else: ?>
-                    <div class="account__block">
+                        <div class="account__block">
                         <h2 class="account__title">Мой профиль</h2>
 
                         <?php if ($saveOk): ?>
@@ -640,17 +640,17 @@ $currentStatus = $statusLabels[$membershipStatus] ?? null;
                         <!-- Блок тарифа -->
                         <div class="account__chapter" style="margin-top:40px">
                             <h3 class="account__subtitle">Ваш тариф</h3>
-                        </div>
-
+                            </div>
+                            
                         <?php if ($currentType && $membershipStatus): ?>
                         <div class="account__rate <?= $currentType['class'] ?>">
-                            <img src="<?=SITE_TEMPLATE_PATH?>/assets/img/my_profile/rate-conus.png" alt="" class="account__rate-conus">
-                            <div class="account__rate-info">
+                                <img src="<?=SITE_TEMPLATE_PATH?>/assets/img/my_profile/rate-conus.png" alt="" class="account__rate-conus">
+                                <div class="account__rate-info">
                                 <span class="account__rate-status <?= $currentStatus['class'] ?? '' ?>">
                                     <?= htmlspecialchars($currentStatus['label'] ?? $membershipStatus) ?>
                                 </span>
                                 <?php if ($membershipExpires && $membershipStatus === 'active'): ?>
-                                <div class="account__rate-date">
+                                    <div class="account__rate-date">
                                     <span>Срок действия</span> до <?= htmlspecialchars($membershipExpires) ?>
                                 </div>
                                 <?php endif; ?>
@@ -659,8 +659,8 @@ $currentStatus = $statusLabels[$membershipStatus] ?? null;
                             <p class="account__rate-price"><?= htmlspecialchars($currentType['price']) ?></p>
                             <p class="account__rate-when">ежегодно</p>
                             <?php if ($membershipStatus === 'active'): ?>
-                            <div class="account__rate-buttons account__grid">
-                                <button class="account__rate-btn btn">Продлить</button>
+                                <div class="account__rate-buttons account__grid">
+                                    <button class="account__rate-btn btn">Продлить</button>
                                 <a href="/join/" class="account__rate-btn account__rate-btn--changes btn">Изменить тариф</a>
                             </div>
                             <?php elseif ($membershipStatus === 'pending'): ?>
@@ -668,42 +668,42 @@ $currentStatus = $statusLabels[$membershipStatus] ?? null;
                                 Заявка принята. После проверки модератором членство будет активировано.
                             </p>
                             <?php endif; ?>
-                        </div>
+                                </div>
                         <?php else: ?>
                         <div class="account__rate">
                             <p>У вас пока нет активного членства.</p>
                             <a href="/join/" class="btn" style="margin-top:12px">Вступить в общество</a>
-                        </div>
+                                </div>
                         <?php endif; ?>
 
                         <!-- Привязка соцсетей (статичная заготовка) -->
                         <div class="account__log" style="margin-top:40px">
                             <div class="account__chapter">
                                 <h3 class="account__subtitle">Привязка аккаунта для быстрого входа</h3>
+                                </div>
+                                <div class="account__log-wrapper">
+                                <button class="account__log-btn" disabled>
+                                        <img src="<?=SITE_TEMPLATE_PATH?>/assets/img/my_profile/yandex-icon.png" alt="">
+                                        Войти через Яндекс
+                                    </button>
+                                <button class="account__log-btn" disabled>
+                                        <img src="<?=SITE_TEMPLATE_PATH?>/assets/img/my_profile/gos-icon.png" alt="">
+                                        Войти через Госуслуги
+                                    </button>
+                                <button class="account__log-btn" disabled>
+                                        <img src="<?=SITE_TEMPLATE_PATH?>/assets/img/my_profile/vk-icon.png" alt="">
+                                        Войти через Вконтакте
+                                    </button>
                             </div>
-                            <div class="account__log-wrapper">
-                                <button class="account__log-btn" disabled>
-                                    <img src="<?=SITE_TEMPLATE_PATH?>/assets/img/my_profile/yandex-icon.png" alt="">
-                                    Войти через Яндекс
-                                </button>
-                                <button class="account__log-btn" disabled>
-                                    <img src="<?=SITE_TEMPLATE_PATH?>/assets/img/my_profile/gos-icon.png" alt="">
-                                    Войти через Госуслуги
-                                </button>
-                                <button class="account__log-btn" disabled>
-                                    <img src="<?=SITE_TEMPLATE_PATH?>/assets/img/my_profile/vk-icon.png" alt="">
-                                    Войти через Вконтакте
-                                </button>
-                            </div>
-                        </div>
+                       </div>
                     </div>
                     <?php endif; ?>
 
                 </div>
+                </div>
             </div>
-        </div>
-    </section>
-</main>
+        </section>
+	</main>
 
 <script>
 document.querySelectorAll('[name="is_graduate"]').forEach(function(r) {
