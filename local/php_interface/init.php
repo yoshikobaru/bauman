@@ -86,6 +86,7 @@ function po_sendAdminEmail(string $type, array $data): void
         'vacancy'            => 'Вакансия (карьерная платформа)',
         'resume'             => 'Резюме выпускника (карьерная платформа)',
         'honorary'           => 'Почётное членство',
+        'contact'            => 'Связаться с организаторами',
         'access_recovery'    => 'Экстренное восстановление доступа',
     ];
     $label = $typeLabels[$type] ?? $type;
@@ -190,6 +191,7 @@ function po_createCrmLead(string $type, array $data): void
         'partnership'        => 'Промышленное партнёрство (D7)',
         'vacancy'            => 'Вакансия (карьерная платформа)',
         'resume'             => 'Резюме выпускника (карьерная платформа)',
+        'contact'            => 'Связаться с организаторами',
     ];
     $title = 'Заявка: ' . ($typeLabels[$type] ?? $type);
 

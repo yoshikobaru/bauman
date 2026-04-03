@@ -118,6 +118,76 @@
 		</p>
 	</div>
 
+	<!-- Форма: Связаться с организаторами / Стать партнёром -->
+	<div class="form-finance-help" id="form-finance-help" style="display:none;max-width:600px;">
+		<div class="join__wrapper">
+			<h2 class="account__title main-title" id="ffh-title">Связаться с организаторами</h2>
+			<div id="ffh-form-block">
+				<p id="ffh-error" style="display:none;color:#c0392b;margin-bottom:12px;font-size:13px"></p>
+				<div style="display:flex;flex-direction:column;gap:12px;margin-top:16px">
+					<input type="text"  id="ffh-name"    placeholder="Имя *">
+					<input type="email" id="ffh-email"   placeholder="Электропочта *">
+					<input type="tel"   id="ffh-phone"   placeholder="Телефон">
+					<textarea id="ffh-message" placeholder="Сообщение" style="min-height:100px;padding:12px;border:1px solid #ccc;border-radius:4px;resize:vertical"></textarea>
+					<div class="join__politic-question">
+						<p class="join__politic-link">Согласен с <a href="<?= defined('DOC_POLITIKA_URL') ? DOC_POLITIKA_URL : '#' ?>" target="_blank">политикой обработки ПДн</a></p>
+						<div class="account__graduate-choice">
+							<label class="account__graduate-item">
+								<input type="radio" name="ffh_consent" value="yes" id="ffh-consent-yes" class="account__graduate-input">
+								<span class="account__graduate-box"></span>Да
+							</label>
+							<label class="account__graduate-item">
+								<input type="radio" name="ffh_consent" value="no" class="account__graduate-input">
+								<span class="account__graduate-box"></span>Нет
+							</label>
+						</div>
+					</div>
+					<button class="btn authorization__btn" id="ffh-submit">Отправить</button>
+				</div>
+			</div>
+			<div id="ffh-ok" style="display:none;text-align:center;padding:32px 0">
+				<div style="font-size:48px;margin-bottom:12px">✅</div>
+				<h3 style="font-size:18px;margin-bottom:8px">Заявка отправлена!</h3>
+				<p style="color:#666;font-size:14px">Мы свяжемся с вами в ближайшее время.</p>
+			</div>
+		</div>
+	</div>
+	<script>
+	(function(){
+		var btn = document.getElementById('ffh-submit');
+		if (!btn) return;
+		btn.addEventListener('click', function(){
+			var name    = (document.getElementById('ffh-name')?.value    || '').trim();
+			var email   = (document.getElementById('ffh-email')?.value   || '').trim();
+			var phone   = (document.getElementById('ffh-phone')?.value   || '').trim();
+			var message = (document.getElementById('ffh-message')?.value || '').trim();
+			var consent = document.getElementById('ffh-consent-yes')?.checked;
+			var errEl   = document.getElementById('ffh-error');
+			errEl.style.display = 'none';
+			if (!name)    { errEl.textContent = 'Введите имя';      errEl.style.display = ''; return; }
+			if (!email)   { errEl.textContent = 'Введите email';    errEl.style.display = ''; return; }
+			if (!consent) { errEl.textContent = 'Необходимо согласие с политикой ПДн'; errEl.style.display = ''; return; }
+			btn.disabled = true;
+			var fd = new FormData();
+			fd.append('name', name); fd.append('email', email);
+			fd.append('phone', phone); fd.append('message', message);
+			fetch('/local/ajax/contact.php', { method: 'POST', body: fd })
+				.then(function(r){ return r.json(); })
+				.then(function(data){
+					if (data.success) {
+						document.getElementById('ffh-form-block').style.display = 'none';
+						document.getElementById('ffh-ok').style.display = '';
+					} else {
+						errEl.textContent = data.message || 'Ошибка. Попробуйте снова.';
+						errEl.style.display = '';
+						btn.disabled = false;
+					}
+				})
+				.catch(function(){ errEl.textContent = 'Ошибка соединения'; errEl.style.display = ''; btn.disabled = false; });
+		});
+	})();
+	</script>
+
 	<script src="<?=SITE_TEMPLATE_PATH?>/assets/js/swiper-bundle.min.js"></script>
 	<script src="<?=SITE_TEMPLATE_PATH?>/assets/js/fancybox.umd.js"></script>
 	<script src="<?=SITE_TEMPLATE_PATH?>/assets/js/script.js"></script>

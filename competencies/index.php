@@ -5,6 +5,7 @@ $APPLICATION->SetPageProperty('description', 'Витрина компетенц�
 
 use Bitrix\Main\Loader;
 $hlOk = Loader::includeModule('highloadblock');
+Loader::includeModule('iblock');
 
 $_userGroups = $USER->IsAuthorized() ? $USER->GetUserGroupArray() : [];
 $_isMember   = defined('PO_MEMBER_BASIC_ID') && (
@@ -77,7 +78,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['d6_action'])) {
                             <h1 class="banner-other__title main-title">
                                Витрина компетенций МВТУ (МГТУ) им. Н.Э. Баумана
                             </h1>
-                            <a href="#" class="banner-other__btn btn" data-fancybox data-src="#form-competencies">Стать партнёром</a>
+                            <a href="#" class="banner-other__btn btn" data-fancybox data-src="#form-finance-help">Стать партнёром</a>
                         </div>
                         <img src="<?=SITE_TEMPLATE_PATH?>/assets/img/reference-page/banner-other-pattern.png" alt="" class="banner-other__pattern">
                     </div>
