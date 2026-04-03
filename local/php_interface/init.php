@@ -76,6 +76,7 @@ define('DOC_POLITIKA_URL', '/local/templates/my_template/assets/' . rawurlencode
 function po_sendAdminEmail(string $type, array $data): void
 {
     $typeLabels = [
+        'membership'         => 'Вступление в общество (D1)',
         'project_support'    => 'Поддержка проекта (D2)',
         'event_reg'          => 'Запись на событие (D3)',
         'reference_visit'    => 'Участие в референс-визите (D4)',
@@ -84,7 +85,8 @@ function po_sendAdminEmail(string $type, array $data): void
         'partnership'        => 'Промышленное партнёрство (D7)',
         'vacancy'            => 'Вакансия (карьерная платформа)',
         'resume'             => 'Резюме выпускника (карьерная платформа)',
-        'access_recovery'   => 'Экстренное восстановление доступа',
+        'honorary'           => 'Почётное членство',
+        'access_recovery'    => 'Экстренное восстановление доступа',
     ];
     $label = $typeLabels[$type] ?? $type;
 

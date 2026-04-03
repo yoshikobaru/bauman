@@ -6,6 +6,30 @@ $APPLICATION->SetPageProperty('description', 'Вступите в Политех
 use Bitrix\Main\Loader;
 $hlOk = Loader::includeModule('highloadblock');
 
+// Почётный тариф — AJAX-обработчик (возвращает JSON, без HTML)
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['honorary_action'])) {
+    $hFio   = trim($_POST['honorary_fio']   ?? '');
+    $hEmail = trim($_POST['honorary_email'] ?? '');
+    $hPhone = trim($_POST['honorary_phone'] ?? '');
+    $hMsg   = trim($_POST['honorary_msg']   ?? '');
+    if ($hFio && $hEmail) {
+        po_sendAdminEmail('honorary', [
+            'fio'   => $hFio,
+            'email' => $hEmail,
+            'phone' => $hPhone,
+            'msg'   => $hMsg,
+        ]);
+        while (ob_get_level()) ob_end_clean();
+        header('Content-Type: application/json; charset=utf-8');
+        echo json_encode(['success' => true]);
+    } else {
+        while (ob_get_level()) ob_end_clean();
+        header('Content-Type: application/json; charset=utf-8');
+        echo json_encode(['success' => false, 'message' => 'Заполните ФИО и email']);
+    }
+    exit;
+}
+
 $_ug      = $USER->IsAuthorized() ? $USER->GetUserGroupArray() : [];
 $isMember = defined('PO_MEMBER_BASIC_ID') && (
     in_array(PO_MEMBER_BASIC_ID,   $_ug) ||
@@ -456,6 +480,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['d7_action'])) {
                                 </ul>
                                 <button type="button" class="membership-slider__join btn btn-empty select-plan" data-plan="partner">Выбрать</button>
                             </div>
+                            <div class="swiper-slide membership-slider__card">
+                                <h3 class="membership-slider__title">Почётное</h3>
+                                <p class="membership-slider__name membership-slider__name--small">По представлению</p>
+                                <p class="membership-slider__time">индивидуально</p>
+                                <ul class="membership-slider__list">
+                                    <li class="membership-slider__item">Для выдающихся выпускников и партнёров общества;</li>
+                                    <li class="membership-slider__item">Присваивается по решению Правления.</li>
+                                </ul>
+                                <button type="button" class="membership-slider__join btn btn-empty" data-fancybox data-src="#form-honorary">Выбрать</button>
+                            </div>
                         </div>
                         <div class="swiper-pagination"></div>
                     </div>
@@ -625,6 +659,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['d7_action'])) {
                                 </ul>
                                 <button type="button" class="membership-slider__join btn btn-empty select-plan" data-plan="partner">Выбрать</button>
                             </div>
+                            <div class="swiper-slide membership-slider__card">
+                                <h3 class="membership-slider__title">Почётное</h3>
+                                <p class="membership-slider__name membership-slider__name--small">По представлению</p>
+                                <p class="membership-slider__time">индивидуально</p>
+                                <ul class="membership-slider__list">
+                                    <li class="membership-slider__item">Для выдающихся выпускников и партнёров общества;</li>
+                                    <li class="membership-slider__item">Присваивается по решению Правления.</li>
+                                </ul>
+                                <button type="button" class="membership-slider__join btn btn-empty" data-fancybox data-src="#form-honorary">Выбрать</button>
+                            </div>
                         </div>
                         <div class="swiper-pagination"></div>
                     </div>
@@ -668,6 +712,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['d7_action'])) {
     </section>
     </section><!-- /join-fiz-block -->
 </main>
+
+<!-- Модаль: Почётный тариф -->
+<div id="form-honorary" style="display:none;max-width:480px;padding:32px 24px">
+    <h3 style="margin-bottom:12px;font-size:22px;font-weight:700">Почётное членство</h3>
+    <p style="color:#666;margin-bottom:24px;font-size:14px;line-height:1.6">
+        Почётное членство присваивается за особые заслуги перед Политехническим обществом. Оставьте заявку — мы свяжемся с вами.
+    </p>
+    <div id="honorary-fields">
+        <p id="honorary-error" style="display:none;color:#c0392b;margin-bottom:12px;font-size:13px"></p>
+        <input type="text"  id="honorary-fio"   placeholder="Фамилия Имя Отчество" style="display:block;width:100%;margin-bottom:12px;box-sizing:border-box">
+        <input type="email" id="honorary-email" placeholder="Электропочта" style="display:block;width:100%;margin-bottom:12px;box-sizing:border-box">
+        <input type="tel"   id="honorary-phone" placeholder="Телефон" style="display:block;width:100%;margin-bottom:12px;box-sizing:border-box">
+        <textarea id="honorary-msg" placeholder="Дополнительно (по желанию)" style="display:block;width:100%;height:80px;margin-bottom:20px;resize:vertical;box-sizing:border-box"></textarea>
+        <button id="honorary-submit" class="btn" style="width:100%">Отправить заявку</button>
+    </div>
+    <div id="honorary-success" style="display:none;text-align:center;padding:24px 0">
+        <div style="font-size:48px;margin-bottom:12px">✅</div>
+        <p style="font-size:16px;font-weight:600">Заявка отправлена!</p>
+        <p style="font-size:14px;color:#666;margin-top:8px">Мы свяжемся с вами в ближайшее время.</p>
+    </div>
+</div>
 
 <script>
 // Переключатель Физ. / Юр. лицо
@@ -735,6 +800,50 @@ document.querySelectorAll('.select-plan').forEach(function(btn) {
             if (img) { img.src = e.target.result; img.style.display = 'block'; }
         };
         reader.readAsDataURL(file);
+    });
+})();
+// Почётный тариф — AJAX-отправка формы
+(function() {
+    var btn = document.getElementById('honorary-submit');
+    if (!btn) return;
+    btn.addEventListener('click', function() {
+        var fio   = (document.getElementById('honorary-fio')   || {}).value || '';
+        var email = (document.getElementById('honorary-email') || {}).value || '';
+        var phone = (document.getElementById('honorary-phone') || {}).value || '';
+        var msg   = (document.getElementById('honorary-msg')   || {}).value || '';
+        var errEl = document.getElementById('honorary-error');
+        errEl.style.display = 'none';
+        if (!fio.trim() || !email.trim()) {
+            errEl.textContent = 'Заполните ФИО и email';
+            errEl.style.display = '';
+            return;
+        }
+        btn.disabled = true;
+        var fd = new FormData();
+        fd.append('honorary_action', '1');
+        fd.append('honorary_fio',   fio.trim());
+        fd.append('honorary_email', email.trim());
+        fd.append('honorary_phone', phone.trim());
+        fd.append('honorary_msg',   msg.trim());
+        fetch('/join/', { method: 'POST', body: fd })
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                if (data.success) {
+                    var fields = document.getElementById('honorary-fields');
+                    var success = document.getElementById('honorary-success');
+                    if (fields)  fields.style.display  = 'none';
+                    if (success) success.style.display = 'block';
+                } else {
+                    errEl.textContent = data.message || 'Ошибка. Попробуйте снова.';
+                    errEl.style.display = '';
+                    btn.disabled = false;
+                }
+            })
+            .catch(function() {
+                errEl.textContent = 'Ошибка соединения. Попробуйте снова.';
+                errEl.style.display = '';
+                btn.disabled = false;
+            });
     });
 })();
 </script>
