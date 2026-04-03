@@ -517,15 +517,26 @@ document.querySelectorAll('[name="fiz_is_graduate"]').forEach(function(r) {
     });
 });
 
-// Выбор тарифа
-document.querySelectorAll('.select-plan').forEach(function(btn) {
-    btn.addEventListener('click', function() {
-        var plan  = this.getAttribute('data-plan');
-        var field = document.getElementById('fiz-membership-type');
-        if (field) field.value = plan;
-        document.querySelectorAll('.select-plan').forEach(function(b) { b.classList.remove('btn--active'); });
-        this.classList.add('btn--active');
+// Выбор тарифа — event delegation, чтобы работало с Swiper-клонами
+document.addEventListener('click', function(e) {
+    var btn = e.target.closest('.select-plan');
+    if (!btn) return;
+    var plan  = btn.getAttribute('data-plan');
+    var field = document.getElementById('fiz-membership-type');
+    if (field) field.value = plan;
+    // Визуальное выделение: обводка выбранной карточки
+    document.querySelectorAll('.membership-slider__card').forEach(function(card) {
+        card.style.outline = '';
+        card.style.boxShadow = '';
     });
+    var card = btn.closest('.membership-slider__card');
+    if (card) {
+        card.style.outline = '2px solid #c0392b';
+        card.style.boxShadow = '0 0 0 4px rgba(192,57,43,0.15)';
+    }
+    document.querySelectorAll('.select-plan').forEach(function(b) { b.textContent = 'Выбрать'; b.classList.remove('btn--active'); });
+    btn.textContent = '✓ Выбрано';
+    btn.classList.add('btn--active');
 });
 
 // Превью аватара

@@ -93,34 +93,29 @@
 	</script>
 	<!-- Форма вступления -->
 	<div class="form-membership" id="form-membership" style="display:none;max-width: 90%;">
-		<div id="modal-membership-form">
-			<div class="form-membership__left">
-				<img src="<?=SITE_TEMPLATE_PATH?>/assets/img/form-membership-basic.png" alt="">
-				<p class="form-membership__text desk-block">
-					Нажимая кнопку «Подать заявку» вы даете свое согласие на <a href="<?= defined('DOC_POLITIKA_URL') ? DOC_POLITIKA_URL : '#' ?>" target="_blank">обработку персональных данных</a>, а также с тем, что вам исполнилось 18 лет, вы студент или выпускник МГТУ им. Н.Э. Баумана, вы разделяете цели Политехнического общества, признаёте его <a href="<?= defined('DOC_USTAV_URL') ? DOC_USTAV_URL : '#' ?>" target="_blank">Устав</a> и подтверждаете свое добровольное согласие на вступление в «МГТУ-Политех»
-				</p>
-			</div>
-			<div class="form-membership__form">
-				<input type="hidden" id="modal-membership-type" value="basic">
-				<p id="modal-membership-error" style="display:none;color:#c0392b;margin-bottom:10px;font-size:13px"></p>
-				<input type="text"   id="modal-membership-lname" placeholder="Фамилия *" required>
-				<input type="text"   id="modal-membership-fname" placeholder="Имя *" required>
-				<input type="text"   id="modal-membership-sname" placeholder="Отчество">
-				<input type="tel"    id="modal-membership-phone" placeholder="Номер телефона">
-				<input type="email"  id="modal-membership-email" placeholder="Электропочта *" required>
-				<input type="text"   id="modal-membership-dept"  placeholder="Выпускающая кафедра">
-				<input type="text"   id="modal-membership-year"  placeholder="Год окончания МГТУ им. Баумана">
-				<button class="btn form-membership__send" id="modal-membership-submit">Подать заявку</button>
-			</div>
-			<p class="form-membership__text desk-none">
-				Нажимая кнопку «Подать заявку» вы даете свое согласие на <a href="<?= defined('DOC_POLITIKA_URL') ? DOC_POLITIKA_URL : '#' ?>" target="_blank">обработку персональных данных</a>, а также с тем, что вам исполнилось 18 лет, вы студент или выпускник МГТУ им. Н.Э. Баумана, вы разделяете цели Политехнического общества, признаёте его <a href="<?= defined('DOC_USTAV_URL') ? DOC_USTAV_URL : '#' ?>" target="_blank">Устав</a> и подтверждаете свое добровольное согласие на вступление в «МГТУ-Политех»
+		<div class="form-membership__left" id="modal-membership-left">
+			<img src="<?=SITE_TEMPLATE_PATH?>/assets/img/form-membership-basic.png" alt="">
+			<p class="form-membership__text desk-block">
+				Нажимая кнопку «Оплатить членский взнос» вы даете свое согласие на <a href="<?= defined('DOC_POLITIKA_URL') ? DOC_POLITIKA_URL : '#' ?>" target="_blank">обработку персональных данных</a>, а также с тем, что вам исполнилось 18 лет, вы студент или выпускник МГТУ им. Н.Э. Баумана, вы разделяете цели Политехнического общества, признаёте его <a href="<?= defined('DOC_USTAV_URL') ? DOC_USTAV_URL : '#' ?>" target="_blank">Устав</a> и подтверждаете свое добровольное согласие на вступление в «МГТУ-Политех»
 			</p>
 		</div>
-		<div id="modal-membership-ok" style="display:none;text-align:center;padding:40px 20px">
-			<div style="font-size:56px;margin-bottom:16px">✅</div>
-			<h3 style="font-size:22px;margin-bottom:12px">Заявка принята!</h3>
-			<p style="color:#666;font-size:14px;line-height:1.6">Мы свяжемся с вами в ближайшее время.<br>Проверьте вашу почту.</p>
+		<div class="form-membership__form" id="modal-membership-form">
+			<input type="hidden" id="modal-membership-type" value="basic">
+			<p id="modal-membership-error" style="display:none;color:#c0392b;margin-bottom:10px;font-size:13px;width:100%"></p>
+			<input type="text"   id="modal-membership-lname" placeholder="Фамилия" required>
+			<input type="text"   id="modal-membership-fname" placeholder="Имя" required>
+			<input type="text"   id="modal-membership-sname" placeholder="Отчество" required>
+			<input type="number" id="modal-membership-phone" placeholder="Номер телефона" required>
+			<input type="email"  id="modal-membership-email" placeholder="Електропочта" required>
+			<select id="modal-membership-dept">
+				<option value="">Кафедра</option>
+			</select>
+			<input class="form-membership__year" type="text" id="modal-membership-year" placeholder="Год окончания МГТУ им. Баумана" required>
+			<button class="btn form-membership__send" id="modal-membership-submit">Оплатить членский взнос</button>
 		</div>
+		<p class="form-membership__text desk-none">
+			Нажимая кнопку «Оплатить членский взнос» вы даете свое согласие на <a href="<?= defined('DOC_POLITIKA_URL') ? DOC_POLITIKA_URL : '#' ?>" target="_blank">обработку персональных данных</a>, а также с тем, что вам исполнилось 18 лет, вы студент или выпускник МГТУ им. Н.Э. Баумана, вы разделяете цели Политехнического общества, признаёте его <a href="<?= defined('DOC_USTAV_URL') ? DOC_USTAV_URL : '#' ?>" target="_blank">Устав</a> и подтверждаете свое добровольное согласие на вступление в «МГТУ-Политех»
+		</p>
 	</div>
 
 	<script src="<?=SITE_TEMPLATE_PATH?>/assets/js/swiper-bundle.min.js"></script>

@@ -396,10 +396,15 @@ document.querySelectorAll('[data-fancybox][data-src="#form-membership"][data-pla
             .then(function(r) { return r.json(); })
             .then(function(data) {
                 if (data.success) {
+                    // Показываем успех внутри формы, скрываем левую панель
+                    var left = document.getElementById('modal-membership-left');
                     var form = document.getElementById('modal-membership-form');
-                    var ok   = document.getElementById('modal-membership-ok');
-                    if (form) form.style.display = 'none';
-                    if (ok)   ok.style.display   = 'block';
+                    if (left) left.style.display = 'none';
+                    if (form) form.innerHTML = '<div style="text-align:center;padding:32px 0">'
+                        + '<div style="font-size:56px;margin-bottom:16px">✅</div>'
+                        + '<h3 style="font-size:20px;margin-bottom:10px">Заявка принята!</h3>'
+                        + '<p style="color:#666;font-size:14px;line-height:1.6">Мы свяжемся с вами в ближайшее время.</p>'
+                        + '</div>';
                 } else {
                     if (errEl) { errEl.textContent = data.message || 'Ошибка. Попробуйте снова.'; errEl.style.display = ''; }
                     submitBtn.disabled = false;
