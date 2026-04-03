@@ -275,20 +275,18 @@ if (defined('IBLOCK_PROJECTS_ID') && IBLOCK_PROJECTS_ID > 0 && \Bitrix\Main\Load
     }
 }
 
-// Рендерим карточки — структура точно как в верстке
+// Рендерим карточки — структура точно как в верстке (h3 + img без обёрток)
 foreach ($_staticProjects as $sp):
-    // Если из CMS — используем полный путь; если нет — заглушка из шаблона
     $imgSrc    = isset($sp['img_full']) ? $sp['img_full'] : SITE_TEMPLATE_PATH . '/assets/img/' . $sp['img'];
     $imgMobSrc = isset($sp['img_full']) ? $sp['img_full'] : SITE_TEMPLATE_PATH . '/assets/img/' . $sp['mob'];
+    $cardUrl   = htmlspecialchars($sp['url']);
 ?>
-				<div class="initiative__card">
+				<div class="initiative__card" style="cursor:pointer;position:relative;" onclick="window.location='<?= $cardUrl ?>'">
 					<h3>
 						<?= htmlspecialchars($sp['name']) ?>
 					</h3>
-					<a href="<?= htmlspecialchars($sp['url']) ?>">
-						<img src="<?= htmlspecialchars($imgSrc) ?>" alt="<?= htmlspecialchars($sp['name']) ?>" class="initiative__image desk-block" />
-						<img src="<?= htmlspecialchars($imgMobSrc) ?>" alt="<?= htmlspecialchars($sp['name']) ?>" class="initiative__image desk-none" />
-					</a>
+					<img src="<?= htmlspecialchars($imgSrc) ?>" alt="<?= htmlspecialchars($sp['name']) ?>" class="initiative__image desk-block" />
+					<img src="<?= htmlspecialchars($imgMobSrc) ?>" alt="<?= htmlspecialchars($sp['name']) ?>" class="initiative__image desk-none" />
 				</div>
 <?php endforeach; ?>
 				</div>
