@@ -1,14 +1,42 @@
 <?php
 require($_SERVER['DOCUMENT_ROOT'] . '/bitrix/header.php');
-$APPLICATION->SetTitle('PolytechExpo');
+use Bitrix\Main\Loader;
+Loader::includeModule('iblock');
+
+$APPLICATION->SetTitle('Конференция PolytechExpo');
+
+// Пытаемся получить CMS-фото из инфоблока проектов
+$cmsImage = '';
+if (defined('IBLOCK_PROJECTS_ID') && IBLOCK_PROJECTS_ID > 0) {
+    $dbEl = CIBlockElement::GetList(
+        [],
+        ['IBLOCK_ID' => IBLOCK_PROJECTS_ID, 'ACTIVE' => 'Y', 'PROPERTY_DETAIL_URL' => '/projects/politech-expo/'],
+        false, false,
+        ['ID', 'PREVIEW_PICTURE', 'DETAIL_PICTURE']
+    );
+    if ($arEl = $dbEl->GetNext()) {
+        $picId = $arEl['DETAIL_PICTURE'] ?: $arEl['PREVIEW_PICTURE'];
+        if ($picId) $cmsImage = CFile::GetPath($picId);
+    }
+}
+
 $tplPath = $_SERVER['DOCUMENT_ROOT'] . '/local/templates/my_template/project_PolytechExpo.html';
-$html = file_get_contents($tplPath);
+$html    = file_get_contents($tplPath);
 if (preg_match('/<main>(.*?)<\/main>/si', $html, $m)) {
     $content = $m[1];
-    $content = str_replace('src="img/', 'src="/local/templates/my_template/img/', $content);
-    $content = str_replace("src='img/", "src='/local/templates/my_template/img/", $content);
-    $content = str_replace('href="support.html"', 'href="/support/"', $content);
+    // Исправляем пути: шаблон использует img/, в Bitrix это assets/img/
+    $content = str_replace('src="img/',  'src="/local/templates/my_template/assets/img/', $content);
+    $content = str_replace("src='img/",  "src='/local/templates/my_template/assets/img/", $content);
+    $content = str_replace('href="support.html"',  'href="/support/"',  $content);
     $content = str_replace('href="projects.html"', 'href="/projects/"', $content);
+    // Заменяем статичную правую фотку на CMS-изображение, если оно задано в инфоблоке
+    if ($cmsImage) {
+        $content = str_replace(
+            '/local/templates/my_template/assets/img/reference-page/banner-other-img.png',
+            htmlspecialchars($cmsImage),
+            $content
+        );
+    }
     echo '<main>' . $content . '</main>';
 }
 require($_SERVER['DOCUMENT_ROOT'] . '/bitrix/footer.php');
