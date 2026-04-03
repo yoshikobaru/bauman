@@ -339,12 +339,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['reg_ur_action'])) {
                                 <li class="membership-slider__item">Участие в закрытых мероприятиях;</li>
                                 <li class="membership-slider__item">Право стать членом правления.</li>
                             </ul>
-                            <button type="button" class="membership-slider__join btn btn-empty select-plan" data-plan="partner">Выбрать</button>
+                            <button type="button" class="membership-slider__join btn btn-empty select-plan" data-plan="partner">Для юридических лиц →</button>
                         </div>
                         <div class="swiper-slide membership-slider__card membership-slider__card--gratuitous">
                             <h3 class="membership-slider__title">Почётное</h3>
                             <p class="membership-slider__name">Бесценно</p>
-                            <p class="membership-slider__time">по результатам заполненной анкеты</p>
+                            <p class="membership-slider__time">без взноса, по решению общества</p>
                             <button class="membership-slider__advantages">+ Возможности Базового</button>
                             <ul class="membership-slider__list">
                                 <li class="membership-slider__item">Для тех, кто внёс значительный вклад в развитие технической науки и деятельности Политехнического общества.</li>
@@ -517,26 +517,34 @@ document.querySelectorAll('[name="fiz_is_graduate"]').forEach(function(r) {
     });
 });
 
-// Выбор тарифа — event delegation, чтобы работало с Swiper-клонами
+// Выбор тарифа — event delegation, работает со Swiper-клонами
 document.addEventListener('click', function(e) {
     var btn = e.target.closest('.select-plan');
     if (!btn) return;
-    var plan  = btn.getAttribute('data-plan');
+    var plan = btn.getAttribute('data-plan');
+
+    // Партнёрское = юр. лицо — переключаемся на нужную вкладку
+    if (plan === 'partner') {
+        switchRegType('ur');
+        return;
+    }
+
     var field = document.getElementById('fiz-membership-type');
     if (field) field.value = plan;
-    // Визуальное выделение: обводка выбранной карточки
-    document.querySelectorAll('.membership-slider__card').forEach(function(card) {
-        card.style.outline = '';
-        card.style.boxShadow = '';
+
+    // Визуальное выделение: только текст кнопки, без обводки
+    document.querySelectorAll('.select-plan').forEach(function(b) {
+        b.textContent = 'Выбрать';
+        b.classList.remove('btn--active');
     });
-    var card = btn.closest('.membership-slider__card');
-    if (card) {
-        card.style.outline = '2px solid #c0392b';
-        card.style.boxShadow = '0 0 0 4px rgba(192,57,43,0.15)';
-    }
-    document.querySelectorAll('.select-plan').forEach(function(b) { b.textContent = 'Выбрать'; b.classList.remove('btn--active'); });
     btn.textContent = '✓ Выбрано';
     btn.classList.add('btn--active');
+
+    // Для Почётного меняем текст кнопки "Вступить"
+    var submitBtn = document.querySelector('#block-fiz button[type="submit"]');
+    if (submitBtn) {
+        submitBtn.textContent = plan === 'honorary' ? 'Подать заявку' : 'Вступить';
+    }
 });
 
 // Превью аватара
