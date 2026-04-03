@@ -64,8 +64,8 @@ define('PO_ADMIN_EMAIL', 'info@bauman-polytech.ru');
 /**
  * Пути к уставным документам (публичный URL).
  */
-define('DOC_USTAV_URL',    '/local/templates/my_template/assets/' . rawurlencode('УСТАВ ПОЛИТЕХ.pdf'));
-define('DOC_POLITIKA_URL', '/local/templates/my_template/assets/' . rawurlencode('Форма_Политика_в_отношении_обработки_персональных_данных_на.docx'));
+define('DOC_USTAV_URL',    '/local/templates/my_template/assets/USTAV.pdf');
+define('DOC_POLITIKA_URL', '/local/templates/my_template/assets/POLITIKA.docx');
 
 /**
  * Отправить уведомление администратору о новой заявке.

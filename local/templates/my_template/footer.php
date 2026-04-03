@@ -122,13 +122,5 @@
 	<script src="<?=SITE_TEMPLATE_PATH?>/assets/js/swiper-bundle.min.js"></script>
 	<script src="<?=SITE_TEMPLATE_PATH?>/assets/js/fancybox.umd.js"></script>
 	<script src="<?=SITE_TEMPLATE_PATH?>/assets/js/script.js"></script>
-	<script>
-	// Принудительное скачивание .docx и .pdf документов
-	document.addEventListener('DOMContentLoaded', function() {
-		document.querySelectorAll('a[href*=".docx"], a[href*=".pdf"]').forEach(function(a) {
-			a.setAttribute('download', '');
-		});
-	});
-	</script>
 </body>
 </html>
