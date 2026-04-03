@@ -235,7 +235,7 @@ endif;
 						</p>
 					</div>
 <?php
-// Эталонные данные 4 проектов — изображения всегда из верстки (initiative-img-N)
+// Эталонные данные 4 проектов с заглушками
 $_staticProjects = [
     ['name' => 'Конференция PolytechExpo',        'url' => '/projects/politech-expo/', 'img' => 'initiative-img-1.png', 'mob' => 'initiative-img-mob-1.png'],
     ['name' => 'Конференция Встреча выпускников', 'url' => '/projects/conference/',    'img' => 'initiative-img-2.png', 'mob' => 'initiative-img-mob-2.png'],
@@ -243,14 +243,14 @@ $_staticProjects = [
     ['name' => 'Реставрации Ротонды',             'url' => '/projects/restoration/',   'img' => 'initiative-img-4.png', 'mob' => 'initiative-img-mob-4.png'],
 ];
 
-// Пробуем переопределить имя и URL из инфоблока (по порядку)
+// Переопределяем из инфоблока: имя, URL и фото (если загружено)
 if (defined('IBLOCK_PROJECTS_ID') && IBLOCK_PROJECTS_ID > 0 && \Bitrix\Main\Loader::includeModule('iblock')) {
     $dbProjects = CIBlockElement::GetList(
         ['SORT' => 'ASC'],
         ['IBLOCK_ID' => IBLOCK_PROJECTS_ID, 'ACTIVE' => 'Y'],
         false,
         ['nTopCount' => 4],
-        ['ID', 'NAME', 'PROPERTY_DETAIL_URL']
+        ['ID', 'NAME', 'PREVIEW_PICTURE', 'PROPERTY_DETAIL_URL']
     );
     $i = 0;
     while ($proj = $dbProjects->GetNext()) {
@@ -261,6 +261,15 @@ if (defined('IBLOCK_PROJECTS_ID') && IBLOCK_PROJECTS_ID > 0 && \Bitrix\Main\Load
             if (!empty($proj['PROPERTY_DETAIL_URL_VALUE'])) {
                 $_staticProjects[$i]['url'] = $proj['PROPERTY_DETAIL_URL_VALUE'];
             }
+            // Реальное фото из CMS — если не загружено, остаётся заглушка initiative-img-N
+            if (!empty($proj['PREVIEW_PICTURE'])) {
+                $cmsImg = CFile::GetPath($proj['PREVIEW_PICTURE']);
+                if ($cmsImg) {
+                    $_staticProjects[$i]['img']       = null; // сигнал что нужен внешний URL
+                    $_staticProjects[$i]['mob']       = null;
+                    $_staticProjects[$i]['img_full']  = $cmsImg; // полный путь из CMS
+                }
+            }
         }
         $i++;
     }
@@ -268,14 +277,17 @@ if (defined('IBLOCK_PROJECTS_ID') && IBLOCK_PROJECTS_ID > 0 && \Bitrix\Main\Load
 
 // Рендерим карточки — структура точно как в верстке
 foreach ($_staticProjects as $sp):
+    // Если из CMS — используем полный путь; если нет — заглушка из шаблона
+    $imgSrc    = isset($sp['img_full']) ? $sp['img_full'] : SITE_TEMPLATE_PATH . '/assets/img/' . $sp['img'];
+    $imgMobSrc = isset($sp['img_full']) ? $sp['img_full'] : SITE_TEMPLATE_PATH . '/assets/img/' . $sp['mob'];
 ?>
 				<div class="initiative__card">
 					<h3>
 						<?= htmlspecialchars($sp['name']) ?>
 					</h3>
-					<a href="<?= $sp['url'] ?>">
-						<img src="<?= SITE_TEMPLATE_PATH ?>/assets/img/<?= $sp['img'] ?>" alt="<?= htmlspecialchars($sp['name']) ?>" class="initiative__image desk-block" />
-						<img src="<?= SITE_TEMPLATE_PATH ?>/assets/img/<?= $sp['mob'] ?>" alt="<?= htmlspecialchars($sp['name']) ?>" class="initiative__image desk-none" />
+					<a href="<?= htmlspecialchars($sp['url']) ?>">
+						<img src="<?= htmlspecialchars($imgSrc) ?>" alt="<?= htmlspecialchars($sp['name']) ?>" class="initiative__image desk-block" />
+						<img src="<?= htmlspecialchars($imgMobSrc) ?>" alt="<?= htmlspecialchars($sp['name']) ?>" class="initiative__image desk-none" />
 					</a>
 				</div>
 <?php endforeach; ?>
