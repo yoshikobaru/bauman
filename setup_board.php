@@ -36,9 +36,19 @@ if ($existing) {
     }
 }
 
-// Добавить реальных членов правления если пусто
-$dbCheck = CIBlockElement::GetList([], ['IBLOCK_ID' => $boardId], false, ['nTopCount' => 1], ['ID']);
-if (!$dbCheck->Fetch()) {
+// Удалить все старые элементы (демо-данные) перед добавлением реальных
+$dbOld = CIBlockElement::GetList([], ['IBLOCK_ID' => $boardId], false, false, ['ID']);
+$deleted = 0;
+while ($row = $dbOld->Fetch()) {
+    CIBlockElement::Delete($row['ID']);
+    $deleted++;
+}
+if ($deleted > 0) {
+    echo "• Удалено старых элементов: {$deleted}.\n";
+}
+
+// Добавить реальных членов правления
+if (true) {
     $members = [
         ['name' => 'Абакумов Евгений',  'pos' => 'Директор по информационным технологиям госкорпорации «Росатом»'],
         ['name' => 'Нагайцев Максим',   'pos' => 'Доктор технических наук'],
@@ -63,8 +73,6 @@ if (!$dbCheck->Fetch()) {
         ]);
         echo $res ? "✓ '{$m['name']}' создан (ID=$res).\n" : "✗ Ошибка '{$m['name']}': " . $el->LAST_ERROR . "\n";
     }
-} else {
-    echo "• Члены правления уже есть в инфоблоке.\n";
 }
 
 // Обновить IBLOCK_BOARD_ID в init.php

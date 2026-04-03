@@ -84,9 +84,19 @@ if ($prop = $dbPs->Fetch()) {
     }
 }
 
-// Добавить 4 demo проекта
-$dbCheck = CIBlockElement::GetList([], ['IBLOCK_ID' => $projId], false, ['nTopCount' => 1], ['ID']);
-if (!$dbCheck->Fetch()) {
+// Удалить все старые элементы перед добавлением актуальных
+$dbOldP = CIBlockElement::GetList([], ['IBLOCK_ID' => $projId], false, false, ['ID']);
+$deletedP = 0;
+while ($row = $dbOldP->Fetch()) {
+    CIBlockElement::Delete($row['ID']);
+    $deletedP++;
+}
+if ($deletedP > 0) {
+    echo "• Удалено старых элементов: {$deletedP}.\n";
+}
+
+// Добавить 4 реальных проекта
+if (true) {
     $projects = [
         ['name' => 'Конференция PolytechExpo',        'preview' => 'Ежегодная конференция выпускников и партнёров МГТУ им. Н.Э. Баумана', 'url' => '/projects/politech-expo/'],
         ['name' => 'Конференция Встреча выпускников', 'preview' => 'Традиционная встреча выпускников всех поколений Бауманки',           'url' => '/projects/conference/'],
@@ -107,8 +117,6 @@ if (!$dbCheck->Fetch()) {
         ]);
         echo $res ? "✓ Проект '{$proj['name']}' создан (ID=$res).\n" : "✗ Ошибка '{$proj['name']}': " . $el->LAST_ERROR . "\n";
     }
-} else {
-    echo "• Проекты уже есть в инфоблоке.\n";
 }
 
 // Обновить IBLOCK_PROJECTS_ID в init.php
