@@ -98,13 +98,17 @@ function po_sendAdminEmail(string $type, array $data): void
         }
     }
 
-    $from = 'noreply@bauman-polytech.ru';
-    \CMain::Mail([
-        'TO'      => PO_ADMIN_EMAIL,
-        'FROM'    => $from,
-        'SUBJECT' => "[ПОЛИТЕХ] Новая заявка: {$label}",
-        'BODY'    => $body,
-    ]);
+    $from    = defined('PO_ADMIN_EMAIL') ? PO_ADMIN_EMAIL : 'noreply@bauman-polytech.ru';
+    $to      = PO_ADMIN_EMAIL;
+    $subject = "[ПОЛИТЕХ] Новая заявка: {$label}";
+
+    $headers  = "MIME-Version: 1.0\r\n";
+    $headers .= "Content-Type: text/plain; charset=UTF-8\r\n";
+    $headers .= "Content-Transfer-Encoding: 8bit\r\n";
+    $headers .= "From: {$from}\r\n";
+
+    $encSubject = '=?UTF-8?B?' . base64_encode($subject) . '?=';
+    @mail($to, $encSubject, $body, $headers);
 }
 
 /**

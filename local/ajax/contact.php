@@ -27,14 +27,13 @@ $body = "Имя: $name\nEmail: $email\n";
 if ($phone)   $body .= "Телефон: $phone\n";
 if ($message) $body .= "\nСообщение:\n$message\n";
 
-CMain::Mail([
-    'TO'       => $adminEmail,
-    'FROM'     => $adminEmail,
-    'SUBJECT'  => $subject,
-    'BODY'     => $body,
-    'CHARSET'  => 'UTF-8',
-    'CONTENT_TYPE' => 'text/plain',
-]);
+$headers  = "MIME-Version: 1.0\r\n";
+$headers .= "Content-Type: text/plain; charset=UTF-8\r\n";
+$headers .= "Content-Transfer-Encoding: 8bit\r\n";
+$headers .= "From: {$adminEmail}\r\n";
+
+$encSubject = '=?UTF-8?B?' . base64_encode($subject) . '?=';
+@mail($adminEmail, $encSubject, $body, $headers);
 
 if (function_exists('po_logAction')) {
     po_logAction('form_submit', 'contact', 0, 'Связаться с организаторами: ' . $name);
