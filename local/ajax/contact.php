@@ -31,6 +31,7 @@ $headers  = "MIME-Version: 1.0\r\n";
 $headers .= "Content-Type: text/plain; charset=UTF-8\r\n";
 $headers .= "Content-Transfer-Encoding: 8bit\r\n";
 $headers .= "From: {$adminEmail}\r\n";
+$headers .= "Reply-To: " . ($email) . "\r\n";
 
 $encSubject = '=?UTF-8?B?' . base64_encode($subject) . '?=';
 @mail($adminEmail, $encSubject, $body, $headers);

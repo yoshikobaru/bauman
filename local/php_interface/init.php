@@ -98,14 +98,16 @@ function po_sendAdminEmail(string $type, array $data): void
         }
     }
 
-    $from    = defined('PO_ADMIN_EMAIL') ? PO_ADMIN_EMAIL : 'noreply@bauman-polytech.ru';
     $to      = PO_ADMIN_EMAIL;
     $subject = "[ПОЛИТЕХ] Новая заявка: {$label}";
+    // From = тот же ящик что получает — сервер точно авторизован его отправлять
+    $from    = PO_ADMIN_EMAIL;
 
     $headers  = "MIME-Version: 1.0\r\n";
     $headers .= "Content-Type: text/plain; charset=UTF-8\r\n";
     $headers .= "Content-Transfer-Encoding: 8bit\r\n";
     $headers .= "From: {$from}\r\n";
+    $headers .= "Reply-To: " . ($data['email'] ?? $from) . "\r\n";
 
     $encSubject = '=?UTF-8?B?' . base64_encode($subject) . '?=';
     @mail($to, $encSubject, $body, $headers);
