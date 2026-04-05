@@ -176,11 +176,41 @@ $prefill = [
                         <input type="hidden" name="donor_type" id="d2_donor_type" value="fiz">
                         <input type="hidden" name="frequency"  id="d2_frequency"  value="month">
 
+                        <style>
+                            .project-programm__item-selector > div,
+                            .project-programm__item-price > div {
+                                cursor: pointer;
+                                user-select: none;
+                                -webkit-user-select: none;
+                            }
+                            .project-programm__item-price > div:hover { opacity: .85; }
+                            .d2-custom-row {
+                                display: flex;
+                                flex-direction: column;
+                                gap: 6px;
+                                align-items: flex-start;
+                                padding: 10px 14px !important;
+                                min-height: unset !important;
+                            }
+                            .d2-custom-row span { font-size: 13px; pointer-events: none; }
+                            .d2-custom-row input {
+                                width: 100%;
+                                border: none;
+                                border-bottom: 1px solid currentColor;
+                                background: transparent;
+                                font-size: 15px;
+                                font-weight: 600;
+                                outline: none;
+                                padding: 2px 0;
+                            }
+                        </style>
+
                         <div class="project-programm__tabs">
                             <ul class="project-programm__navs">
                                 <li class="main-tabs-click main-tabs-click--active" data-tab="summ">Сумма</li>
                                 <li class="main-tabs-click" data-tab="programm">Программы</li>
                                 <li class="main-tabs-click" data-tab="data">Данные</li>
+                                <li class="main-tabs-click" data-tab="pay">Оплата</li>
                             </ul>
                         </div>
                         <div class="project-programm__content">
@@ -199,8 +229,9 @@ $prefill = [
                                     <div data-val="5000">5000 Р</div>
                                     <div data-val="10000">10 000 Р</div>
                                     <div data-val="30000">30 000 Р</div>
-                                    <div data-val="custom">
-                                        Другая: <input type="number" id="d2_custom_amount" placeholder="руб." min="1" style="width:90px;padding:4px 8px;margin-left:6px">
+                                    <div data-val="custom" class="d2-custom-row">
+                                        <span>Другая сумма</span>
+                                        <input type="number" id="d2_custom_amount" placeholder="Введите сумму, руб." min="1" onclick="event.stopPropagation()">
                                     </div>
                                 </div>
                                 <div class="project-programm__buttons">
@@ -300,6 +331,21 @@ $prefill = [
 
                                 <div class="project-programm__buttons">
                                     <button type="button" class="btn project-programm__btn project-programm__btn--back" id="d2_back_data">Назад</button>
+                                    <button type="button" class="btn project-programm__btn" id="d2_next_data">Продолжить</button>
+                                </div>
+                            </div>
+
+                            <!-- Шаг 4: Оплата -->
+                            <div class="project-programm__item main-tabs-pane" data-tab="pay">
+                                <div style="padding:24px 0 8px;text-align:center">
+                                    <div style="font-size:40px;margin-bottom:12px">💳</div>
+                                    <p style="font-size:15px;color:#555;line-height:1.6;margin-bottom:20px">
+                                        Онлайн-оплата будет доступна после подключения эквайринга.<br>
+                                        Чтобы поддержать проект сейчас — оставьте заявку и мы свяжемся с вами.
+                                    </p>
+                                </div>
+                                <div class="project-programm__buttons">
+                                    <button type="button" class="btn project-programm__btn project-programm__btn--back" id="d2_back_pay">Назад</button>
                                     <button type="submit" class="btn project-programm__btn">Отправить заявку</button>
                                 </div>
                             </div>
@@ -456,6 +502,14 @@ function po_selectFund(fundName) {
     // Back: data → programm
     var btnBackData = document.getElementById('d2_back_data');
     if (btnBackData) btnBackData.addEventListener('click', function() { switchTab('programm'); });
+
+    // Next: data → pay
+    var btnNextData = document.getElementById('d2_next_data');
+    if (btnNextData) btnNextData.addEventListener('click', function() { switchTab('pay'); });
+
+    // Back: pay → data
+    var btnBackPay = document.getElementById('d2_back_pay');
+    if (btnBackPay) btnBackPay.addEventListener('click', function() { switchTab('data'); });
 
     // Donor type toggle
     document.querySelectorAll('[data-donor]').forEach(function(el) {
