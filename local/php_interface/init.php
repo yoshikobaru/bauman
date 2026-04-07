@@ -131,11 +131,11 @@ AddEventHandler('main', 'OnBuildGlobalMenu', function (&$globalMenu, &$moduleMen
         }
     } catch (\Exception $e) {}
 
-    $badge = $newCount > 0 ? ' <span style="background:#e74c3c;color:#fff;border-radius:10px;padding:1px 6px;font-size:10px;font-weight:700;">' . $newCount . '</span>' : '';
+    $badge = $newCount > 0 ? ' (' . $newCount . ')' : '';
 
     $globalMenu['global_menu_politeh'] = [
         'menu_id'   => 'politeh',
-        'text'      => 'Политех',
+        'text'      => 'Политех' . $badge,
         'title'     => 'Управление Политехническим обществом',
         'icon'      => 'main_menu_group',
         'page_icon' => 'main_menu_group',
@@ -143,7 +143,7 @@ AddEventHandler('main', 'OnBuildGlobalMenu', function (&$globalMenu, &$moduleMen
         'items_id'  => 'menu_politeh_items',
         'items'     => [
             [
-                'text'      => 'Заявки' . $badge,
+                'text'      => 'Заявки' . ($newCount > 0 ? ' (' . $newCount . ')' : ''),
                 'title'     => 'Модерация заявок с форм сайта (D1–D7)',
                 'url'       => '/local/admin/po_moderation.php',
                 'icon'      => 'main_menu_comment',
@@ -170,7 +170,7 @@ AddEventHandler('main', 'OnBuildGlobalMenu', function (&$globalMenu, &$moduleMen
             [
                 'text'  => '— Инфоблоки (контент)',
                 'title' => 'Новости, события, проекты, правление',
-                'url'   => '/bitrix/admin/iblock_type_admin.php?lang=ru',
+                'url'   => '/bitrix/admin/iblock_admin.php?type=po_catalog&lang=ru',
                 'icon'  => 'main_menu_content',
             ],
         ],

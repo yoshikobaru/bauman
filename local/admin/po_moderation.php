@@ -130,15 +130,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && check_bitrix_sessid() && $hlClass) 
                         $statusText  = $statusLabels[$newStatus] ?? $newStatus;
                         $typeText    = $typeLabels[$app['UF_TYPE']] ?? $app['UF_TYPE'];
                         $commentText = $comment ? "\n\nКомментарий: {$comment}" : '';
-                        \CMain::Mail([
-                            'TO'      => $userRow['EMAIL'],
-                            'FROM'    => defined('PO_ADMIN_EMAIL') ? PO_ADMIN_EMAIL : 'noreply@bauman-polytech.ru',
-                            'SUBJECT' => "[ПОЛИТЕХ] Статус вашей заявки изменён",
-                            'BODY'    =>
-                                "Уважаемый(ая) {$userRow['NAME']},\n\n" .
-                                "Статус вашей заявки «{$typeText}» изменён на: {$statusText}.{$commentText}\n\n" .
-                                "Политехническое общество выпускников МГТУ им. Н.Э. Баумана",
-                        ]);
+                        $adminEmail  = defined('PO_ADMIN_EMAIL') ? PO_ADMIN_EMAIL : 'noreply@bauman-polytech.ru';
+                        $toEmail     = $userRow['EMAIL'];
+                        $subject     = '[ПОЛИТЕХ] Статус вашей заявки изменён';
+                        $body        =
+                            "Уважаемый(ая) {$userRow['NAME']},\n\n" .
+                            "Статус вашей заявки «{$typeText}» изменён на: {$statusText}.{$commentText}\n\n" .
+                            "Политехническое общество выпускников МГТУ им. Н.Э. Баумана";
+                        $headers  = "MIME-Version: 1.0\r\n";
+                        $headers .= "Content-Type: text/plain; charset=UTF-8\r\n";
+                        $headers .= "Content-Transfer-Encoding: 8bit\r\n";
+                        $headers .= "From: {$adminEmail}\r\n";
+                        $headers .= "Reply-To: {$adminEmail}\r\n";
+                        @mail($toEmail, '=?UTF-8?B?' . base64_encode($subject) . '?=', $body, $headers);
                     }
                 }
             } else {
@@ -576,5 +580,21 @@ while ($lr = $dbLogs->fetch()) $logRows[] = $lr;
 <!-- (старый блок логов удалён — логи теперь во вкладке выше) -->
 
 </div>
+
+<script>
+// Перехватываем переходы по ссылкам Bitrix-админки, которые
+// ошибочно генерируются с /local/admin/ вместо /bitrix/admin/
+document.addEventListener('click', function(e) {
+    var a = e.target.closest('a[href]');
+    if (!a) return;
+    var href = a.getAttribute('href');
+    if (!href) return;
+    // Абсолютный путь /local/admin/... (кроме нашей страницы)
+    if (/^\/local\/admin\//.test(href) && href.indexOf('po_moderation') === -1) {
+        e.preventDefault();
+        window.location.href = href.replace('/local/admin/', '/bitrix/admin/');
+    }
+});
+</script>
 
 <?php require_once($_SERVER['DOCUMENT_ROOT'] . '/bitrix/modules/main/include/epilog_admin.php'); ?>
