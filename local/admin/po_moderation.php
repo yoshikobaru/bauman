@@ -581,20 +581,4 @@ while ($lr = $dbLogs->fetch()) $logRows[] = $lr;
 
 </div>
 
-<script>
-// Перехватываем переходы по ссылкам Bitrix-админки, которые
-// ошибочно генерируются с /local/admin/ вместо /bitrix/admin/
-document.addEventListener('click', function(e) {
-    var a = e.target.closest('a[href]');
-    if (!a) return;
-    var href = a.getAttribute('href');
-    if (!href) return;
-    // Абсолютный путь /local/admin/... (кроме нашей страницы)
-    if (/^\/local\/admin\//.test(href) && href.indexOf('po_moderation') === -1) {
-        e.preventDefault();
-        window.location.href = href.replace('/local/admin/', '/bitrix/admin/');
-    }
-});
-</script>
-
 <?php require_once($_SERVER['DOCUMENT_ROOT'] . '/bitrix/modules/main/include/epilog_admin.php'); ?>

@@ -1,0 +1,6 @@
+RewriteEngine On
+
+# Все запросы к /local/admin/*.php кроме po_moderation.php
+# перенаправляем на /bitrix/admin/ с теми же параметрами
+RewriteCond %{REQUEST_FILENAME} !po_moderation\.php$
+RewriteRule ^(.+\.php.*)$ /bitrix/admin/$1 [R=302,L]
