@@ -147,31 +147,9 @@ $APPLICATION->SetPageProperty('description', 'Политехническое о�
 			<!-- /.container -->
 		</section>
 		<!-- /.opportunities -->
-		 <section class="boards">
-			<div class="container">
-				<div class="boards__wrapper">
-					<h2 class="main-title">
-						Члены правления Политехнического общества
-					</h2>
-				<div class="boards__list">
 <?php
-// Статичные данные членов правления (эталон из верстки)
-$_staticBoard = [
-    ['name' => 'Абакумов Евгений',  'pos' => 'Директор по информационным технологиям госкорпорации «Росатом»',                                             'img' => 'board-img-1.png'],
-    ['name' => 'Нагайцев Максим',   'pos' => 'Доктор технических наук',                                                                                     'img' => 'board-img-2.png'],
-    ['name' => 'Гордин Михаил',     'pos' => 'Ректор МГТУ им. Н.Э. Баумана, кандидат технических наук',                                                    'img' => 'board-img-3.png'],
-    ['name' => 'Кондратьев Андрей', 'pos' => 'Генеральный директор АО «РТ-ФИНАНС», председатель совета директоров НОВИКОМа',                               'img' => 'board-img-4.png'],
-    ['name' => 'Майоров Игорь',     'pos' => 'Генеральный директор METEOR Lift',                                                                            'img' => 'board-img-5.png'],
-    ['name' => 'Фетисов Алексей',   'pos' => 'Генеральный директор Холдинга Т1',                                                                            'img' => 'board-img-6.png'],
-    ['name' => 'Федоров Алексей',   'pos' => 'Вице-Президент «Газпромбанк»',                                                                               'img' => 'board-img-7.png'],
-    ['name' => 'Шелобков Алексей',  'pos' => 'Генеральный директор ООО «Бюро 1440»',                                                                       'img' => 'board-img-8.png'],
-    ['name' => 'Дабагов Анатолий',  'pos' => 'Кандидат технических наук, президент МТЛ',                                                                   'img' => 'board-img-9.png'],
-    ['name' => 'Краснов Дмитрий',   'pos' => 'Кандидат технических наук, председатель Правления Промышленной Группы «Приводная Техника»',                  'img' => 'board-img-10.png'],
-    ['name' => 'Пивень Валерий',    'pos' => 'Директор департамента станкостроения и тяжелого машиностроения',                                              'img' => 'board-img-11.png'],
-];
-
-$_boardFromIblock = false;
-if (defined('IBLOCK_BOARD_ID') && IBLOCK_BOARD_ID > 0 && \Bitrix\Main\Loader::includeModule('iblock')):
+$_boardItems = [];
+if (defined('IBLOCK_BOARD_ID') && IBLOCK_BOARD_ID > 0 && \Bitrix\Main\Loader::includeModule('iblock')) {
     $dbBoard = CIBlockElement::GetList(
         ['SORT' => 'ASC'],
         ['IBLOCK_ID' => IBLOCK_BOARD_ID, 'ACTIVE' => 'Y'],
@@ -179,48 +157,43 @@ if (defined('IBLOCK_BOARD_ID') && IBLOCK_BOARD_ID > 0 && \Bitrix\Main\Loader::in
         ['nTopCount' => 12],
         ['ID', 'NAME', 'PREVIEW_PICTURE', 'PREVIEW_TEXT']
     );
-    while ($board = $dbBoard->GetNext()):
-        $_boardFromIblock = true;
-        // Используем реальное фото из инфоблока если загружено, иначе — статичный эталон по порядку
-        $photoSrc = !empty($board['PREVIEW_PICTURE'])
-            ? CFile::GetPath($board['PREVIEW_PICTURE'])
-            : SITE_TEMPLATE_PATH . '/assets/img/board-placeholder.png';
-?>
-						<div class="boards__item">
-							<img src="<?= htmlspecialchars($photoSrc) ?>" alt="<?= htmlspecialchars($board['NAME']) ?>" class="boards__item-image">
-							<h3 class="boards__item-title">
-								<?= htmlspecialchars($board['NAME']) ?>
-							</h3>
-							<p class="boards__item-text">
-								<?= htmlspecialchars($board['PREVIEW_TEXT']) ?>
-							</p>
-						</div>
-<?php
-    endwhile;
-endif;
 
-// Fallback: статичные реальные члены правления из верстки
-if (!$_boardFromIblock):
-    foreach ($_staticBoard as $bm):
+    while ($board = $dbBoard->GetNext()) {
+        $_boardItems[] = [
+            'name' => (string)$board['NAME'],
+            'pos' => (string)$board['PREVIEW_TEXT'],
+            'photo' => !empty($board['PREVIEW_PICTURE']) ? CFile::GetPath($board['PREVIEW_PICTURE']) : '',
+        ];
+    }
+}
 ?>
+<?php if (!empty($_boardItems)): ?>
+		 <section class="boards">
+			<div class="container">
+				<div class="boards__wrapper">
+					<h2 class="main-title">
+						Члены правления Политехнического общества
+					</h2>
+				<div class="boards__list">
+<?php foreach ($_boardItems as $boardItem): ?>
 						<div class="boards__item">
-							<img src="<?= SITE_TEMPLATE_PATH ?>/assets/img/<?= $bm['img'] ?>" alt="<?= htmlspecialchars($bm['name']) ?>" class="boards__item-image">
+							<?php if (!empty($boardItem['photo'])): ?>
+							<img src="<?= htmlspecialchars($boardItem['photo']) ?>" alt="<?= htmlspecialchars($boardItem['name']) ?>" class="boards__item-image">
+							<?php endif; ?>
 							<h3 class="boards__item-title">
-								<?= htmlspecialchars($bm['name']) ?>
+								<?= htmlspecialchars($boardItem['name']) ?>
 							</h3>
 							<p class="boards__item-text">
-								<?= htmlspecialchars($bm['pos']) ?>
+								<?= htmlspecialchars($boardItem['pos']) ?>
 							</p>
 						</div>
-<?php
-    endforeach;
-endif;
-?>
+<?php endforeach; ?>
 				</div>
 				</div>
 			</div>
 			<!-- /.container -->
 		 </section>
+<?php endif; ?>
 		 <!-- /.boards -->
 		<!-- initiative -->
 		<section class="initiative">
