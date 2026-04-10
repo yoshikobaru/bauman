@@ -30,41 +30,7 @@ function po_hlSave($type, $userId, array $data, $elementId = 0)
     return $res->isSuccess();
 }
 
-$d4Done  = false; $d4Error  = '';
 $d5Done  = false; $d5Error  = '';
-
-// D4: Участие в референс-визите (только члены)
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['d4_action'])) {
-    if (!$_isMember) {
-        $d4Error = 'Участие в референс-визитах доступно только членам общества.';
-    } else {
-        $fn = trim($_POST['first_name'] ?? '');
-        $ln = trim($_POST['last_name']  ?? '');
-        $em = trim($_POST['email']      ?? '');
-        if (!$fn || !$ln || !$em) {
-            $d4Error = 'Заполните обязательные поля: Имя, Фамилия, Email.';
-        } else {
-            $saved = $hlOk ? po_hlSave('reference_visit', $USER->GetID(), [
-                'last_name'  => $ln, 'first_name' => $fn,
-                'email'      => $em, 'phone'      => trim($_POST['phone'] ?? ''),
-                'telegram'   => trim($_POST['telegram'] ?? ''),
-            ]) : false;
-            if (!$hlOk || $saved) {
-                $d4Done = true;
-                po_logAction('form_submit', 'application', 0, 'D4 участие в референс-визите');
-                $d4Data = [
-                    'first_name' => $fn, 'last_name' => $ln,
-                    'email'      => $em, 'phone'     => trim($_POST['phone'] ?? ''),
-                    'telegram'   => trim($_POST['telegram'] ?? ''),
-                ];
-                po_sendAdminEmail('reference_visit', $d4Data);
-                po_createCrmLead('reference_visit', $d4Data);
-            } else {
-                $d4Error = 'Ошибка сохранения. Попробуйте позже.';
-            }
-        }
-    }
-}
 
 // D5: Организация референс-визита (все)
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['d5_action'])) {
@@ -228,9 +194,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['d5_action'])) {
                             <p class="visits__text"><?= htmlspecialchars($visit['PREVIEW_TEXT']) ?></p>
                             <?php endif; ?>
                             <a href="<?= htmlspecialchars($detailUrl) ?>" class="btn visits__btn btn-transparent">Подробнее</a>
-                            <?php if ($visitsTab === 'active' && $_isMember && !empty($vProps['REF_REGISTER_URL'])): ?>
-                            <a href="<?= htmlspecialchars($vProps['REF_REGISTER_URL']) ?>" class="btn" style="margin-top:8px">Зарегистрироваться</a>
-                            <?php endif; ?>
                         </div>
                     </div>
                     <?php endforeach; ?>
@@ -243,50 +206,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['d5_action'])) {
             <!-- /.container -->
         </section>
         <!-- /.visits -->
-
-        <!-- D4: Участие в референс-визите (только члены) -->
-        <?php if ($USER->IsAuthorized()): ?>
-        <section class="account" style="padding-top:0">
-            <div class="container">
-                <div class="account__block" style="max-width:700px;margin:0 auto 60px">
-                    <h3 class="account__subtitle">
-                        <?= $_isMember ? 'Записаться на референс-визит' : 'Доступно для членов общества' ?>
-                    </h3>
-                    <?php if ($d4Done): ?>
-                        <div class="authorization__alert authorization__alert--success" style="margin-top:16px">
-                            <p>Заявка принята! Мы свяжемся с вами для подтверждения.</p>
-                        </div>
-                    <?php elseif ($_isMember): ?>
-                        <?php if ($d4Error): ?>
-                        <div class="authorization__alert authorization__alert--error" style="margin-top:16px">
-                            <p><?= htmlspecialchars($d4Error) ?></p>
-                        </div>
-                        <?php endif; ?>
-                        <form method="POST" action="/reference/">
-                            <input type="hidden" name="d4_action" value="1">
-                            <div class="account__personal-list account__grid" style="margin-top:16px">
-                                <input type="text"  name="last_name"  placeholder="Фамилия *" required
-                                       value="<?= htmlspecialchars($USER->GetParam('LAST_NAME')) ?>">
-                                <input type="text"  name="first_name" placeholder="Имя *" required
-                                       value="<?= htmlspecialchars($USER->GetParam('NAME')) ?>">
-                                <input type="email" name="email"      placeholder="e-mail *" required
-                                       value="<?= htmlspecialchars($USER->GetParam('EMAIL')) ?>">
-                                <input type="tel"   name="phone"      placeholder="Телефон">
-                                <input type="text"  name="telegram"   placeholder="Telegram">
-                            </div>
-                            <p class="form-required-note">* Обязательные поля</p>
-                            <button type="submit" class="btn authorization__btn" style="margin-top:16px">Подать заявку на участие</button>
-                        </form>
-                    <?php else: ?>
-                        <p style="color:#888;margin-top:12px">
-                            Запись на референс-визиты доступна только членам Политехнического общества.
-                            <a href="/join/">Вступить</a>
-                        </p>
-                    <?php endif; ?>
-                </div>
-            </div>
-        </section>
-        <?php endif; ?>
 
         <!-- culture -->
 		<section class="culture culture-reference" id="culture">
