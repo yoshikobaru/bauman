@@ -153,10 +153,6 @@ $userPhone     = $USER->IsAuthorized() ? htmlspecialchars($USER->GetParam('PERSO
                         <?php endif; ?>
                         <?php if ($_isMember): ?>
                         <a href="#" class="banner-other__btn btn" data-fancybox data-src="#form-d4-visit">Зарегистрироваться</a>
-                        <?php elseif ($USER->IsAuthorized()): ?>
-                        <p class="banner-other__text main-text" style="margin-top:12px;opacity:.7">
-                            Регистрация на визиты доступна только членам общества. <a href="/join/" style="color:inherit;text-decoration:underline">Вступить</a>
-                        </p>
                         <?php else: ?>
                         <a href="/join/?back=<?= urlencode($_SERVER['REQUEST_URI']) ?>" class="banner-other__btn btn">Зарегистрироваться</a>
                         <?php endif; ?>
