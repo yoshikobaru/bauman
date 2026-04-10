@@ -101,7 +101,10 @@ if (!empty($arElement['DETAIL_PICTURE'])) {
                         }
                         ?>
                         <?php if ($projectSubtitle !== ''): ?>
-                        <p class="banner-other__text main-text" style="margin-top:16px;white-space:pre-line;"><?= nl2br(htmlspecialchars($projectSubtitle)) ?></p>
+                        <p class="banner-other__text main-text" style="margin-top:16px;white-space:pre-line;line-height:1.25;"><?= htmlspecialchars($projectSubtitle) ?></p>
+                        <?php endif; ?>
+                        <?php if ($projectStatusNorm === '' || in_array($projectStatusNorm, ['active', 'активный', 'в работе', 'активен'])): ?>
+                        <a href="/support/?project=<?= urlencode($arElement['NAME']) ?>" class="btn" style="margin-top:24px;">Поддержать</a>
                         <?php endif; ?>
                     </div>
                     <img src="<?=SITE_TEMPLATE_PATH?>/assets/img/reference-page/banner-other-pattern.png" alt="" class="banner-other__pattern">
@@ -112,6 +115,16 @@ if (!empty($arElement['DETAIL_PICTURE'])) {
     </section>
 
     <?php if ($arElement): ?>
+    <section class="project-help">
+        <div class="container">
+            <h2 class="main-title project-help__title">Проекту необходима финансовая поддержка</h2>
+            <p class="project-help__text main-text">
+                Мы рады любой помощи вне зависимости от её размера. Для компаний желающими стать спонсорами данного мероприятия - готовы направить спонсорский пакет.
+            </p>
+            <button class="btn project-help__btn" data-fancybox data-src="#form-finance-help">Связаться с организаторами</button>
+        </div>
+    </section>
+
     <!-- Детальный текст -->
     <?php if (!empty($arProps['PROJECT_AMOUNT']['VALUE'])): ?>
     <section class="project-programm">
@@ -160,17 +173,7 @@ if (!empty($arElement['DETAIL_PICTURE'])) {
     ?>
     <?= $detailHtml ?>
 
-    <section class="project-help">
-        <div class="container">
-            <h2 class="main-title project-help__title">Проекту необходима финансовая поддержка</h2>
-            <p class="project-help__text main-text">
-                Мы рады любой помощи вне зависимости от её размера. Для компаний желающими стать спонсорами данного мероприятия - готовы направить спонсорский пакет.
-            </p>
-            <a href="/support/?project=<?= urlencode($arElement['NAME']) ?>" class="btn project-help__btn">Связаться с организаторами</a>
-        </div>
-    </section>
-
-    <section class="project-programm">
+    <section class="project-programm" style="background:transparent;">
         <div class="container">
             <p style="margin-top:24px">
                 <?php
