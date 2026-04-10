@@ -1,7 +1,7 @@
 <?php
 require($_SERVER["DOCUMENT_ROOT"]."/bitrix/header.php");
 $APPLICATION->SetTitle("Витрина компетенций");
-$APPLICATION->SetPageProperty('description', 'Витрина компетенций МГТУ им. Н.Э. Баумана: НОЦ, студенческие КБ и компетенции партнёров Политехнического общества выпускников.');
+$APPLICATION->SetPageProperty('description', 'Витрина компетенций МВТУ (МГТУ) им. Н.Э. Баумана: НОЦ, студенческие КБ и компетенции партнёров Политехнического общества выпускников.');
 
 use Bitrix\Main\Loader;
 $hlOk = Loader::includeModule('highloadblock');
@@ -206,7 +206,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['d6_action'])) {
 					       value="<?= htmlspecialchars($USER->GetParam('LAST_NAME')) ?>">
 					<input type="text"  name="first_name" placeholder="Имя *" required
 					       value="<?= htmlspecialchars($USER->GetParam('NAME')) ?>">
-					<input type="email" name="email"      placeholder="Электропочта *" required
+					<input type="email" name="email"      placeholder="e-mail *" required
 					       value="<?= htmlspecialchars($USER->GetParam('EMAIL')) ?>">
 					<input type="tel"   name="phone"      placeholder="Телефон">
 					<input type="text"  name="company"    placeholder="Компания">
@@ -221,6 +221,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['d6_action'])) {
 					          style="width:100%;min-height:100px;padding:12px;border:1px solid #ccc"></textarea>
 				</div>
 			</div>
+			<p class="form-required-note">* Обязательные поля</p>
 			<button type="submit" class="btn authorization__btn">Отправить</button>
 		</form>
 		<?php endif; ?>

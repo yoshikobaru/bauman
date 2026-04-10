@@ -50,18 +50,13 @@
 								</a>
 							</li>
 							<li class="header-wrapper__item">
-								<a href="/news/">
-									События
-								</a>
-							</li>
-							<li class="header-wrapper__item">
 								<a href="/about/">
 									О нас
 								</a>
 							</li>
 							<li class="header-wrapper__item">
-								<a href="/contacts/">
-									Контакты
+								<a href="/news/">
+									События
 								</a>
 							</li>
 							<li class="header-wrapper__item">
@@ -70,13 +65,18 @@
 								</a>
 							</li>
 							<li class="header-wrapper__item">
+								<a href="/competencies/">
+									Витрина компетенций
+								</a>
+							</li>
+							<li class="header-wrapper__item">
 								<a href="/resume-form/">
 									Карьерная платформа
 								</a>
 							</li>
 							<li class="header-wrapper__item">
-								<a href="/competencies/">
-									Витрина компетенций
+								<a href="/contacts/">
+									Контакты
 								</a>
 							</li>
 						</ul>

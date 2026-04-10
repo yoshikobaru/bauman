@@ -468,14 +468,14 @@ $currentStatus = $statusLabels[$membershipStatus] ?? null;
                             <div style="background:#fff;border:1px solid #e8e8e8;border-radius:10px;padding:18px 20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
                                 <div>
                                     <div style="font-weight:600;margin-bottom:4px">База резюме</div>
-                                    <div style="color:#666;font-size:13px">Просматривайте резюме выпускников МГТУ</div>
+                                    <div style="color:#666;font-size:13px">Просматривайте резюме выпускников МВТУ (МГТУ) им. Н.Э. Баумана</div>
                                 </div>
                                 <a href="/resume-form/" class="btn btn-empty" style="font-size:13px;padding:10px 20px">Перейти к платформе</a>
                             </div>
                             <div style="background:#fff;border:1px solid #e8e8e8;border-radius:10px;padding:18px 20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
                                 <div>
                                     <div style="font-weight:600;margin-bottom:4px">Витрина компетенций</div>
-                                    <div style="color:#666;font-size:13px">Отправьте запрос в НОЦ, СКБ или кафедры МГТУ</div>
+                                    <div style="color:#666;font-size:13px">Отправьте запрос в НОЦ, СКБ или кафедры МВТУ (МГТУ) им. Н.Э. Баумана</div>
                                 </div>
                                 <a href="/competencies/" class="btn btn-empty" style="font-size:13px;padding:10px 20px">Открыть витрину</a>
                             </div>
@@ -580,7 +580,7 @@ $currentStatus = $statusLabels[$membershipStatus] ?? null;
                                            value="<?= htmlspecialchars($arUser['NAME']        ?? '') ?>">
                                     <input type="text" name="second_name" placeholder="Отчество"
                                            value="<?= htmlspecialchars($arUser['SECOND_NAME'] ?? '') ?>">
-                                    <input type="email" placeholder="Электропочта"
+                                    <input type="email" placeholder="e-mail"
                                            value="<?= htmlspecialchars($arUser['EMAIL'] ?? '') ?>" readonly
                                            title="Email изменяется через раздел Безопасность">
                                 </div>
@@ -588,7 +588,7 @@ $currentStatus = $statusLabels[$membershipStatus] ?? null;
 
                             <div class="account__graduate">
                                 <div class="account__chapter">
-                                    <h3 class="account__subtitle">Выпускник МГТУ?</h3>
+                                    <h3 class="account__subtitle">Выпускник МВТУ (МГТУ) им. Н.Э. Баумана?</h3>
                                 </div>
                                 <div class="account__graduate-choice">
                                     <label class="account__graduate-item">

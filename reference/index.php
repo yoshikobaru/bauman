@@ -299,11 +299,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['d5_action'])) {
                                        value="<?= htmlspecialchars($USER->GetParam('LAST_NAME')) ?>">
                                 <input type="text"  name="first_name" placeholder="Имя *" required
                                        value="<?= htmlspecialchars($USER->GetParam('NAME')) ?>">
-                                <input type="email" name="email"      placeholder="Электропочта *" required
+                                <input type="email" name="email"      placeholder="e-mail *" required
                                        value="<?= htmlspecialchars($USER->GetParam('EMAIL')) ?>">
                                 <input type="tel"   name="phone"      placeholder="Телефон">
                                 <input type="text"  name="telegram"   placeholder="Telegram">
                             </div>
+                            <p class="form-required-note">* Обязательные поля</p>
                             <button type="submit" class="btn authorization__btn" style="margin-top:16px">Подать заявку на участие</button>
                         </form>
                     <?php else: ?>
@@ -414,7 +415,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['d5_action'])) {
                             </p>
                             <ul class="participants__list">
                                 <li class="participants__item">
-                                    Эксперты от МГТУ им. Н.Э. Баумана
+                                    Эксперты от МВТУ (МГТУ) им. Н.Э. Баумана
                                 </li>
                                 <li class="participants__item">
                                     Эксперты от Политехнического общества выпускников МВТУ (МГТУ) им. Н.Э. Баумана
@@ -607,7 +608,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['d5_action'])) {
 									Кто участники?
 								</h3>
 								<p>
-									Выпускники МГТУ им. Н.Э. Баумана с опытом. Отбираем 8–12 человек под профиль вашей компании.
+									Выпускники МВТУ (МГТУ) им. Н.Э. Баумана с опытом. Отбираем 8–12 человек под профиль вашей компании.
 								</p>
 							</div>
 							<div class="new-project__card new-project__card--faq">
@@ -655,7 +656,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['d5_action'])) {
 					<input type="text"  name="d5_last_name"  placeholder="Фамилия">
 					<input type="text"  name="d5_first_name" placeholder="Имя *" required>
 					<input type="tel"   name="d5_phone"      placeholder="Номер телефона">
-					<input type="email" name="d5_email"      placeholder="Электропочта *" required>
+					<input type="email" name="d5_email"      placeholder="e-mail *" required>
 					<input type="text"  name="d5_site"       placeholder="Сайт">
 				</div>
 			</div>
@@ -674,6 +675,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['d5_action'])) {
 					</div>
 				</div>
 			</div>
+			<p class="form-required-note">* Обязательные поля</p>
 			<button type="submit" class="btn authorization__btn">Отправить</button>
 		</form>
 		<?php endif; ?>

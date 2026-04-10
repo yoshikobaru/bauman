@@ -1,7 +1,7 @@
 <?php
 require($_SERVER["DOCUMENT_ROOT"]."/bitrix/header.php");
 $APPLICATION->SetTitle("Вступить в общество");
-$APPLICATION->SetPageProperty('description', 'Вступите в Политехническое общество выпускников МГТУ им. Н.Э. Баумана. Выберите тип членства: Базовое, Профессиональное, Партнёрское или Почётное.');
+$APPLICATION->SetPageProperty('description', 'Вступите в Политехническое общество выпускников МВТУ (МГТУ) им. Н.Э. Баумана. Выберите тип членства: Базовое, Профессиональное, Партнёрское или Почётное.');
 
 use Bitrix\Main\Loader;
 $hlOk = Loader::includeModule('highloadblock');
@@ -168,7 +168,7 @@ if ($isAuthorized) {
     <section class="membership">
         <div class="container">
             <h2 class="main-title membership__title">
-                Новые резиденты укрепляют связи внутри сообщества и способствуют его развитию
+                Новые резиденты укрепляют связи внутри общества и способствуют его развитию
             </h2>
             <div class="membership-slider swiper">
                 <div class="swiper-wrapper">
@@ -331,7 +331,7 @@ if ($isAuthorized) {
     <div id="honorary-fields">
         <p id="honorary-error" style="display:none;color:#c0392b;margin-bottom:12px;font-size:13px"></p>
         <input type="text"  id="honorary-fio"   placeholder="Фамилия Имя Отчество" style="display:block;width:100%;margin-bottom:12px;box-sizing:border-box">
-        <input type="email" id="honorary-email" placeholder="Электропочта" style="display:block;width:100%;margin-bottom:12px;box-sizing:border-box">
+        <input type="email" id="honorary-email" placeholder="e-mail" style="display:block;width:100%;margin-bottom:12px;box-sizing:border-box">
         <input type="tel"   id="honorary-phone" placeholder="Телефон" style="display:block;width:100%;margin-bottom:12px;box-sizing:border-box">
         <textarea id="honorary-msg" placeholder="Дополнительно (по желанию)" style="display:block;width:100%;height:80px;margin-bottom:20px;resize:vertical;box-sizing:border-box"></textarea>
         <button id="honorary-submit" class="btn" style="width:100%">Отправить заявку</button>

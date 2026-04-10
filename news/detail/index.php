@@ -45,7 +45,7 @@ if ($isEvent && $hlOk && defined('HL_APPLICATIONS_ID') && HL_APPLICATIONS_ID > 0
             $telegram  = trim($_POST['telegram']   ?? '');
 
             if (!$firstName || !$lastName || !$email) {
-                $regError = 'Заполните обязательные поля: Имя, Фамилия, Электропочта';
+                $regError = 'Заполните обязательные поля: Имя, Фамилия, e-mail';
             } else {
                 $data = json_encode([
                     'last_name'  => $lastName,
@@ -160,12 +160,13 @@ if (!empty($arElement['DATE_ACTIVE_FROM'])) {
                                value="<?= $USER->IsAuthorized() ? htmlspecialchars($USER->GetParam('LAST_NAME')) : '' ?>">
                         <input type="text"  name="first_name" placeholder="Имя *" required
                                value="<?= $USER->IsAuthorized() ? htmlspecialchars($USER->GetParam('NAME')) : '' ?>">
-                        <input type="email" name="email"      placeholder="Электропочта *" required
+                        <input type="email" name="email"      placeholder="e-mail *" required
                                value="<?= $USER->IsAuthorized() ? htmlspecialchars($USER->GetParam('EMAIL')) : '' ?>">
                         <input type="tel"   name="phone"      placeholder="Телефон"
                                value="">
                         <input type="text"  name="telegram"   placeholder="Telegram">
                     </div>
+                    <p class="form-required-note">* Обязательные поля</p>
                     <button type="submit" class="btn authorization__btn" style="margin-top:16px">Зарегистрироваться</button>
                 </form>
                 <?php endif; ?>
@@ -196,7 +197,7 @@ if ($isEvent):
   "url": "<?= $_schemaUrl ?>",
   "organizer": {
     "@type": "Organization",
-    "name": "Политехническое общество выпускников МГТУ им. Н.Э. Баумана",
+    "name": "Политехническое общество выпускников МВТУ (МГТУ) им. Н.Э. Баумана",
     "url": "https://bauman-polytech.ru"
   },
   "location": {
@@ -221,7 +222,7 @@ if ($isEvent):
   "url": "<?= $_schemaUrl ?>",
   "publisher": {
     "@type": "Organization",
-    "name": "Политехническое общество выпускников МГТУ им. Н.Э. Баумана",
+    "name": "Политехническое общество выпускников МВТУ (МГТУ) им. Н.Э. Баумана",
     "url": "https://bauman-polytech.ru"
   }
 }

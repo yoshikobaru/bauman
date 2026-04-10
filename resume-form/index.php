@@ -282,7 +282,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['resume_action'])) {
                                    value="<?= htmlspecialchars($_POST['vac_sname'] ?? ($USER->IsAuthorized() ? $USER->GetParam('SECOND_NAME') : '')) ?>">
                             <input type="tel"   name="vac_phone" placeholder="Номер телефона"
                                    value="<?= htmlspecialchars($_POST['vac_phone'] ?? '') ?>">
-                            <input type="email" name="vac_email" placeholder="Электропочта"
+                            <input type="email" name="vac_email" placeholder="e-mail"
                                    value="<?= htmlspecialchars($_POST['vac_email'] ?? ($USER->IsAuthorized() ? $USER->GetParam('EMAIL') : '')) ?>">
                         </div>
                     </div>
@@ -317,6 +317,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['resume_action'])) {
                         </div>
                     </div>
 
+                    <p class="form-required-note">* Обязательные поля</p>
                     <button type="submit" class="btn authorization__btn" style="margin-top:24px">Разместить вакансию</button>
                 </form>
                 <?php endif; ?>

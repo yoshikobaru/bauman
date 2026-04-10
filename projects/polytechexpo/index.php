@@ -62,7 +62,7 @@ $APPLICATION->SetTitle("PolytechExpo");
                     </div>
                     <div class="project-target__item">
                         <h3>
-                            Развитие сообщества молодых учёных политехнического общества
+                            Развитие общества молодых учёных политехнического общества
                         </h3>
                     </div>
                 </div>
@@ -254,7 +254,7 @@ $APPLICATION->SetTitle("PolytechExpo");
 	</main>
 <div class="form-finance-help" id="form-finance-help" style="display:none;max-width:1440px;">
         <h2 class="main-title">Связаться с организаторами</h2>
-		<input type="email" placeholder="Електропочта" required>
+		<input type="email" placeholder="e-mail" required>
 		<input type="password" placeholder="Пароль" required>
         <textarea name="" id="" placeholder="Письмо"></textarea>
         <div class="join__politic-question">

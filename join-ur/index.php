@@ -99,7 +99,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['d7_action'])) {
                                    value="<?= htmlspecialchars($_POST['first_name']  ?? '') ?>">
                             <input type="text"  name="second_name" placeholder="Отчество"
                                    value="<?= htmlspecialchars($_POST['second_name'] ?? '') ?>">
-                            <input type="email" name="email"       placeholder="Электропочта *" required
+                            <input type="email" name="email"       placeholder="e-mail *" required
                                    value="<?= htmlspecialchars($_POST['email'] ?? '') ?>">
                         </div>
                     </div>
@@ -146,6 +146,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['d7_action'])) {
                             </div>
                         </div>
                     </div>
+                    <p class="form-required-note">* Обязательные поля</p>
                     <button type="submit" class="btn authorization__btn">Вступить</button>
                 </form>
             </div>

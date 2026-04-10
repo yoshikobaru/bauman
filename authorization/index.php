@@ -155,7 +155,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'forgo
                 <form method="POST" action="/authorization/">
                     <input type="hidden" name="action" value="login">
                     <div class="authorization__row">
-                        <input type="email" name="email" placeholder="Электропочта"
+                        <input type="email" name="email" placeholder="e-mail"
                                value="<?= htmlspecialchars($_POST['email'] ?? '') ?>" required>
                         <input type="password" name="password" placeholder="Пароль" required>
                     </div>
@@ -173,10 +173,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'forgo
                 <form method="POST" action="/authorization/">
                     <input type="hidden" name="action" value="forgot">
                     <div class="account__chapter">
-                        <h3 class="account__subtitle">Электропочта</h3>
+                        <h3 class="account__subtitle">e-mail</h3>
                     </div>
                     <div class="authorization__row">
-                        <input type="email" name="forgot_email" placeholder="Электропочта"
+                        <input type="email" name="forgot_email" placeholder="e-mail"
                                value="<?= htmlspecialchars($_POST['forgot_email'] ?? '') ?>">
                     </div>
                     <a href="#" class="authorization__link" data-show="login">← Вернуться к входу</a>

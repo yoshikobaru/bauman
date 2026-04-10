@@ -228,7 +228,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['reg_ur_action'])) {
             <div class="account__personal">
                 <div class="account__chapter"><h3 class="account__subtitle">Личные данные</h3></div>
                 <div class="account__personal-list account__grid">
-                    <input type="email"    name="fiz_email"       placeholder="Электропочта *" required
+                    <input type="email"    name="fiz_email"       placeholder="e-mail *" required
                            value="<?= htmlspecialchars($_POST['fiz_email'] ?? '') ?>">
                     <input type="password" name="fiz_password"    placeholder="Пароль (мин. 6 символов) *" required>
                     <input type="text"     name="fiz_last_name"   placeholder="Фамилия *" required
@@ -244,7 +244,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['reg_ur_action'])) {
 
             <!-- Выпускник? -->
             <div class="account__graduate" style="margin-top:24px">
-                <div class="account__chapter"><h3 class="account__subtitle">Выпускник МГТУ?</h3></div>
+                <div class="account__chapter"><h3 class="account__subtitle">Выпускник МВТУ (МГТУ) им. Н.Э. Баумана?</h3></div>
                 <div class="account__graduate-choice">
                     <label class="account__graduate-item">
                         <input type="radio" name="fiz_is_graduate" value="yes" id="fiz-grad-yes"
@@ -265,7 +265,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['reg_ur_action'])) {
             <div id="fiz-dont-block" class="join__dont"
                  style="display:<?= ($_POST['fiz_is_graduate'] ?? 'no') !== 'yes' ? 'block' : 'none' ?>;background:#fff8e1;border-radius:12px;padding:20px 24px;margin:16px 0;border-left:4px solid #f59e0b">
                 <p style="font-size:15px;color:#555;line-height:1.6">
-                    Членство в Политехническом обществе доступно выпускникам МГТУ им. Н.Э. Баумана.<br>
+                    Членство в Политехническом обществе доступно выпускникам МВТУ (МГТУ) им. Н.Э. Баумана.<br>
                     Если вы хотите сотрудничать в другом формате — свяжитесь с нами:
                     <a href="mailto:info@bauman-polytech.ru" style="font-weight:600">info@bauman-polytech.ru</a>
                 </p>
@@ -429,7 +429,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['reg_ur_action'])) {
                            value="<?= htmlspecialchars($_POST['ur_first_name'] ?? '') ?>">
                     <input type="text"     name="ur_second_name" placeholder="Отчество"
                            value="<?= htmlspecialchars($_POST['ur_second_name'] ?? '') ?>">
-                    <input type="email"    name="ur_email"       placeholder="Электропочта *" required
+                    <input type="email"    name="ur_email"       placeholder="e-mail *" required
                            value="<?= htmlspecialchars($_POST['ur_email'] ?? '') ?>">
                     <input type="password" name="ur_password"    placeholder="Пароль (мин. 6 символов) *" required>
                 </div>

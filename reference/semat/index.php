@@ -25,7 +25,7 @@ $APPLICATION->SetTitle("Референс-визит СЕМАТ");
                                 Авиастроение, машиностроение, медицина, приборка, робототехника, электроника — если вы внутри этих процессов, вам точно будет о чём поговорить.
                             </p>
                             <p class="banner-other__text main-text">
-                                Референс-визит <strong>только для выпускников МГТУ им. Н.Э. Баумана.</strong> <br> И да: совсем скоро такие встречи будут доступны только членам Политехнического общества выпускников.
+                                Референс-визит <strong>только для выпускников МВТУ (МГТУ) им. Н.Э. Баумана.</strong> <br> И да: совсем скоро такие встречи будут доступны только членам Политехнического общества выпускников.
                             </p>
                             <p class="banner-other__text main-text">
                                Регистрация до 30 января, количество мест ограниченно.
@@ -131,7 +131,7 @@ $APPLICATION->SetTitle("Референс-визит СЕМАТ");
                             </p>
                             <ul class="participants__list">
                                 <li class="participants__item">
-                                    Эксперты от МГТУ им. Н.Э. Баумана
+                                    Эксперты от МВТУ (МГТУ) им. Н.Э. Баумана
                                 </li>
                                 <li class="participants__item">
                                     Эксперты от Политехнического общества выпускников МВТУ (МГТУ) им. Н.Э. Баумана
@@ -228,7 +228,7 @@ $APPLICATION->SetTitle("Референс-визит СЕМАТ");
 				<div class="account__personal-list join__grid join__grid--cemat">
 					<input type="text" placeholder=" Имя">
 					<input type="text" placeholder="Фамилия">
-					<input type="email" placeholder="Електропочта">
+					<input type="email" placeholder="e-mail">
 					<input type="tel" placeholder="Номер телефона">
 					<input type="text" placeholder="Telegram">
 					

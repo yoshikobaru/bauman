@@ -50,7 +50,7 @@
 	<!-- Форма входа -->
 	<div class="form-login" id="form-login" style="display:none;max-width:500px;">
 		<p id="form-login-error" style="display:none;color:#c0392b;margin-bottom:12px"></p>
-		<input type="email"    id="modal-email"    placeholder="Электропочта" required>
+		<input type="email"    id="modal-email"    placeholder="e-mail" required>
 		<input type="password" id="modal-password" placeholder="Пароль" required>
 		<div class="form-login__row">
 			<label class="checkbox-container">
@@ -96,7 +96,7 @@
 		<div class="form-membership__left" id="modal-membership-left">
 			<img src="<?=SITE_TEMPLATE_PATH?>/assets/img/form-membership-basic.png" alt="">
 			<p class="form-membership__text desk-block">
-				Нажимая кнопку «Оплатить членский взнос» вы даете свое согласие на <a href="<?= defined('DOC_POLITIKA_URL') ? DOC_POLITIKA_URL : '#' ?>" target="_blank">обработку персональных данных</a>, а также с тем, что вам исполнилось 18 лет, вы студент или выпускник МГТУ им. Н.Э. Баумана, вы разделяете цели Политехнического общества, признаёте его <a href="<?= defined('DOC_USTAV_URL') ? DOC_USTAV_URL : '#' ?>" target="_blank">Устав</a> и подтверждаете свое добровольное согласие на вступление в «МГТУ-Политех»
+				Нажимая кнопку «Оплатить членский взнос» вы даете свое согласие на <a href="<?= defined('DOC_POLITIKA_URL') ? DOC_POLITIKA_URL : '#' ?>" target="_blank">обработку персональных данных</a>, а также с тем, что вам исполнилось 18 лет, вы студент или выпускник МВТУ (МГТУ) им. Н.Э. Баумана, вы разделяете цели Политехнического общества, признаёте его <a href="<?= defined('DOC_USTAV_URL') ? DOC_USTAV_URL : '#' ?>" target="_blank">Устав</a> и подтверждаете свое добровольное согласие на вступление в «МГТУ-Политех»
 			</p>
 		</div>
 		<div class="form-membership__form" id="modal-membership-form">
@@ -106,15 +106,15 @@
 			<input type="text"   id="modal-membership-fname" placeholder="Имя" required>
 			<input type="text"   id="modal-membership-sname" placeholder="Отчество" required>
 			<input type="number" id="modal-membership-phone" placeholder="Номер телефона" required>
-			<input type="email"  id="modal-membership-email" placeholder="Електропочта" required>
+			<input type="email"  id="modal-membership-email" placeholder="e-mail" required>
 			<select id="modal-membership-dept">
 				<option value="">Кафедра</option>
 			</select>
-			<input class="form-membership__year" type="text" id="modal-membership-year" placeholder="Год окончания МГТУ им. Баумана" required>
+			<input class="form-membership__year" type="text" id="modal-membership-year" placeholder="Год окончания МВТУ (МГТУ) им. Н.Э. Баумана" required>
 			<button class="btn form-membership__send" id="modal-membership-submit">Оплатить членский взнос</button>
 		</div>
 		<p class="form-membership__text desk-none">
-			Нажимая кнопку «Оплатить членский взнос» вы даете свое согласие на <a href="<?= defined('DOC_POLITIKA_URL') ? DOC_POLITIKA_URL : '#' ?>" target="_blank">обработку персональных данных</a>, а также с тем, что вам исполнилось 18 лет, вы студент или выпускник МГТУ им. Н.Э. Баумана, вы разделяете цели Политехнического общества, признаёте его <a href="<?= defined('DOC_USTAV_URL') ? DOC_USTAV_URL : '#' ?>" target="_blank">Устав</a> и подтверждаете свое добровольное согласие на вступление в «МГТУ-Политех»
+			Нажимая кнопку «Оплатить членский взнос» вы даете свое согласие на <a href="<?= defined('DOC_POLITIKA_URL') ? DOC_POLITIKA_URL : '#' ?>" target="_blank">обработку персональных данных</a>, а также с тем, что вам исполнилось 18 лет, вы студент или выпускник МВТУ (МГТУ) им. Н.Э. Баумана, вы разделяете цели Политехнического общества, признаёте его <a href="<?= defined('DOC_USTAV_URL') ? DOC_USTAV_URL : '#' ?>" target="_blank">Устав</a> и подтверждаете свое добровольное согласие на вступление в «МГТУ-Политех»
 		</p>
 	</div>
 
@@ -126,7 +126,7 @@
 				<p id="ffh-error" style="display:none;color:#c0392b;margin-bottom:12px;font-size:13px"></p>
 				<div style="display:flex;flex-direction:column;gap:12px;margin-top:16px">
 					<input type="text"  id="ffh-name"    placeholder="Имя *">
-					<input type="email" id="ffh-email"   placeholder="Электропочта *">
+					<input type="email" id="ffh-email"   placeholder="e-mail *">
 					<input type="tel"   id="ffh-phone"   placeholder="Телефон">
 					<textarea id="ffh-message" placeholder="Сообщение" style="min-height:100px;padding:12px;border:1px solid #ccc;border-radius:4px;resize:vertical"></textarea>
 					<div class="join__politic-question">

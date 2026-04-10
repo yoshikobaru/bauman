@@ -1,7 +1,7 @@
 <?php
 require($_SERVER["DOCUMENT_ROOT"]."/bitrix/header.php");
 $APPLICATION->SetTitle("Политехническое Общество Выпускников");
-$APPLICATION->SetPageProperty('description', 'Политехническое общество выпускников МГТУ им. Н.Э. Баумана — объединение выпускников, партнёров и друзей университета. Проекты, события, карьера, референс-визиты.');
+$APPLICATION->SetPageProperty('description', 'Политехническое общество выпускников МВТУ (МГТУ) им. Н.Э. Баумана — объединение выпускников, партнёров и друзей университета. Проекты, события, карьера, референс-визиты.');
 ?>
 
 	<main>
@@ -35,7 +35,7 @@ $APPLICATION->SetPageProperty('description', 'Политехническое о�
 							Об обществе выпускников
 						</h2>
 						<p class="society__text main-text">
-							Мы помогаем выпускникам расти и строить карьеру. Даём площадку для общения и обмена опытом. Создаём сообщество, частью которого&nbsp;престижно быть.
+							Мы помогаем выпускникам расти и строить карьеру. Даём площадку для общения и обмена опытом. Создаём Общество, частью которого&nbsp;престижно быть.
 						</p>
 					</div>
 					<div class="society__slider swiper">
@@ -116,7 +116,7 @@ $APPLICATION->SetPageProperty('description', 'Политехническое о�
 							Миссия
 						</h3>
 						<p>
-							Поддерживать связь выпускников МГТУ им. Н.Э. Баумана, содействовать развитию технического образования, науки и промышленности Российской федерации.
+							Поддерживать связь выпускников МВТУ (МГТУ) им. Н.Э. Баумана, содействовать развитию технического образования, науки и промышленности Российской федерации.
 						</p>
 					</div>
 					<div class="opportunities__target">
@@ -172,7 +172,7 @@ if (defined('IBLOCK_BOARD_ID') && IBLOCK_BOARD_ID > 0 && \Bitrix\Main\Loader::in
 			<div class="container">
 				<div class="boards__wrapper">
 					<h2 class="main-title">
-						Члены правления Политехнического общества
+						Члены Совета Политехнического общества
 					</h2>
 				<div class="boards__list">
 <?php foreach ($_boardItems as $boardItem): ?>
@@ -299,7 +299,7 @@ foreach ($_staticProjects as $sp):
 							</div>
 							<div class="history__item">
 								<h3>2024</h3>
-								<p>Перезапуск <br> общества</p>
+								<p>Обновление <br> общества</p>
 							</div>
 						</div>
 					</div>
@@ -398,23 +398,23 @@ foreach ($_staticProjects as $sp):
 				<div class="new-project__slider swiper">
 					<div class="swiper-wrapper">
 						<div class="swiper-slide new-project__item">
-							<div class="new-project__card">
+							<a href="/resume-form/" class="new-project__card" style="text-decoration:none;color:inherit;display:block;">
 								<h3>
 									Карьерная платформа
 								</h3>
 								<p>
 									Встречи с представителями индустрии
 								</p>
-							</div>
-							<div class="new-project__card">
+							</a>
+							<a href="/competencies/" class="new-project__card" style="text-decoration:none;color:inherit;display:block;">
 								<h3>
 									Витрина компетенций
 								</h3>
 								<p>
 									Практика на основе исследований
 								</p>
-							</div>
-						<a href="/about/" class="new-project__card new-project__card--different" style="text-decoration:none;color:inherit;display:block;">
+							</a>
+						<a href="/about/" class="new-project__card new-project__card--different" style="text-decoration:none;color:#fff;display:block;">
 							<img src="<?=SITE_TEMPLATE_PATH?>/assets/img/new-project-bg.png" alt="">
 							<h3>
 								История и крепкое сообщество
@@ -458,10 +458,10 @@ foreach ($_staticProjects as $sp):
 									Участие в активностях, выставках и мероприятиях Политехнического общества;
 								</li>
 								<li class="membership-slider__item">
-									Доступ в электронную библиотеку МГТУ (в разработке);
+									Доступ в электронную библиотеку МВТУ (МГТУ) им. Н.Э. Баумана (в разработке);
 								</li>
 								<li class="membership-slider__item">
-									Доступ к витрине компетенций партнёров Политехнического общества, кафедр, студенческих конструкторских бюро и научно-образовательных центров МГТУ.
+									Доступ к витрине компетенций партнёров Политехнического общества, кафедр, студенческих конструкторских бюро и научно-образовательных центров МВТУ (МГТУ) им. Н.Э. Баумана.
 								</li>
 							</ul>
 						<a href="/join/" class="membership-slider__join btn btn-empty">Вступить</a>
@@ -536,6 +536,77 @@ foreach ($_staticProjects as $sp):
 		<!-- /.container -->
 	</section>
 	<!-- /.membership -->
+
+	<!-- partner -->
+	<section class="partner">
+		<div class="container">
+			<div class="partner__wrapper">
+				<div class="partner__info">
+					<h2 class="main-title partner__title">Индустриальное партнерство</h2>
+					<p class="main-text partner__text">Для юридических лиц</p>
+					<button class="btn partner__btn desk-block" onclick="showPartnerFormMain()">Стать партнером</button>
+				</div>
+				<div class="partner__discription">
+					<ul class="partner__list">
+						<li class="partner__item">Все преимущества базового и бизнес членства</li>
+						<li class="partner__item">Возможность состоять в индустриальном клубе Политехнического общества</li>
+						<li class="partner__item">Доступ к витрине компетенций, возможность разместить заказ/взять задачу</li>
+						<li class="partner__item">Рекламные возможности площадок и мероприятий Политехнического общества</li>
+					</ul>
+					<p class="partner__discription-text">Стоимость обсуждается индивидуально.</p>
+				</div>
+				<button class="btn partner__btn desk-none" onclick="showPartnerFormMain()">Стать партнером</button>
+			</div>
+		</div>
+	</section>
+	<!-- /.partner -->
+
+	<!-- partner form on main -->
+	<section id="join-ur-block-main" style="display:none">
+		<div class="container" style="padding-top:48px;padding-bottom:48px">
+			<div class="join__wrapper">
+				<h2 class="account__title main-title">Индустриальное партнёрство</h2>
+				<p style="margin-bottom:24px;color:#666">Для компаний, НИИ и организаций. После отправки заявки мы свяжемся с вами в течение 5 рабочих дней.</p>
+				<form method="POST" action="/join/#join-ur-block">
+					<input type="hidden" name="d7_action" value="1">
+					<div class="account__personal">
+						<div class="account__chapter"><h3 class="account__subtitle">Данные компании</h3></div>
+						<div class="account__personal-list account__grid">
+							<input type="text" name="d7_company" placeholder="Компания *" required>
+							<input type="url" name="d7_site" placeholder="Сайт компании">
+						</div>
+					</div>
+					<div class="account__personal" style="margin-top:24px">
+						<div class="account__chapter"><h3 class="account__subtitle">Контакты представителя</h3></div>
+						<div class="account__personal-list account__grid">
+							<input type="text" name="d7_contact" placeholder="ФИО представителя *" required>
+							<input type="email" name="d7_email" placeholder="e-mail *" required>
+							<input type="tel" name="d7_phone" placeholder="Телефон">
+							<input type="number" name="d7_count" placeholder="Планируемое кол-во представителей *" min="1" required>
+						</div>
+					</div>
+					<div class="join__politic" style="margin-top:24px">
+						<div class="join__politic-question">
+							<p class="join__politic-link">Согласен с <a href="<?= defined('DOC_POLITIKA_URL') ? DOC_POLITIKA_URL : '#' ?>" target="_blank">политикой обработки ПДн</a></p>
+							<div class="account__graduate-choice">
+								<label class="account__graduate-item">
+									<input type="radio" name="d7_agree_pd" value="yes" class="account__graduate-input">
+									<span class="account__graduate-box"></span>Да
+								</label>
+								<label class="account__graduate-item">
+									<input type="radio" name="d7_agree_pd" value="no" class="account__graduate-input">
+									<span class="account__graduate-box"></span>Нет
+								</label>
+							</div>
+						</div>
+					</div>
+					<p class="form-required-note">* Обязательные поля</p>
+					<button type="submit" class="btn authorization__btn" style="margin-top:24px">Отправить заявку на партнёрство</button>
+				</form>
+			</div>
+		</div>
+	</section>
+	<!-- /partner form on main -->
 		<!-- news -->
 		<section class="news">
 			<div class="container">
@@ -590,14 +661,24 @@ endif;
 		<!-- /.news -->
 	</main>
 
+<script>
+function showPartnerFormMain() {
+	var block = document.getElementById('join-ur-block-main');
+	if (block) {
+		block.style.display = '';
+		block.scrollIntoView({ behavior: 'smooth', block: 'start' });
+	}
+}
+</script>
+
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
   "@type": "Organization",
-  "name": "Политехническое общество выпускников МГТУ им. Н.Э. Баумана",
+  "name": "Политехническое общество выпускников МВТУ (МГТУ) им. Н.Э. Баумана",
   "url": "https://bauman-polytech.ru",
   "logo": "https://bauman-polytech.ru<?= SITE_TEMPLATE_PATH ?>/assets/img/logo.svg",
-  "description": "Политехническое общество выпускников МГТУ им. Н.Э. Баумана — объединение выпускников, партнёров и друзей университета.",
+  "description": "Политехническое общество выпускников МВТУ (МГТУ) им. Н.Э. Баумана — объединение выпускников, партнёров и друзей университета.",
   "sameAs": [],
   "contactPoint": {
     "@type": "ContactPoint",
@@ -613,7 +694,7 @@ endif;
   "foundingDate": "2020",
   "parentOrganization": {
     "@type": "EducationalOrganization",
-    "name": "МГТУ им. Н.Э. Баумана",
+    "name": "МВТУ (МГТУ) им. Н.Э. Баумана",
     "url": "https://bmstu.ru"
   }
 }

@@ -25,7 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['d2_action'])) {
     $agreePd   = ($_POST['agree_pd']       ?? '') === 'yes';
 
     if (!$fn || !$email) {
-        $d2Error = 'Заполните обязательные поля: Имя, Электропочта.';
+        $d2Error = 'Заполните обязательные поля: Имя, e-mail.';
     } elseif (!$agreeDoc || !$agreePd) {
         $d2Error = 'Необходимо согласие с Уставом и политикой ПДн.';
     } else {
@@ -275,7 +275,7 @@ $prefill = [
                                                    value="<?= htmlspecialchars($prefill['last_name']) ?>">
                                             <input type="text"  name="first_name" placeholder="Имя *" required
                                                    value="<?= htmlspecialchars($prefill['first_name']) ?>">
-                                            <input type="email" name="email"      placeholder="Электропочта *" required
+                                            <input type="email" name="email"      placeholder="e-mail *" required
                                                    value="<?= htmlspecialchars($prefill['email']) ?>">
                                             <input type="tel"   name="phone"      placeholder="Номер телефона">
                                         </div>
@@ -306,7 +306,7 @@ $prefill = [
                                         <div class="account__personal-list account__personal-list--project">
                                             <input type="text"  name="last_name"  placeholder="Фамилия">
                                             <input type="text"  name="first_name" placeholder="Имя *" required>
-                                            <input type="email" name="email"      placeholder="Электропочта *" required>
+                                            <input type="email" name="email"      placeholder="e-mail *" required>
                                             <input type="tel"   name="phone"      placeholder="Номер телефона">
                                             <input type="text"  name="company"    placeholder="Компания">
                                             <input type="text"  name="site"       placeholder="Сайт">

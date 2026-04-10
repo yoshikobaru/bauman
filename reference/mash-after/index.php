@@ -87,7 +87,7 @@ $APPLICATION->SetTitle("Референс-визит в МАШ ЮНИТ — ит�
 				<div class="account__personal-list join__grid join__grid--cemat">
 					<input type="text" placeholder=" Имя">
 					<input type="text" placeholder="Фамилия">
-					<input type="email" placeholder="Електропочта">
+					<input type="email" placeholder="e-mail">
 					<input type="tel" placeholder="Номер телефона">
 					<input type="text" placeholder="Telegram">
 					

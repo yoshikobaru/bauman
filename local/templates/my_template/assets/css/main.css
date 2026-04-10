@@ -919,6 +919,25 @@ strong {
     grid-row: -1 / 1;
 }
 
+@media(max-width: 1176px) {
+    .initiative__wrapper {
+        gap: 16px;
+    }
+    .initiative__card,
+    .initiative__card:nth-child(4), .initiative__card:nth-child(5) {
+        max-width: none;
+        width: 100%;
+        align-items: center;
+        justify-content: flex-start;
+    }
+    .initiative__card h3 {
+        font-size: 20px;
+    }
+    .initiative__image {
+        width: 100%;
+    }
+}
+
 @media(max-width: 1530px) {
     .initiative__card:nth-child(4), .initiative__card:nth-child(5) {
         max-width: 48%;
@@ -4267,6 +4286,12 @@ select,
     color: #CE2029;
 }
 
+.form-required-note {
+    margin: 0 0 10px;
+    font-size: 14px;
+    color: #666;
+}
+
 .join__grid {
     display: grid;
     grid-template-columns: repeat(6, 1fr);
@@ -4830,7 +4855,7 @@ select,
     }
     .btn:hover,
     .visits__btn--help:hover {
-        background-color: transparent;
+        background-color: #fff;
         border-color: #CE2029;
         color: #CE2029;
         
@@ -4840,8 +4865,9 @@ select,
     .resume-select__btn:hover,
     .btn-transparent:hover,
     .project-help__btn:hover {
-        background-color: var(--red-color);
-        color: #fff;
+        background-color: #fff;
+        color: #CE2029;
+        border-color: #CE2029;
     }
     
     .header-wrapper__item a:hover:after {
