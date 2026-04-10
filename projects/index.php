@@ -6,6 +6,22 @@ $APPLICATION->SetPageProperty('description', 'Проекты Политехни�
 use Bitrix\Main\Loader;
 $iblockOk = Loader::includeModule('iblock');
 
+$formatRuProjectDate = static function (?string $rawDate): string {
+    if (!$rawDate) {
+        return '';
+    }
+    $ts = strtotime($rawDate);
+    if (!$ts) {
+        return '';
+    }
+    $months = [
+        1 => 'января', 2 => 'февраля', 3 => 'марта', 4 => 'апреля',
+        5 => 'мая', 6 => 'июня', 7 => 'июля', 8 => 'августа',
+        9 => 'сентября', 10 => 'октября', 11 => 'ноября', 12 => 'декабря',
+    ];
+    return date('d', $ts) . ' ' . $months[(int)date('n', $ts)] . ' ' . date('Y', $ts);
+};
+
 // ?status=active | completed | (all by default)
 $statusFilter = $_GET['status'] ?? 'all';
 if (!in_array($statusFilter, ['active', 'completed', 'all'])) {
@@ -93,7 +109,7 @@ $_staticActive = [
                     <div class="visits__content">
                         <?php if (!empty($row['DATE_ACTIVE_FROM'])): ?>
                         <div class="visits__date"><div class="visits__date-current">
-                            <p><span>Дата:</span> <?= date('d F Y', strtotime($row['DATE_ACTIVE_FROM'])) ?></p>
+                            <p><span>Дата:</span> <?= htmlspecialchars($formatRuProjectDate($row['DATE_ACTIVE_FROM'])) ?></p>
                         </div></div>
                         <?php endif; ?>
                         <h3 class="visits__subtitle"><?= htmlspecialchars($row['NAME']) ?></h3>

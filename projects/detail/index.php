@@ -4,6 +4,22 @@ require($_SERVER["DOCUMENT_ROOT"]."/bitrix/header.php");
 use Bitrix\Main\Loader;
 $iblockOk = Loader::includeModule('iblock');
 
+$formatRuProjectDate = static function (?string $rawDate): string {
+    if (!$rawDate) {
+        return '';
+    }
+    $ts = strtotime($rawDate);
+    if (!$ts) {
+        return '';
+    }
+    $months = [
+        1 => 'января', 2 => 'февраля', 3 => 'марта', 4 => 'апреля',
+        5 => 'мая', 6 => 'июня', 7 => 'июля', 8 => 'августа',
+        9 => 'сентября', 10 => 'октября', 11 => 'ноября', 12 => 'декабря',
+    ];
+    return date('d', $ts) . ' ' . $months[(int)date('n', $ts)] . ' ' . date('Y', $ts);
+};
+
 $elementId = (int)($_GET['id'] ?? 0);
 $elementCode = trim((string)($_REQUEST['ELEMENT_CODE'] ?? $_GET['code'] ?? ''));
 $arElement = [];
@@ -65,12 +81,13 @@ if (!empty($arElement['DETAIL_PICTURE'])) {
                             'архивный' => 'Архивный',
                         ];
                         $projectStatusView = $statusMap[$projectStatusNorm] ?? $projectStatusRaw;
+                        $projectDateView = $formatRuProjectDate($arElement['DATE_ACTIVE_FROM'] ?? '');
                         if (!empty($projectStatusView)):
                         ?>
                         <div class="banner-other__date">
                             <p class="banner-other__status"><?= htmlspecialchars($projectStatusView) ?></p>
-                            <?php if (!empty($arElement['DATE_ACTIVE_FROM'])): ?>
-                            <p class="banner-other__time"><span>Запущен</span> <?= date('d F Y', strtotime($arElement['DATE_ACTIVE_FROM'])) ?></p>
+                            <?php if ($projectDateView !== ''): ?>
+                            <p class="banner-other__time"><span>Дата:</span> <?= htmlspecialchars($projectDateView) ?></p>
                             <?php endif; ?>
                         </div>
                         <?php endif; ?>
@@ -106,17 +123,43 @@ if (!empty($arElement['DETAIL_PICTURE'])) {
     </section>
     <?php endif; ?>
 
-    <?= $arElement['DETAIL_TEXT'] ?>
+    <?php
+    $detailHtml = (string)($arElement['DETAIL_TEXT'] ?? '');
+    if ($detailHtml !== '') {
+        // Legacy static markup may contain relative links like support.html.
+        $detailHtml = preg_replace(
+            '#href=(["\'])(?:https?://[^"\']+)?(?:/projects/[^/"\']+)?/support\.html\1#iu',
+            'href="/support/"',
+            $detailHtml
+        );
+        $detailHtml = str_ireplace(
+            ['href="support.html"', "href='support.html'"],
+            ['href="/support/"', "href='/support/'"],
+            $detailHtml
+        );
+
+        // "Проекту необходима финансовая поддержка" must be rendered by template, not from iblock HTML.
+        $detailHtml = preg_replace(
+            '#<section[^>]*class=(["\'])[^"\']*\bproject-help\b[^"\']*\1[^>]*>.*?</section>#isu',
+            '',
+            $detailHtml
+        );
+    }
+    ?>
+    <?= $detailHtml ?>
+
+    <section class="project-help">
+        <div class="container">
+            <h2 class="main-title project-help__title">Проекту необходима финансовая поддержка</h2>
+            <p class="project-help__text main-text">
+                Мы рады любой помощи вне зависимости от её размера. Для компаний желающими стать спонсорами данного мероприятия - готовы направить спонсорский пакет.
+            </p>
+            <a href="/support/?project=<?= urlencode($arElement['NAME']) ?>" class="btn project-help__btn">Поддержать проект</a>
+        </div>
+    </section>
 
     <section class="project-programm">
         <div class="container">
-            <?php if (!empty($arProps['PROJECT_LINK']['VALUE'])): ?>
-            <p style="margin-top:24px">
-                <a href="<?= htmlspecialchars($arProps['PROJECT_LINK']['VALUE']) ?>" target="_blank" class="btn">
-                    Подробнее о проекте
-                </a>
-            </p>
-            <?php endif; ?>
             <p style="margin-top:24px">
                 <?php
                 $projectStatus = $projectStatusNorm;
@@ -127,7 +170,17 @@ if (!empty($arElement['DETAIL_PICTURE'])) {
                     Поддержать проект
                 </a>
                 <?php endif; ?>
-                <a href="/projects/" class="btn btn-transparent" style="margin-left:12px">← К списку проектов</a>
+                <?php
+                $secondBtnHref = '/projects/';
+                $secondBtnText = 'Вернуться к проектам';
+                if (!empty($arProps['PROJECT_LINK']['VALUE'])) {
+                    $secondBtnHref = (string)$arProps['PROJECT_LINK']['VALUE'];
+                    $secondBtnText = 'Подробнее о проекте';
+                }
+                ?>
+                <a href="<?= htmlspecialchars($secondBtnHref) ?>" class="btn btn-transparent"<?= $secondBtnText === 'Подробнее о проекте' ? ' target="_blank"' : '' ?> style="margin-left:12px">
+                    <?= htmlspecialchars($secondBtnText) ?>
+                </a>
             </p>
         </div>
     </section>
