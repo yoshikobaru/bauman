@@ -84,11 +84,12 @@ if (defined('IBLOCK_REFERENCE_ID') && IBLOCK_REFERENCE_ID > 0) {
     if (!$arElement) LocalRedirect('/reference/');
 
     $dbProps = CIBlockElement::GetProperty(
-        IBLOCK_REFERENCE_ID, $arElement['ID'], 'sort', 'asc',
-        ['CODE' => ['REF_STATUS', 'REF_DATE', 'REF_LOCATION', 'REF_DURATION']]
+        IBLOCK_REFERENCE_ID, $arElement['ID'], 'sort', 'asc', []
     );
     $props = [];
+    $detailCodes = ['REF_STATUS', 'REF_DATE', 'REF_LOCATION', 'REF_DURATION'];
     while ($p = $dbProps->Fetch()) {
+        if (!in_array($p['CODE'], $detailCodes)) continue;
         $props[$p['CODE']] = $p['VALUE_ENUM'] ?: $p['VALUE'];
     }
 } else {

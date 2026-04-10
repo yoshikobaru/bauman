@@ -127,11 +127,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['d5_action'])) {
             );
             while ($el = $dbRef->GetNext()) {
                 $dbP = CIBlockElement::GetProperty(
-                    IBLOCK_REFERENCE_ID, $el['ID'], 'sort', 'asc',
-                    ['CODE' => ['REF_STATUS', 'REF_DATE', 'REF_LOCATION', 'REF_DURATION', 'REF_REGISTER_URL']]
+                    IBLOCK_REFERENCE_ID, $el['ID'], 'sort', 'asc', []
                 );
                 $elProps = []; $statusXml = '';
+                $refCodes = ['REF_STATUS', 'REF_DATE', 'REF_LOCATION', 'REF_DURATION', 'REF_REGISTER_URL'];
                 while ($p = $dbP->Fetch()) {
+                    if (!in_array($p['CODE'], $refCodes)) continue;
                     $elProps[$p['CODE']] = $p['VALUE_ENUM'] ?: $p['VALUE'];
                     if ($p['CODE'] === 'REF_STATUS') $statusXml = $p['XML_ID'] ?? '';
                 }
