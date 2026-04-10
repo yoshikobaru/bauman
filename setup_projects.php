@@ -76,19 +76,30 @@ if (!$dbPropUrl->Fetch()) {
 
 // Свойство PROJECT_SUBTITLE (подзаголовок для детальной страницы)
 $dbPropSubtitle = CIBlockProperty::GetList([], ['IBLOCK_ID' => $projId, 'CODE' => 'PROJECT_SUBTITLE']);
-if (!$dbPropSubtitle->Fetch()) {
+if (!($subtitleProp = $dbPropSubtitle->Fetch())) {
     $ibProp = new CIBlockProperty();
     $ibProp->Add([
         'IBLOCK_ID'     => $projId,
         'CODE'          => 'PROJECT_SUBTITLE',
         'NAME'          => 'Подзаголовок проекта (детальная)',
         'PROPERTY_TYPE' => 'S',
+        'ROW_COUNT'     => 6,
+        'COL_COUNT'     => 80,
         'SORT'          => 650,
         'ACTIVE'        => 'Y',
     ]);
     echo "✓ Свойство PROJECT_SUBTITLE создано.\n";
 } else {
-    echo "• Свойство PROJECT_SUBTITLE уже существует.\n";
+    $ibProp = new CIBlockProperty();
+    $ibProp->Update((int)$subtitleProp['ID'], [
+        'NAME'          => 'Подзаголовок проекта (детальная)',
+        'PROPERTY_TYPE' => 'S',
+        'ROW_COUNT'     => 6,
+        'COL_COUNT'     => 80,
+        'SORT'          => 650,
+        'ACTIVE'        => 'Y',
+    ]);
+    echo "• Свойство PROJECT_SUBTITLE уже существует (обновлены размеры поля).\n";
 }
 
 // Получить enum ID для 'active'

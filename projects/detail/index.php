@@ -84,7 +84,7 @@ if (!empty($arElement['DETAIL_PICTURE'])) {
                         }
                         ?>
                         <?php if ($projectSubtitle !== ''): ?>
-                        <p class="banner-other__text main-text" style="margin-top:16px"><?= htmlspecialchars($projectSubtitle) ?></p>
+                        <p class="banner-other__text main-text" style="margin-top:16px;white-space:pre-line;"><?= nl2br(htmlspecialchars($projectSubtitle)) ?></p>
                         <?php endif; ?>
                     </div>
                     <img src="<?=SITE_TEMPLATE_PATH?>/assets/img/reference-page/banner-other-pattern.png" alt="" class="banner-other__pattern">
