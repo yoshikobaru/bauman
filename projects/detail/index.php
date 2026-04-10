@@ -50,11 +50,25 @@ if (!empty($arElement['DETAIL_PICTURE'])) {
                 <div class="banner-other__content">
                     <div class="banner-other__info banner-other__info--current">
                         <?php
-                        $projectStatusRaw = $arProps['PROJECT_STATUS']['VALUE_ENUM'] ?? $arProps['PROJECT_STATUS']['VALUE'] ?? '';
-                        if (!empty($projectStatusRaw)):
+                        $projectStatusRaw = (string)($arProps['PROJECT_STATUS']['VALUE_ENUM'] ?? $arProps['PROJECT_STATUS']['VALUE'] ?? '');
+                        $projectStatusNorm = mb_strtolower(trim($projectStatusRaw));
+                        $statusMap = [
+                            'active' => 'Активный',
+                            'активный' => 'Активный',
+                            'в работе' => 'Активный',
+                            'активен' => 'Активный',
+                            'completed' => 'Завершённый',
+                            'завершённый' => 'Завершённый',
+                            'завершенный' => 'Завершённый',
+                            'archived' => 'Архивный',
+                            'archive' => 'Архивный',
+                            'архивный' => 'Архивный',
+                        ];
+                        $projectStatusView = $statusMap[$projectStatusNorm] ?? $projectStatusRaw;
+                        if (!empty($projectStatusView)):
                         ?>
                         <div class="banner-other__date">
-                            <p class="banner-other__status"><?= htmlspecialchars($projectStatusRaw) ?></p>
+                            <p class="banner-other__status"><?= htmlspecialchars($projectStatusView) ?></p>
                             <?php if (!empty($arElement['DATE_ACTIVE_FROM'])): ?>
                             <p class="banner-other__time"><span>Запущен</span> <?= date('d F Y', strtotime($arElement['DATE_ACTIVE_FROM'])) ?></p>
                             <?php endif; ?>
@@ -63,8 +77,14 @@ if (!empty($arElement['DETAIL_PICTURE'])) {
                         <h1 class="banner-other__title main-title">
                             <?= $arElement ? htmlspecialchars($arElement['NAME']) : 'Проект не найден' ?>
                         </h1>
-                        <?php if (!empty($arElement['PREVIEW_TEXT'])): ?>
-                        <p style="margin-top:16px"><?= htmlspecialchars($arElement['PREVIEW_TEXT']) ?></p>
+                        <?php
+                        $projectSubtitle = trim((string)($arProps['PROJECT_SUBTITLE']['VALUE'] ?? ''));
+                        if ($projectSubtitle === '' && !empty($arElement['PREVIEW_TEXT'])) {
+                            $projectSubtitle = trim((string)$arElement['PREVIEW_TEXT']);
+                        }
+                        ?>
+                        <?php if ($projectSubtitle !== ''): ?>
+                        <p style="margin-top:16px"><?= htmlspecialchars($projectSubtitle) ?></p>
                         <?php endif; ?>
                     </div>
                     <img src="<?=SITE_TEMPLATE_PATH?>/assets/img/reference-page/banner-other-pattern.png" alt="" class="banner-other__pattern">
@@ -78,37 +98,31 @@ if (!empty($arElement['DETAIL_PICTURE'])) {
     <!-- Детальный текст -->
     <section class="project-programm">
         <div class="container">
-            <div class="project-programm__wrapper">
-                <div class="project-programm__preview">
-                    <?php if (!empty($arProps['PROJECT_AMOUNT']['VALUE'])): ?>
-                    <h2 class="project-programm__preview-title">
-                        Цель сбора: <?= htmlspecialchars($arProps['PROJECT_AMOUNT']['VALUE']) ?>
-                    </h2>
-                    <?php endif; ?>
-                </div>
-                <div style="max-width:700px">
-                    <?= $arElement['DETAIL_TEXT'] ?>
-                    <?php if (!empty($arProps['PROJECT_LINK']['VALUE'])): ?>
-                    <p style="margin-top:24px">
-                        <a href="<?= htmlspecialchars($arProps['PROJECT_LINK']['VALUE']) ?>" target="_blank" class="btn">
-                            Подробнее о проекте
-                        </a>
-                    </p>
-                    <?php endif; ?>
-                    <p style="margin-top:24px">
-                        <?php
-                        $projectStatus = mb_strtolower((string)($arProps['PROJECT_STATUS']['VALUE_ENUM'] ?? $arProps['PROJECT_STATUS']['VALUE'] ?? ''));
-                        $isActiveProject = in_array($projectStatus, ['active', 'активный', 'в работе', 'активен']);
-                        ?>
-                        <?php if ($isActiveProject || empty($projectStatus)): ?>
-                        <a href="/support/?project=<?= urlencode($arElement['NAME']) ?>" class="btn">
-                            Поддержать проект
-                        </a>
-                        <?php endif; ?>
-                        <a href="/projects/" class="btn btn-transparent" style="margin-left:12px">← К списку проектов</a>
-                    </p>
-                </div>
-            </div>
+            <?php if (!empty($arProps['PROJECT_AMOUNT']['VALUE'])): ?>
+            <p style="margin-bottom:24px;font-size:20px;font-weight:600">
+                Цель сбора: <?= htmlspecialchars($arProps['PROJECT_AMOUNT']['VALUE']) ?>
+            </p>
+            <?php endif; ?>
+            <?= $arElement['DETAIL_TEXT'] ?>
+            <?php if (!empty($arProps['PROJECT_LINK']['VALUE'])): ?>
+            <p style="margin-top:24px">
+                <a href="<?= htmlspecialchars($arProps['PROJECT_LINK']['VALUE']) ?>" target="_blank" class="btn">
+                    Подробнее о проекте
+                </a>
+            </p>
+            <?php endif; ?>
+            <p style="margin-top:24px">
+                <?php
+                $projectStatus = $projectStatusNorm;
+                $isActiveProject = in_array($projectStatus, ['active', 'активный', 'в работе', 'активен']);
+                ?>
+                <?php if ($isActiveProject || empty($projectStatus)): ?>
+                <a href="/support/?project=<?= urlencode($arElement['NAME']) ?>" class="btn">
+                    Поддержать проект
+                </a>
+                <?php endif; ?>
+                <a href="/projects/" class="btn btn-transparent" style="margin-left:12px">← К списку проектов</a>
+            </p>
         </div>
     </section>
     <?php else: ?>
@@ -121,7 +135,11 @@ if (!empty($arElement['DETAIL_PICTURE'])) {
 <?php if ($arElement): ?>
 <?php
 $_projName  = htmlspecialchars($arElement['NAME'], ENT_QUOTES);
-$_projDesc  = htmlspecialchars(strip_tags($arElement['PREVIEW_TEXT'] ?? ''), ENT_QUOTES);
+$_projDescSource = trim((string)($arProps['PROJECT_SUBTITLE']['VALUE'] ?? ''));
+if ($_projDescSource === '') {
+    $_projDescSource = (string)($arElement['PREVIEW_TEXT'] ?? '');
+}
+$_projDesc  = htmlspecialchars(strip_tags($_projDescSource), ENT_QUOTES);
 $_projUrl   = !empty($arElement['CODE'])
     ? 'https://bauman-polytech.ru/projects/' . rawurlencode($arElement['CODE']) . '/'
     : 'https://bauman-polytech.ru/projects/detail/?id=' . $arElement['ID'];
