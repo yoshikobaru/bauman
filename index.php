@@ -444,6 +444,7 @@ foreach ($_staticProjects as $sp):
 							<h3 class="membership-slider__title">
 								Базовое
 							</h3>
+							<p class="membership-slider__name">1 000 Р</p>
 							<p class="membership-slider__time">
 								ежегодно
 							</p>
@@ -470,6 +471,7 @@ foreach ($_staticProjects as $sp):
 							<h3 class="membership-slider__title">
 								Профессиональное
 							</h3>
+							<p class="membership-slider__name">50 000 Р</p>
 							<p class="membership-slider__time">
 								ежегодно
 							</p>
@@ -497,6 +499,7 @@ foreach ($_staticProjects as $sp):
 							<h3 class="membership-slider__title">
 								Партнёрское
 							</h3>
+							<p class="membership-slider__name membership-slider__name--small">Персональные условия</p>
 							<p class="membership-slider__time">
 								обсуждается индивидуально
 							</p>
@@ -506,10 +509,10 @@ foreach ($_staticProjects as $sp):
 									Участие в закрытых мероприятиях Политехнического общества;
 								</li>
 								<li class="membership-slider__item">
-									Право стать членом правления Политехнического общества выпускников МВТУ (МГТУ) им. Н.Э. Баумана;
+									Право стать членом Совета Политехнического общества выпускников МВТУ (МГТУ) им. Н.Э. Баумана;
 								</li>
 								<li class="membership-slider__item">
-									Участие в закрытом чате почётных членов Политехнического общества.
+									Участие в закрытом чате партнёров Политехнического общества.
 								</li>
 							</ul>
 						<a href="/join/" class="membership-slider__join btn btn-empty">Вступить</a>
@@ -518,6 +521,7 @@ foreach ($_staticProjects as $sp):
 							<h3 class="membership-slider__title">
 								Почётное
 							</h3>
+							<p class="membership-slider__name">Бесценно</p>
 							<p class="membership-slider__time">
 								по результатам заполненной анкеты
 							</p>
