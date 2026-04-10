@@ -50,16 +50,6 @@
 								</a>
 							</li>
 							<li class="header-wrapper__item">
-								<a href="/about/">
-									О нас
-								</a>
-							</li>
-							<li class="header-wrapper__item">
-								<a href="/news/">
-									События
-								</a>
-							</li>
-							<li class="header-wrapper__item">
 								<a href="/reference/">
 									Референс-визиты
 								</a>
@@ -72,6 +62,16 @@
 							<li class="header-wrapper__item">
 								<a href="/resume-form/">
 									Карьерная платформа
+								</a>
+							</li>
+							<li class="header-wrapper__item">
+								<a href="/about/">
+									О нас
+								</a>
+							</li>
+							<li class="header-wrapper__item">
+								<a href="/news/">
+									События
 								</a>
 							</li>
 							<li class="header-wrapper__item">

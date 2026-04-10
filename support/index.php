@@ -15,19 +15,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['d2_action'])) {
     $project   = trim($_POST['project']   ?? '');
     $frequency = in_array($_POST['frequency'] ?? '', ['month', 'once']) ? $_POST['frequency'] : 'once';
     $donorType = trim($_POST['donor_type'] ?? 'fiz');
-    $fn        = trim($_POST['first_name'] ?? '');
-    $ln        = trim($_POST['last_name']  ?? '');
-    $email     = trim($_POST['email']      ?? '');
-    $phone     = trim($_POST['phone']      ?? '');
-    $company   = trim($_POST['company']    ?? '');
-    $site      = trim($_POST['site']       ?? '');
-    $agreeDoc  = ($_POST['agree_doc']      ?? '') === 'yes';
+    if ($donorType === 'ur') {
+        $fn      = trim($_POST['ur_first_name'] ?? '');
+        $ln      = trim($_POST['ur_last_name']  ?? '');
+        $email   = trim($_POST['ur_email']      ?? '');
+        $phone   = trim($_POST['ur_phone']      ?? '');
+        $company = trim($_POST['ur_company']    ?? '');
+        $site    = trim($_POST['ur_site']       ?? '');
+    } else {
+        $fn      = trim($_POST['first_name'] ?? '');
+        $ln      = trim($_POST['last_name']  ?? '');
+        $email   = trim($_POST['email']      ?? '');
+        $phone   = trim($_POST['phone']      ?? '');
+        $company = '';
+        $site    = '';
+    }
+    $comment   = trim($_POST['payment_comment'] ?? '');
     $agreePd   = ($_POST['agree_pd']       ?? '') === 'yes';
 
-    if (!$fn || !$email) {
-        $d2Error = 'Заполните обязательные поля: Имя, e-mail.';
-    } elseif (!$agreeDoc || !$agreePd) {
-        $d2Error = 'Необходимо согласие с Уставом и политикой ПДн.';
+    if (!$project) {
+        $d2Error = 'Выберите проект.';
+    } elseif (!$ln || !$fn || !$email || !$phone) {
+        $d2Error = 'Заполните обязательные поля: Фамилия, Имя, e-mail, Номер телефона.';
+    } elseif ($donorType === 'ur' && (!$company || !$site)) {
+        $d2Error = 'Для юр. лица заполните обязательные поля: Компания, Сайт.';
+    } elseif ($donorType === 'fiz' && !$comment) {
+        $d2Error = 'Заполните обязательное поле: Комментарий к платежу.';
+    } elseif (!$agreePd) {
+        $d2Error = 'Необходимо согласие с политикой обработки ПДн.';
     } else {
         $saved = false;
         if ($hlOk && defined('HL_APPLICATIONS_ID') && HL_APPLICATIONS_ID > 0) {
@@ -45,6 +60,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['d2_action'])) {
                         'first_name' => $fn,        'last_name'  => $ln,
                         'email'      => $email,     'phone'      => $phone,
                         'company'    => $company,   'site'       => $site,
+                        'payment_comment' => $comment,
                     ], JSON_UNESCAPED_UNICODE),
                 ]);
                 if ($res->isSuccess()) $saved = true;
@@ -61,6 +77,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['d2_action'])) {
                 'email'      => $email, 'phone'      => $phone,
                 'project'    => $project, 'amount'   => $amount,
                 'donor_type' => $donorType, 'company' => $company,
+                'payment_comment' => $comment,
             ];
             po_sendAdminEmail('project_support', $d2Data);
             po_createCrmLead('project_support', $d2Data);
@@ -144,7 +161,7 @@ $prefill = [
                                 border: none;
                                 border-bottom: 1px solid currentColor;
                                 background: transparent;
-                                font-size: 15px;
+                                font-size: 26px;
                                 font-weight: 600;
                                 outline: none;
                                 padding: 2px 0;
@@ -154,7 +171,7 @@ $prefill = [
                         <div class="project-programm__tabs">
                             <ul class="project-programm__navs">
                                 <li class="main-tabs-click main-tabs-click--active" data-tab="summ">Сумма</li>
-                                <li class="main-tabs-click" data-tab="programm">Программы</li>
+                                <li class="main-tabs-click" data-tab="programm">Проекты</li>
                                 <li class="main-tabs-click" data-tab="data">Данные</li>
                                 <li class="main-tabs-click" data-tab="pay">Оплата</li>
                             </ul>
@@ -188,8 +205,9 @@ $prefill = [
                             <!-- Шаг 2: Проект -->
                             <div class="project-programm__item main-tabs-pane" data-tab="programm">
                                 <div class="project-programm__all">
+                                    <p style="margin-bottom:10px;color:#666;">Просим выбрать проект</p>
                                     <select id="d2_project_select" name="project">
-                                        <option value="">— Выберите программу —</option>
+                                        <option value="">— Выберите проект —</option>
                                         <option value="Пожертвование на ведение уставной деятельности">Пожертвование на ведение уставной деятельности</option>
                                         <?php if (!empty($arProjects)): ?>
                                             <?php foreach ($arProjects as $projectItem): ?>
@@ -223,25 +241,26 @@ $prefill = [
                                             <h3 class="account__subtitle">Личные данные</h3>
                                         </div>
                                         <div class="account__personal-list account__grid--tripl">
-                                            <input type="text"  name="last_name"  placeholder="Фамилия"
+                                            <input type="text"  name="last_name"  placeholder="Фамилия *" required
                                                    value="<?= htmlspecialchars($prefill['last_name']) ?>">
                                             <input type="text"  name="first_name" placeholder="Имя *" required
                                                    value="<?= htmlspecialchars($prefill['first_name']) ?>">
                                             <input type="email" name="email"      placeholder="e-mail *" required
                                                    value="<?= htmlspecialchars($prefill['email']) ?>">
-                                            <input type="tel"   name="phone"      placeholder="Номер телефона">
+                                            <input type="tel"   name="phone"      placeholder="Номер телефона *" required>
+                                            <input type="text"  name="payment_comment" id="d2_payment_comment" placeholder="Комментарий к платежу *" required>
                                         </div>
                                     </div>
                                     <div class="join__politic">
                                         <div class="join__politic-question">
-                                            <p class="join__politic-link">Ознакомлен с <a href="<?= defined('DOC_USTAV_URL') ? DOC_USTAV_URL : '#' ?>" target="_blank">Уставом</a> и <a href="<?= defined('DOC_POLITIKA_URL') ? DOC_POLITIKA_URL : '#' ?>" target="_blank">политикой обработки ПДн</a></p>
+                                            <p class="join__politic-link">Ознакомлен с <a href="<?= defined('DOC_POLITIKA_URL') ? DOC_POLITIKA_URL : '#' ?>" target="_blank">политикой обработки ПДн</a></p>
                                             <div class="account__graduate-choice">
                                                 <label class="account__graduate-item">
-                                                    <input type="radio" name="agree_doc" value="yes" class="account__graduate-input">
+                                                    <input type="radio" name="agree_pd" value="yes" class="account__graduate-input">
                                                     <span class="account__graduate-box"></span>Да
                                                 </label>
                                                 <label class="account__graduate-item">
-                                                    <input type="radio" name="agree_doc" value="no" class="account__graduate-input">
+                                                    <input type="radio" name="agree_pd" value="no" class="account__graduate-input">
                                                     <span class="account__graduate-box"></span>Нет
                                                 </label>
                                             </div>
@@ -256,17 +275,17 @@ $prefill = [
                                             <h3 class="account__subtitle">Данные представителя</h3>
                                         </div>
                                         <div class="account__personal-list account__personal-list--project">
-                                            <input type="text"  name="last_name"  placeholder="Фамилия">
-                                            <input type="text"  name="first_name" placeholder="Имя *" required>
-                                            <input type="email" name="email"      placeholder="e-mail *" required>
-                                            <input type="tel"   name="phone"      placeholder="Номер телефона">
-                                            <input type="text"  name="company"    placeholder="Компания">
-                                            <input type="text"  name="site"       placeholder="Сайт">
+                                            <input type="text"  name="ur_last_name"  placeholder="Фамилия *" required>
+                                            <input type="text"  name="ur_first_name" placeholder="Имя *" required>
+                                            <input type="email" name="ur_email"      placeholder="e-mail *" required>
+                                            <input type="tel"   name="ur_phone"      placeholder="Номер телефона *" required>
+                                            <input type="text"  name="ur_company"    placeholder="Компания *" required>
+                                            <input type="text"  name="ur_site"       placeholder="Сайт *" required>
                                         </div>
                                     </div>
                                     <div class="join__politic">
                                         <div class="join__politic-question">
-                                            <p class="join__politic-link">Согласен с <a href="<?= defined('DOC_POLITIKA_URL') ? DOC_POLITIKA_URL : '#' ?>" target="_blank">политикой обработки ПДн</a></p>
+                                            <p class="join__politic-link">Ознакомлен с <a href="<?= defined('DOC_POLITIKA_URL') ? DOC_POLITIKA_URL : '#' ?>" target="_blank">политикой обработки ПДн</a></p>
                                             <div class="account__graduate-choice">
                                                 <label class="account__graduate-item">
                                                     <input type="radio" name="agree_pd" value="yes" class="account__graduate-input">
@@ -327,7 +346,7 @@ $prefill = [
                 }
             }
         }
-        // Сразу переключаем на шаг «Программы»
+        // Сразу переключаем на шаг «Проекты»
         var prog = document.querySelector('.main-tabs-click[data-tab="programm"]');
         if (prog) prog.click();
     }
@@ -338,6 +357,8 @@ $prefill = [
     var priceList    = document.getElementById('d2_price_list');
     var amountField  = document.getElementById('d2_amount');
     var projectField = document.getElementById('d2_project');
+    var projectSelect = document.getElementById('d2_project_select');
+    var commentField  = document.getElementById('d2_payment_comment');
     var donorField   = document.getElementById('d2_donor_type');
     var customInput  = document.getElementById('d2_custom_amount');
     var freqField    = document.getElementById('d2_frequency');
@@ -372,9 +393,33 @@ $prefill = [
     // Init default
     amountField.value = '300 руб.';
 
+    function updatePaymentComment() {
+        if (!commentField) return;
+        var projectName = projectField && projectField.value ? projectField.value : '';
+        if (!projectName && projectSelect && projectSelect.value) {
+            projectName = projectSelect.value;
+        }
+        if (!projectName) {
+            projectName = 'выбранный проект';
+        }
+        commentField.value = 'Пожертвование на проект ' + projectName;
+    }
+    updatePaymentComment();
+
     // Next: summ → programm
     var btnNextSumm = document.getElementById('d2_next_summ');
     if (btnNextSumm) btnNextSumm.addEventListener('click', function() {
+        if (priceList) {
+            var activePrice = priceList.querySelector('[data-val].active');
+            if (activePrice && activePrice.getAttribute('data-val') === 'custom') {
+                var customVal = customInput ? (customInput.value || '').trim() : '';
+                if (!customVal || Number(customVal) <= 0) {
+                    alert('Введите корректную сумму.');
+                    if (customInput) customInput.focus();
+                    return;
+                }
+            }
+        }
         switchTab('programm');
     });
 
@@ -386,9 +431,22 @@ $prefill = [
     var btnNextProg = document.getElementById('d2_next_prog');
     if (btnNextProg) btnNextProg.addEventListener('click', function() {
         var sel = document.getElementById('d2_project_select');
+        if (!sel || !sel.value) {
+            alert('Выберите проект.');
+            if (sel) sel.focus();
+            return;
+        }
         if (sel) projectField.value = sel.value || 'Общий фонд';
+        updatePaymentComment();
         switchTab('data');
     });
+
+    if (projectSelect) {
+        projectSelect.addEventListener('change', function() {
+            if (projectField) projectField.value = projectSelect.value || '';
+            updatePaymentComment();
+        });
+    }
 
     // Back: data → programm
     var btnBackData = document.getElementById('d2_back_data');
@@ -396,7 +454,27 @@ $prefill = [
 
     // Next: data → pay
     var btnNextData = document.getElementById('d2_next_data');
-    if (btnNextData) btnNextData.addEventListener('click', function() { switchTab('pay'); });
+    if (btnNextData) btnNextData.addEventListener('click', function() {
+        var donor = donorField && donorField.value ? donorField.value : 'fiz';
+        var paneSelector = donor === 'ur' ? '[data-tab="your"]' : '[data-tab="fiz"]';
+        var pane = document.querySelector('.main-tabs-pane-project' + paneSelector);
+        if (pane) {
+            var requiredInputs = pane.querySelectorAll('input[required]');
+            for (var i = 0; i < requiredInputs.length; i++) {
+                var input = requiredInputs[i];
+                if (!input.checkValidity()) {
+                    input.reportValidity();
+                    return;
+                }
+            }
+        }
+        var agree = document.querySelector('input[name="agree_pd"]:checked');
+        if (!agree || agree.value !== 'yes') {
+            alert('Подтвердите ознакомление с политикой обработки ПДн.');
+            return;
+        }
+        switchTab('pay');
+    });
 
     // Back: pay → data
     var btnBackPay = document.getElementById('d2_back_pay');
@@ -406,8 +484,25 @@ $prefill = [
     document.querySelectorAll('[data-donor]').forEach(function(el) {
         el.addEventListener('click', function() {
             donorField.value = el.getAttribute('data-donor');
+            applyRequiredByDonor();
         });
     });
+
+    function applyRequiredByDonor() {
+        var donor = donorField && donorField.value ? donorField.value : 'fiz';
+        var fizInputs = document.querySelectorAll('[data-tab="fiz"] input[name]');
+        var urInputs  = document.querySelectorAll('[data-tab="your"] input[name]');
+
+        fizInputs.forEach(function(input) {
+            var must = ['last_name', 'first_name', 'email', 'phone', 'payment_comment'].indexOf(input.name) !== -1;
+            input.required = donor === 'fiz' && must;
+        });
+        urInputs.forEach(function(input) {
+            var must = ['ur_last_name', 'ur_first_name', 'ur_email', 'ur_phone', 'ur_company', 'ur_site'].indexOf(input.name) !== -1;
+            input.required = donor === 'ur' && must;
+        });
+    }
+    applyRequiredByDonor();
 
     function switchTab(tab) {
         document.querySelectorAll('.project-programm__tabs .main-tabs-click').forEach(function(li) {
