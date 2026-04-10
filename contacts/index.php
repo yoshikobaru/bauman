@@ -9,9 +9,9 @@ $APPLICATION->SetTitle("Контакты");
                 <a href="mailto:info@bauman-polytech.ru" class="footer-mail">
                     info@bauman-polytech.ru
                 </a>
-                <a href="#" class="footer-address">
+                <p class="footer-address">
                     Москва, Бригадирский переулок, 13, 4 этаж, каб. 407
-                </a>
+                </p>
                 <p class="footer-name">
                     Политехническое Общество Выпускников МВТУ (МГТУ) им. Н.Э. Баумана
                 </p>
