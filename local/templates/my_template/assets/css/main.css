@@ -1716,6 +1716,16 @@ strong {
     max-width: 46vw;
 }
 
+.banner-other--about .banner-other__wrapper {
+    min-height: 430px;
+}
+
+.banner-other--about .banner-other__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
 .banner-other__list-initiatives {
     padding-left: 26px;
 }
@@ -3053,6 +3063,11 @@ strong {
 }
 
 /* map */
+
+.contacts-top {
+    margin-top: var(--section-margin);
+    padding-bottom: 24px;
+}
 
 .map {
     margin-top: var(--section-margin);
@@ -4822,6 +4837,9 @@ select,
 @media(max-width: 768px) {
     .competencies__navs {
         flex-direction: column;
+    }
+    .banner-other--about .banner-other__wrapper {
+        min-height: 300px;
     }
 }
 
