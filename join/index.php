@@ -80,10 +80,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['d7_action'])) {
     $d7Site    = trim($_POST['d7_site']    ?? '');
     $d7Email   = trim($_POST['d7_email']   ?? '');
     $d7Phone   = trim($_POST['d7_phone']   ?? '');
-    $d7Count   = trim($_POST['d7_count']   ?? '');
     $d7AgreePd = ($_POST['d7_agree_pd'] ?? '') === 'yes';
-    if (!$d7Company || !$d7Contact || !$d7Email) {
-        $d7Error = 'Заполните обязательные поля: Компания, ФИО, Email.';
+    if (!$d7Company || !$d7Contact || !$d7Email || !$d7Phone) {
+        $d7Error = 'Заполните обязательные поля: Компания, ФИО, Email, Телефон.';
     } elseif (!$d7AgreePd) {
         $d7Error = 'Необходимо согласие с политикой ПДн.';
     } else {
@@ -100,7 +99,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['d7_action'])) {
                     'UF_DATA'        => json_encode([
                         'company' => $d7Company, 'contact_name' => $d7Contact,
                         'site' => $d7Site, 'email' => $d7Email,
-                        'phone' => $d7Phone, 'planned_count' => $d7Count,
+                        'phone' => $d7Phone,
                     ], JSON_UNESCAPED_UNICODE),
                 ]);
                 $saved = $res->isSuccess();
@@ -175,7 +174,7 @@ if ($isAuthorized) {
                     <!-- Базовое -->
                     <div class="swiper-slide membership-slider__card">
                         <h3 class="membership-slider__title">Базовое</h3>
-                        <p class="membership-slider__name">5 000 Р</p>
+                        <p class="membership-slider__name">1 000 Р</p>
                         <p class="membership-slider__time">ежегодно</p>
                         <ul class="membership-slider__list">
                             <li class="membership-slider__item">Возможность размещения резюме на карьерной платформе Политехнического общества;</li>
@@ -204,13 +203,13 @@ if ($isAuthorized) {
                     <!-- Партнёрское -->
                     <div class="swiper-slide membership-slider__card membership-slider__card--honorary">
                         <h3 class="membership-slider__title">Партнёрское</h3>
-                        <p class="membership-slider__name membership-slider__name--small">Индивидуальные условия</p>
+                        <p class="membership-slider__name membership-slider__name--small">Персональные условия</p>
                         <p class="membership-slider__time">обсуждается индивидуально</p>
                         <button class="membership-slider__advantages">+ Возможности профессионального</button>
                         <ul class="membership-slider__list">
                             <li class="membership-slider__item">Участие в закрытых мероприятиях Политехнического общества;</li>
-                            <li class="membership-slider__item">Право стать членом правления Политехнического общества выпускников МВТУ (МГТУ) им. Н.Э. Баумана;</li>
-                            <li class="membership-slider__item">Участие в закрытом чате почётных членов Политехнического общества.</li>
+                            <li class="membership-slider__item">Право стать членом Совета Политехнического общества выпускников МВТУ (МГТУ) им. Н.Э. Баумана;</li>
+                            <li class="membership-slider__item">Участие в закрытом чате партнёров Политехнического общества.</li>
                         </ul>
                         <button type="button" class="membership-slider__join btn btn-empty" onclick="showPartnerForm()">Стать партнером</button>
                     </div>
@@ -293,10 +292,8 @@ if ($isAuthorized) {
                                    value="<?= htmlspecialchars($_POST['d7_contact'] ?? '') ?>">
                             <input type="email"  name="d7_email"   placeholder="Email *" required
                                    value="<?= htmlspecialchars($_POST['d7_email'] ?? ($arCurUser['EMAIL'] ?? '')) ?>">
-                            <input type="tel"    name="d7_phone"   placeholder="Телефон"
+                            <input type="tel"    name="d7_phone"   placeholder="Телефон *" required
                                    value="<?= htmlspecialchars($_POST['d7_phone'] ?? '') ?>">
-                            <input type="number" name="d7_count"   placeholder="Планируемое кол-во представителей *" min="1" required
-                                   value="<?= htmlspecialchars($_POST['d7_count'] ?? '') ?>">
                         </div>
                     </div>
                     <div class="join__politic" style="margin-top:24px">
