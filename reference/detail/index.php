@@ -87,7 +87,7 @@ if (defined('IBLOCK_REFERENCE_ID') && IBLOCK_REFERENCE_ID > 0) {
         IBLOCK_REFERENCE_ID, $arElement['ID'], 'sort', 'asc', []
     );
     $props = [];
-    $detailCodes = ['REF_STATUS', 'REF_DATE', 'REF_LOCATION', 'REF_DURATION'];
+    $detailCodes = ['REF_STATUS', 'REF_DATE', 'REF_LOCATION', 'REF_DURATION', 'REF_SUBTITLE'];
     while ($p = $dbProps->Fetch()) {
         if (!in_array($p['CODE'], $detailCodes)) continue;
         $props[$p['CODE']] = $p['VALUE_ENUM'] ?: $p['VALUE'];
@@ -102,6 +102,7 @@ $refStatus   = htmlspecialchars($props['REF_STATUS']   ?? '');
 $refDate     = htmlspecialchars($props['REF_DATE']     ?? '');
 $refLocation = htmlspecialchars($props['REF_LOCATION'] ?? '');
 $refDuration = htmlspecialchars($props['REF_DURATION'] ?? '');
+$refSubtitle = trim($props['REF_SUBTITLE'] ?? '');
 
 $bannerImg = '';
 if (!empty($arElement['DETAIL_PICTURE']))       $bannerImg = CFile::GetPath($arElement['DETAIL_PICTURE']);
@@ -141,7 +142,11 @@ $userPhone     = $USER->IsAuthorized() ? htmlspecialchars($USER->GetParam('PERSO
                         <h1 class="banner-other__title main-title">
                             <?= htmlspecialchars($arElement['NAME']) ?>
                         </h1>
-                        <?php if (!empty($arElement['PREVIEW_TEXT'])): ?>
+                        <?php if ($refSubtitle !== ''): ?>
+                        <p class="banner-other__text main-text" style="white-space:pre-line;">
+                            <?= htmlspecialchars($refSubtitle) ?>
+                        </p>
+                        <?php elseif (!empty($arElement['PREVIEW_TEXT'])): ?>
                         <p class="banner-other__text main-text">
                             <?= nl2br(htmlspecialchars($arElement['PREVIEW_TEXT'])) ?>
                         </p>
