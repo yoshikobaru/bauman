@@ -126,19 +126,31 @@ if (!empty($arElement['DETAIL_PICTURE'])) {
     <?php
     $detailHtml = (string)($arElement['DETAIL_TEXT'] ?? '');
     if ($detailHtml !== '') {
-        // Legacy static markup may contain relative links like support.html.
+        // Legacy static markup may contain links like support.html or absolute .../support.html.
         $detailHtml = preg_replace(
-            '#href=(["\'])(?:https?://[^"\']+)?(?:/projects/[^/"\']+)?/support\.html\1#iu',
+            '#href=(["\'])(?:https?://[^"\']+)?(?:/projects/[^"\']+)?/support\.html(?:\?[^"\']*)?\1#iu',
             'href="/support/"',
             $detailHtml
         );
+        $detailHtml = preg_replace('#https?://[^"\']+/support\.html(?:\?[^"\']*)?#iu', '/support/', $detailHtml);
+        $detailHtml = preg_replace('#(^|[/"\'])support\.html(?:\?[^"\']*)?([/"\']|$)#iu', '$1/support/$2', $detailHtml);
         $detailHtml = str_ireplace(
             ['href="support.html"', "href='support.html'"],
             ['href="/support/"', "href='/support/'"],
             $detailHtml
         );
 
-        // "Проекту необходима финансовая поддержка" must be rendered by template, not from iblock HTML.
+        // Remove template-only sections from iblock HTML to avoid duplicate layout/buttons.
+        $detailHtml = preg_replace(
+            '#<section[^>]*class=(["\'])[^"\']*\bbanner-other\b[^"\']*\1[^>]*>.*?</section>#isu',
+            '',
+            $detailHtml
+        );
+        $detailHtml = preg_replace(
+            '#<section[^>]*class=(["\'])[^"\']*\bbutton-help\b[^"\']*\1[^>]*>.*?</section>#isu',
+            '',
+            $detailHtml
+        );
         $detailHtml = preg_replace(
             '#<section[^>]*class=(["\'])[^"\']*\bproject-help\b[^"\']*\1[^>]*>.*?</section>#isu',
             '',
@@ -154,7 +166,7 @@ if (!empty($arElement['DETAIL_PICTURE'])) {
             <p class="project-help__text main-text">
                 Мы рады любой помощи вне зависимости от её размера. Для компаний желающими стать спонсорами данного мероприятия - готовы направить спонсорский пакет.
             </p>
-            <a href="/support/?project=<?= urlencode($arElement['NAME']) ?>" class="btn project-help__btn">Поддержать проект</a>
+            <a href="/support/?project=<?= urlencode($arElement['NAME']) ?>" class="btn project-help__btn">Связаться с организаторами</a>
         </div>
     </section>
 
