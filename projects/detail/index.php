@@ -84,7 +84,7 @@ if (!empty($arElement['DETAIL_PICTURE'])) {
                         }
                         ?>
                         <?php if ($projectSubtitle !== ''): ?>
-                        <p style="margin-top:16px"><?= htmlspecialchars($projectSubtitle) ?></p>
+                        <p class="banner-other__text main-text" style="margin-top:16px"><?= htmlspecialchars($projectSubtitle) ?></p>
                         <?php endif; ?>
                     </div>
                     <img src="<?=SITE_TEMPLATE_PATH?>/assets/img/reference-page/banner-other-pattern.png" alt="" class="banner-other__pattern">
@@ -96,14 +96,20 @@ if (!empty($arElement['DETAIL_PICTURE'])) {
 
     <?php if ($arElement): ?>
     <!-- Детальный текст -->
+    <?php if (!empty($arProps['PROJECT_AMOUNT']['VALUE'])): ?>
     <section class="project-programm">
         <div class="container">
-            <?php if (!empty($arProps['PROJECT_AMOUNT']['VALUE'])): ?>
             <p style="margin-bottom:24px;font-size:20px;font-weight:600">
                 Цель сбора: <?= htmlspecialchars($arProps['PROJECT_AMOUNT']['VALUE']) ?>
             </p>
-            <?php endif; ?>
-            <?= $arElement['DETAIL_TEXT'] ?>
+        </div>
+    </section>
+    <?php endif; ?>
+
+    <?= $arElement['DETAIL_TEXT'] ?>
+
+    <section class="project-programm">
+        <div class="container">
             <?php if (!empty($arProps['PROJECT_LINK']['VALUE'])): ?>
             <p style="margin-top:24px">
                 <a href="<?= htmlspecialchars($arProps['PROJECT_LINK']['VALUE']) ?>" target="_blank" class="btn">
