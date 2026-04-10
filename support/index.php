@@ -90,60 +90,6 @@ $prefill = [
 ?>
 
 <main>
-    <!-- banner-other -->
-    <section class="banner-other banner-project-current">
-        <div class="container">
-            <div class="banner-other__wrapper banner-other__wrapper--current">
-                <div class="banner-other__content">
-                    <div class="banner-other__info banner-other__info--current">
-                        <div class="banner-other__date">
-                            <p class="banner-other__status">Активный</p>
-                            <p class="banner-other__time"><span>Запущен</span> 11 Апреля 2025</p>
-                        </div>
-                        <h1 class="banner-other__title main-title">
-                            Бауманский университет пилотирует создание Фонда целевого капитала
-                        </h1>
-                        <div class="banner-other__detail">
-                            <div>
-                                <p class="details-project__about-discription">Команда</p>
-                                <div class="details-project__about-team">
-                                    <div class="details-project__about-who">
-                                        <img src="<?=SITE_TEMPLATE_PATH?>/assets/img/projects-page/foto-team-1.png" alt="" class="details-project__about-foto">
-                                        <div class="details-project__about-person"><p>Дима Архипов</p><p>Менеджер проекта</p></div>
-                                    </div>
-                                    <div class="details-project__about-who">
-                                        <img src="<?=SITE_TEMPLATE_PATH?>/assets/img/projects-page/foto-team-2.png" alt="" class="details-project__about-foto">
-                                        <div class="details-project__about-person"><p>Алена Артемьева</p><p>Разработчик</p></div>
-                                    </div>
-                                    <div class="details-project__about-who">
-                                        <img src="<?=SITE_TEMPLATE_PATH?>/assets/img/projects-page/foto-team-3.png" alt="" class="details-project__about-foto">
-                                        <div class="details-project__about-person"><p>Олег Швец</p><p>Вдохновитель</p></div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div>
-                                <p class="details-project__about-discription">Документация</p>
-                                <div class="details-project__about-document">
-                                    <a href="#" class="details-project__about-download">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="20" viewBox="0 0 16 20" fill="none"><path d="M11.2871 0.5L15.5 4.88281V19.5H0.5V0.5H11.2871Z" stroke="white"/></svg>
-                                        document-plan.pdf
-                                    </a>
-                                </div>
-                                <p class="details-project__about-discription">Ссылки</p>
-                                <div class="details-project__about-links">
-                                    <a href="#" target="_blank">Группа Вконтакте</a>
-                                    <a href="#" target="_blank">Канал с новостями в Телеграм</a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <img src="<?=SITE_TEMPLATE_PATH?>/assets/img/reference-page/banner-other-pattern.png" alt="" class="banner-other__pattern">
-                </div>
-                <img src="<?=SITE_TEMPLATE_PATH?>/assets/img/reference-page/banner-other-img.png" alt="" class="banner-other__image banner-other__image--current">
-            </div>
-        </div>
-    </section>
-
     <!-- D2: Форма поддержки проекта -->
     <section class="project-programm">
         <div class="container">

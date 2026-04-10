@@ -43,7 +43,7 @@ $statusLabels = ['all' => 'Все', 'active' => 'Активные', 'completed' 
                     </div>
                     <img src="<?=SITE_TEMPLATE_PATH?>/assets/img/reference-page/banner-other-pattern.png" alt="" class="banner-other__pattern">
                 </div>
-                <img src="<?=SITE_TEMPLATE_PATH?>/assets/img/reference-page/banner-other-img.png" alt="" class="banner-other__image">
+                <img src="<?=SITE_TEMPLATE_PATH?>/assets/img/projects-page/current-project-img-1.png" alt="" class="banner-other__image">
             </div>
         </div>
     </section>
@@ -124,22 +124,11 @@ $_staticActive = [
                         </div>
                     </div>
                 </div>
-                <?php endforeach; }
-
-                // Архивная карточка при фильтре completed
-                if ($statusFilter === 'completed' && !$hasItems): ?>
-                <div class="visits__card">
-                    <img src="<?= SITE_TEMPLATE_PATH ?>/assets/img/projects-page/current-project-img-1.png" alt="" class="visits__image">
-                    <div class="visits__content">
-                        <h3 class="visits__subtitle">Завершённые проекты</h3>
-                        <p class="visits__text">Архив инициатив и реализованных программ Политехнического общества.</p>
-                        <div class="visits__buttons">
-                            <a href="/projects/archive-template/" class="btn visits__btn btn-transparent">Подробнее</a>
-                        </div>
-                    </div>
-                </div>
-                <?php endif; ?>
+                <?php endforeach; } ?>
             </div>
+            <?php if ($statusFilter === 'completed' && !$hasItems): ?>
+            <p style="color:#888;margin-top:12px">Завершённых проектов пока нет.</p>
+            <?php endif; ?>
         </div>
     </section>
 </main>
