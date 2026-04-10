@@ -7,4 +7,11 @@ $arUrlRewrite = array(
     'PATH' => '/projects/detail/index.php',
     'SORT' => 100,
   ),
+  array(
+    'CONDITION' => '#^/reference/([a-zA-Z0-9_-]+)/?$#',
+    'RULE' => 'code=$1',
+    'ID' => '',
+    'PATH' => '/reference/detail/index.php',
+    'SORT' => 110,
+  ),
 );

@@ -54,6 +54,7 @@ define('HL_RESUMES_ID',   4);
  * ID присваиваются при запуске соответствующих setup-скриптов.
  */
 define('IBLOCK_COMPETENCIES_ID', 5);
+define('IBLOCK_REFERENCE_ID',   0); // Референс-визиты (обновить ID после запуска setup_reference.php)
 define('IBLOCK_FUNDS_ID',        6); // после setup_funds.php
 
 /**

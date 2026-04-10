@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 require($_SERVER["DOCUMENT_ROOT"]."/bitrix/header.php");
 $APPLICATION->SetTitle("Референс-визит СЕМАТ — итоги");
 ?>
@@ -25,7 +25,7 @@ $APPLICATION->SetTitle("Референс-визит СЕМАТ — итоги");
                             <p class="banner-other__text main-text">
                                 Референс-визит <strong>только для выпускников МГТУ им. Н.Э. Баумана.</strong> <br> И да: совсем скоро такие встречи будут доступны только членам Политехнического общества выпускников.
                             </p>
-                            <a href="#" class="banner-other__btn btn" data-fancybox data-src="#form-cemat">Зарегестрироваться</a>
+                            <a href="#" class="banner-other__btn btn" data-fancybox data-src="#form-cemat">Зарегистрироваться</a>
                         </div>
                         <img src="<?=SITE_TEMPLATE_PATH?>/assets/img/reference-page/banner-other-pattern.png" alt="" class="banner-other__pattern">
                     </div>

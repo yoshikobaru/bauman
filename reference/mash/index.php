@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 require($_SERVER["DOCUMENT_ROOT"]."/bitrix/header.php");
 $APPLICATION->SetTitle("Референс-визит в МАШ ЮНИТ");
 ?>
@@ -28,7 +28,7 @@ $APPLICATION->SetTitle("Референс-визит в МАШ ЮНИТ");
                             <p class="banner-other__text main-text">
                                Регистрация до 22 февраля. Мест немного — формат камерный.
                             </p>
-                            <a href="#" class="banner-other__btn btn" data-fancybox data-src="#form-cemat">Зарегестрироваться</a>
+                            <a href="#" class="banner-other__btn btn" data-fancybox data-src="#form-cemat">Зарегистрироваться</a>
                         </div>
                         <img src="<?=SITE_TEMPLATE_PATH?>/assets/img/reference-page/banner-other-pattern.png" alt="" class="banner-other__pattern">
                     </div>

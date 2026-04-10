@@ -111,7 +111,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['d5_action'])) {
                     <div class="banner-other__content">
                         <div class="banner-other__info">
                             <h1 class="banner-other__title main-title">
-                                Референс- визиты Политехнического общества выпускников МВТУ (МГТУ) им. Н.Э. Баумана
+                                Референс- визиты Политехнического общества выпускников МВТУ (МГТУ) им. Н.Э. Баумана
                             </h1>
                             <div class="banner-other__list">
                                 <div class="banner-other__item">
@@ -119,7 +119,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['d5_action'])) {
                                         Референс-визит
                                     </h2>
                                     <p>
-                                        Экскурсия по вашему предприятию для потенциальных и действующих клиентов, партнёров, экспертов из области.
+                                        Экскурсия по вашему предприятию для потенциальных и действующих клиентов, партнёров, экспертов из области.
                                     </p>
                                 </div>
                                 <div class="banner-other__item">
@@ -127,7 +127,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['d5_action'])) {
                                         Формат
                                     </h2>
                                     <p>
-                                        До 12 участников смотрят ваше производство, обсуждают технологии и вызовы области.
+                                        До 12 участников смотрят ваше производство, обсуждают технологии и вызовы области.
 
                                     </p>
                                 </div>
@@ -145,27 +145,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['d5_action'])) {
             <!-- /.container -->
         </section>
         <!-- /.banner-other -->
-        <!-- visits dynamic -->
+
+        <!-- visits dynamic (из инфоблока "Референс-визиты") -->
         <?php
         $iblockRefOk = \Bitrix\Main\Loader::includeModule('iblock');
         $arActiveVisits = [];
         $arPastVisits   = [];
-        $today = date('Y-m-d');
 
-        if ($iblockRefOk && defined('IBLOCK_EVENTS_ID') && IBLOCK_EVENTS_ID > 0) {
+        if ($iblockRefOk && defined('IBLOCK_REFERENCE_ID') && IBLOCK_REFERENCE_ID > 0) {
             $dbRef = CIBlockElement::GetList(
-                ['DATE_ACTIVE_TO' => 'DESC'],
-                [
-                    'IBLOCK_ID' => IBLOCK_EVENTS_ID,
-                    'ACTIVE'    => 'Y',
-                    'PROPERTY_TYPE' => 'reference',
-                ],
+                ['SORT' => 'ASC'],
+                ['IBLOCK_ID' => IBLOCK_REFERENCE_ID, 'ACTIVE' => 'Y'],
                 false, false,
-                ['ID', 'NAME', 'PREVIEW_TEXT', 'PREVIEW_PICTURE', 'DATE_ACTIVE_FROM', 'DATE_ACTIVE_TO', 'DETAIL_PAGE_URL']
+                ['ID', 'NAME', 'CODE', 'PREVIEW_TEXT', 'PREVIEW_PICTURE']
             );
             while ($el = $dbRef->GetNext()) {
-                $dateTo = $el['DATE_ACTIVE_TO'] ?? '';
-                if ($dateTo && strtotime($dateTo) < strtotime($today)) {
+                $dbP = CIBlockElement::GetProperty(
+                    IBLOCK_REFERENCE_ID, $el['ID'], 'sort', 'asc',
+                    ['CODE' => ['REF_STATUS', 'REF_DATE', 'REF_LOCATION', 'REF_DURATION', 'REF_REGISTER_URL']]
+                );
+                $elProps = []; $statusXml = '';
+                while ($p = $dbP->Fetch()) {
+                    $elProps[$p['CODE']] = $p['VALUE_ENUM'] ?: $p['VALUE'];
+                    if ($p['CODE'] === 'REF_STATUS') $statusXml = $p['XML_ID'] ?? '';
+                }
+                $el['_PROPS']      = $elProps;
+                $el['_STATUS_XML'] = $statusXml;
+                if ($statusXml === 'completed') {
                     $arPastVisits[]   = $el;
                 } else {
                     $arActiveVisits[] = $el;
@@ -174,14 +180,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['d5_action'])) {
         }
 
         $visitsTab = $_GET['visits_tab'] ?? 'active';
+        $hasAny = !empty($arActiveVisits) || !empty($arPastVisits);
         ?>
-        <?php if (!empty($arActiveVisits) || !empty($arPastVisits)): ?>
-        <section style="padding:40px 0;background:#f8f8f8">
+
+        <section class="visits">
             <div class="container">
-                <h2 class="main-title" style="margin-bottom:24px">Визиты</h2>
-                <div style="display:flex;gap:12px;margin-bottom:32px;flex-wrap:wrap">
+                <h2 class="main-title visits__title">Визиты</h2>
+                <?php if ($hasAny): ?>
+                <div style="display:flex;gap:12px;margin-bottom:32px;flex-wrap:wrap;margin-top:24px">
                     <a href="?visits_tab=active" class="btn <?= $visitsTab !== 'active' ? 'btn-empty' : '' ?>"
-                       style="padding:10px 24px">Активные визиты (<?= count($arActiveVisits) ?>)</a>
+                       style="padding:10px 24px">Активные (<?= count($arActiveVisits) ?>)</a>
                     <a href="?visits_tab=past" class="btn <?= $visitsTab !== 'past' ? 'btn-empty' : '' ?>"
                        style="padding:10px 24px">Завершённые (<?= count($arPastVisits) ?>)</a>
                 </div>
@@ -193,82 +201,44 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['d5_action'])) {
                 <?php else: ?>
                 <div class="visits__list">
                     <?php foreach ($visitsToShow as $visit):
-                        $imgSrc = !empty($visit['PREVIEW_PICTURE'])
+                        $vProps   = $visit['_PROPS'] ?? [];
+                        $imgSrc   = !empty($visit['PREVIEW_PICTURE'])
                             ? CFile::GetPath($visit['PREVIEW_PICTURE'])
                             : SITE_TEMPLATE_PATH . '/assets/img/reference-page/reference-main-img-1.png';
-                        $dateFrom = !empty($visit['DATE_ACTIVE_FROM']) ? date('d.m.Y', strtotime($visit['DATE_ACTIVE_FROM'])) : '';
-                        $dateTo   = !empty($visit['DATE_ACTIVE_TO'])   ? date('d.m.Y', strtotime($visit['DATE_ACTIVE_TO']))   : '';
+                        $detailUrl = '/reference/' . ($visit['CODE'] ?: $visit['ID']) . '/';
                     ?>
                     <div class="visits__card">
                         <img src="<?= htmlspecialchars($imgSrc) ?>" alt="<?= htmlspecialchars($visit['NAME']) ?>" class="visits__image">
                         <div class="visits__content">
                             <div class="visits__date">
                                 <div class="visits__date-current">
-                                    <?php if ($dateFrom): ?>
-                                    <p><span>Дата: </span><?= $dateFrom ?><?= $dateTo && $dateTo !== $dateFrom ? ' — ' . $dateTo : '' ?></p>
+                                    <?php if (!empty($vProps['REF_DATE'])): ?>
+                                    <p><span>Дата: </span><?= htmlspecialchars($vProps['REF_DATE']) ?></p>
+                                    <?php endif; ?>
+                                    <?php if (!empty($vProps['REF_LOCATION'])): ?>
+                                    <p><?= htmlspecialchars($vProps['REF_LOCATION']) ?></p>
+                                    <?php endif; ?>
+                                    <?php if (!empty($vProps['REF_DURATION'])): ?>
+                                    <p><?= htmlspecialchars($vProps['REF_DURATION']) ?></p>
                                     <?php endif; ?>
                                 </div>
                             </div>
-                            <h3 class="visits__title"><?= htmlspecialchars($visit['NAME']) ?></h3>
+                            <h3 class="visits__subtitle"><?= htmlspecialchars($visit['NAME']) ?></h3>
                             <?php if (!empty($visit['PREVIEW_TEXT'])): ?>
                             <p class="visits__text"><?= htmlspecialchars($visit['PREVIEW_TEXT']) ?></p>
                             <?php endif; ?>
-                            <?php if ($visitsTab === 'active' && $_isMember): ?>
-                            <a href="#" class="btn" data-fancybox data-src="#form-d4-modal" style="margin-top:16px">
-                                Записаться на визит
-                            </a>
+                            <a href="<?= htmlspecialchars($detailUrl) ?>" class="btn visits__btn btn-transparent">Подробнее</a>
+                            <?php if ($visitsTab === 'active' && $_isMember && !empty($vProps['REF_REGISTER_URL'])): ?>
+                            <a href="<?= htmlspecialchars($vProps['REF_REGISTER_URL']) ?>" class="btn" style="margin-top:8px">Зарегистрироваться</a>
                             <?php endif; ?>
                         </div>
                     </div>
                     <?php endforeach; ?>
                 </div>
                 <?php endif; ?>
-            </div>
-        </section>
-        <?php endif; ?>
-
-        <!-- visits (статичные заглушки, если инфоблок не настроен) -->
-        <section class="visits">
-            <div class="container">
-                <h2 class="main-title visits__title">
-                    <?= (empty($arActiveVisits) && empty($arPastVisits)) ? 'Визиты' : 'Ближайшие мероприятия (из шаблона)' ?>
-                </h2>
-                 <div class="visits__list">
-                    <div class="visits__card">
-                        <img src="<?=SITE_TEMPLATE_PATH?>/assets/img/reference-page/reference-main-img-1.png" alt="" class="visits__image">
-                        <div class="visits__content">
-                            <div class="visits__date">
-								<div class="visits__date-current">
-									<p><span>Дата: </span>5 февраля 2026, 10:30</p>
-								</div>
-							</div>
-                            <h3 class="visits__subtitle">
-                                Референс-визит в СЕМАТ
-                            </h3>
-                            <p class="visits__text">
-                               Авиастроение, машиностроение, медицина, приборка, робототехника, электроника — если вы внутри этих процессов, вам точно будет о чём поговорить.
-                            </p>
-                            <a href="/reference/visit-semat/" class="btn visits__btn btn-transparent">Подробнее</a>
-                        </div>
-                    </div>
-                    <div class="visits__card">
-                        <img src="<?=SITE_TEMPLATE_PATH?>/assets/img/reference-page/reference-main-img-2.png" alt="" class="visits__image">
-                        <div class="visits__content">
-							<div class="visits__date">
-								<div class="visits__date-current">
-									<p><span>Дата: </span>27 февраля, 10:00</p>
-								</div>
-							</div>
-                            <h3 class="visits__subtitle">
-                                Референс-визит в МАШ ЮНИТ
-                            </h3>
-                            <p class="visits__text">
-                               Едем к разработчикам отечественной электроники МАШ ЮНИТ — резиденту Сколково, который собирает ИТ-оборудование от платы до промышленного компьютера.
-                            </p>
-                            <a href="/reference/visit-mash/" class="btn visits__btn btn-transparent">Подробнее</a>
-                        </div>
-                    </div>
-                </div>
+                <?php else: ?>
+                <p style="color:#888;margin-top:16px">Визиты пока не добавлены.</p>
+                <?php endif; ?>
             </div>
             <!-- /.container -->
         </section>
@@ -329,7 +299,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['d5_action'])) {
 					<div class="culture__box">
 						<div class="culture__card">
 							<h3>
-								Визуализация вашего продукта или услуги в действии
+								Визуализация вашего продукта или услуги в действии
 							</h3>
 							<p>
 								Наглядное доказательство эффективности.
@@ -340,12 +310,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['d5_action'])) {
 								Прямой контакт с партнером или клиентом
 							</h3>
 							<p>
-								Обратная связь + элемент доверия и прозрачности.
+								Обратная связь + элемент доверия и прозрачности.
 							</p>
 						</div>
 						<div class="culture__card">
 							<h3>
-								Профессиональный рост и развитие
+								Профессиональный рост и развитие
 							</h3>
 							<p>
 								компании и ее сотрудников.
@@ -368,10 +338,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['d5_action'])) {
                                Репутационные преимущества.
                             </h3>
                             <p>
-                               Увеличение узнаваемости бренда, положительный имидж. Развитие бизнеса в долгосрочной перспективе.
+                               Увеличение узнаваемости бренда, положительный имидж. Развитие бизнеса в долгосрочной перспективе.
                             </p>
                         </div>						
-					</div>
+				</div>
 				</div>
 			</div>
 			<!-- /.container -->
@@ -482,10 +452,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['d5_action'])) {
 				<div class="opportunities__wrapper">
 					<div class="opportunities__info">
 						<h2 class="opportunities__title main-title">
-							Программа и затраты
+							Программа и затраты
 						</h2>
 						<p class="main-text">
-                            Программа корректируется под вашу специфику, масштабы и свободное время
+                            Программа корректируется под вашу специфику, масштабы и свободное время
 
                         </p>
 					</div>
@@ -498,13 +468,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['d5_action'])) {
                                 Согласовать дату визита, программу
                             </li>
                             <li>
-                                Назначить куратора от компании
+                                Назначить куратора от компании
                             </li>
                             <li>
-                                Подготовить помещения, уведомить персонал об экскурсии
+                                Подготовить помещения, уведомить персонал об экскурсии
                             </li>
                             <li>
-                                Провести визит в выбранный день
+                                Провести визит в выбранный день
                             </li>
                         </ul>
 					</div>
@@ -554,7 +524,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['d5_action'])) {
                                 Подведение итогов. Вопросы, фото, обмен контактами
                             </p>
                         </div>
-					</div>
+				</div>
 				</div>
 			</div>
 			<!-- /.container -->
@@ -571,18 +541,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['d5_action'])) {
 						<div class="swiper-slide new-project__item">
 							<div class="new-project__card">
 								<h3>
-									Сколько раз нужно принимать?
+									Сколько раз нужно принимать?
 								</h3>
 								<p>
-									Один раз. Дальше — по желанию. Никаких обязательств.
+									Один раз. Дальше — по желанию. Никаких обязательств.
 								</p>
 							</div>
 							<div class="new-project__card">
 								<h3>
-									А если у нас коммерческая тайна?
+									А если у нас коммерческая тайна?
 								</h3>
 								<p>
-									Вы решаете, что показывать, без раскрытия секретов.
+									Вы решаете, что показывать, без раскрытия секретов.
 								</p>
 							</div>
 							<div class="new-project__card">
@@ -590,22 +560,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['d5_action'])) {
 									Сколько времени займёт визит?
 								</h3>
                                 <p>
-                                    От 4 до 8 часов, с учётом ваших ресурсов и возможностей.
+                                    От 4 до 8 часов, с учётом ваших ресурсов и возможностей.
                                 </p>
 							</div>
 						</div>
 						<div class="swiper-slide new-project__item">
 							<div class="new-project__card">
 								<h3>
-									Это платно?
+									Это платно?
 								</h3>
 								<p>
-									Нет. Все затраты во время визита к вам — на ваше усмотрение.
+									Нет. Все затраты во время визита к вам — на ваше усмотрение.
 								</p>
 							</div>
 							<div class="new-project__card">
 								<h3>
-									Кто участники?
+									Кто участники?
 								</h3>
 								<p>
 									Выпускники МВТУ (МГТУ) им. Н.Э. Баумана с опытом. Отбираем 8–12 человек под профиль вашей компании.

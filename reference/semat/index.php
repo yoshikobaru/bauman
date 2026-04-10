@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 require($_SERVER["DOCUMENT_ROOT"]."/bitrix/header.php");
 $APPLICATION->SetTitle("Референс-визит СЕМАТ");
 ?>
@@ -30,7 +30,7 @@ $APPLICATION->SetTitle("Референс-визит СЕМАТ");
                             <p class="banner-other__text main-text">
                                Регистрация до 30 января, количество мест ограниченно.
                             </p>
-                            <a href="#" class="banner-other__btn btn" data-fancybox data-src="#form-cemat">Зарегестрироваться</a>
+                            <a href="#" class="banner-other__btn btn" data-fancybox data-src="#form-cemat">Зарегистрироваться</a>
                         </div>
                         <img src="<?=SITE_TEMPLATE_PATH?>/assets/img/reference-page/banner-other-pattern.png" alt="" class="banner-other__pattern">
                     </div>
@@ -211,7 +211,7 @@ $APPLICATION->SetTitle("Референс-визит СЕМАТ");
         </section>
 
         <div class="button-help">
-            <a href="#" class="btn project-polytech__btn" data-fancybox data-src="#form-cemat">Зарегестрироваться</a>
+            <a href="#" class="btn project-polytech__btn" data-fancybox data-src="#form-cemat">Зарегистрироваться</a>
         </div>
 
         
