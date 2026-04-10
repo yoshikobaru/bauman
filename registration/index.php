@@ -32,11 +32,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['reg_fiz_action'])) {
     if (!in_array($memberType, ['basic','premium','partner','honorary'])) $memberType = 'basic';
     $agreeCharter    = ($_POST['fiz_agree_charter'] ?? '') === 'yes';
 
-    // Normalize DOB: accept YYYY-MM-DD (from type=date) or DD.MM.YYYY
+    // Normalize DOB: accept DD.MM.YYYY
     $dob = '';
-    if (preg_match('/^(\d{4})-(\d{2})-(\d{2})$/', $dobRaw, $m)) {
-        $dob = $m[3] . '.' . $m[2] . '.' . $m[1];
-    } elseif (preg_match('/^\d{2}\.\d{2}\.\d{4}$/', $dobRaw)) {
+    if (preg_match('/^\d{2}\.\d{2}\.\d{4}$/', $dobRaw)) {
         $dob = $dobRaw;
     }
 
@@ -275,20 +273,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['reg_ur_action'])) {
                     <input type="text" name="fiz_second_name" placeholder="Отчество"
                            value="<?= htmlspecialchars($_POST['fiz_second_name'] ?? '') ?>">
 
-                    <!-- Дата рождения с календарём -->
-                    <div style="position:relative">
-                        <input type="date" name="fiz_dob" id="fiz-dob" placeholder="Дата рождения *" required
-                               max="<?= date('Y-m-d') ?>"
-                               value="<?php
-                                    $dobPost = $_POST['fiz_dob'] ?? '';
-                                    if (preg_match('/^(\d{2})\.(\d{2})\.(\d{4})$/', $dobPost, $m2))
-                                        echo $m2[3].'-'.$m2[2].'-'.$m2[1];
-                                    else echo htmlspecialchars($dobPost);
-                               ?>"
-                               style="width:100%;box-sizing:border-box">
-                    </div>
+                    <!-- Дата рождения с маской -->
+                    <input type="text" name="fiz_dob" id="fiz-dob" placeholder="ДД.ММ.ГГГГ *"
+                           maxlength="10" autocomplete="bday" required
+                           value="<?= htmlspecialchars($_POST['fiz_dob'] ?? '') ?>">
                 </div>
-                <p style="font-size:12px;color:#888;margin-top:6px">Дата рождения: формат ДД.ММ.ГГГГ</p>
             </div>
 
             <!-- Выпускник? -->
@@ -368,7 +357,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['reg_ur_action'])) {
                     <div class="account__chapter"><h3 class="account__subtitle">Выбор тарифа</h3></div>
                 </div>
                 <div class="membership-slider swiper" style="margin-top:16px">
-                    <div class="swiper-wrapper">
+                    <div class="swiper-wrapper" style="align-items:stretch">
                         <!-- Базовое -->
                         <div class="swiper-slide membership-slider__card">
                             <h3 class="membership-slider__title">Базовое</h3>
@@ -381,7 +370,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['reg_ur_action'])) {
                                 <li class="membership-slider__item">Доступ в электронную библиотеку МГТУ (в разработке);</li>
                                 <li class="membership-slider__item">Доступ к витрине компетенций партнёров Политехнического общества, кафедр, студенческих конструкторских бюро и научно-образовательных центров МГТУ.</li>
                             </ul>
-                            <button type="button" class="membership-slider__join btn btn-empty select-plan btn--active" data-plan="basic">Выбрать</button>
+                                <button type="button" class="membership-slider__join btn btn-empty select-plan btn--active" data-plan="basic">Выбрать</button>
                         </div>
                         <!-- Профессиональное -->
                         <div class="swiper-slide membership-slider__card membership-slider__card--proffesional">
@@ -452,24 +441,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['reg_ur_action'])) {
             </div><!-- /fiz-graduate-section -->
 
             <!-- Блок для юр. лиц — Индустриальное партнёрство -->
-            <div style="margin-top:32px">
-                <div class="partner__wrapper" style="background:#1a2035;border-radius:16px;padding:32px;color:#fff;display:flex;gap:32px;align-items:center;flex-wrap:wrap">
-                    <div style="flex:0 0 auto;max-width:280px">
-                        <h3 style="font-size:22px;font-weight:700;margin-bottom:8px;color:#fff">Индустриальное партнерство</h3>
-                        <p style="font-size:14px;color:rgba(255,255,255,0.7);margin-bottom:20px">Для юридических лиц</p>
-                        <button type="button" class="btn" onclick="switchRegType('ur')">Стать партнером</button>
+            <section class="partner" style="margin-top:40px">
+                <div class="partner__wrapper">
+                    <div class="partner__info">
+                        <h2 class="main-title partner__title">Индустриальное партнерство</h2>
+                        <p class="main-text partner__text">Для юридических лиц</p>
+                        <button type="button" class="btn partner__btn desk-block" onclick="switchRegType('ur')">Стать партнером</button>
                     </div>
-                    <div style="flex:1;min-width:220px">
-                        <ul style="list-style:none;padding:0;margin:0 0 12px;display:flex;flex-direction:column;gap:8px">
-                            <li style="font-size:14px;color:rgba(255,255,255,0.85);padding-left:20px;position:relative"><span style="position:absolute;left:0;color:#e31e24">•</span>Все преимущества базового и бизнес членства</li>
-                            <li style="font-size:14px;color:rgba(255,255,255,0.85);padding-left:20px;position:relative"><span style="position:absolute;left:0;color:#e31e24">•</span>Возможность состоять в индустриальном клубе Политехнического общества</li>
-                            <li style="font-size:14px;color:rgba(255,255,255,0.85);padding-left:20px;position:relative"><span style="position:absolute;left:0;color:#e31e24">•</span>Доступ к витрине компетенций, возможность разместить заказ/взять задачу</li>
-                            <li style="font-size:14px;color:rgba(255,255,255,0.85);padding-left:20px;position:relative"><span style="position:absolute;left:0;color:#e31e24">•</span>Рекламные возможности площадок и мероприятий Политехнического общества</li>
+                    <div class="partner__discription">
+                        <ul class="partner__list">
+                            <li class="partner__item">Все преимущества базового и бизнес членства</li>
+                            <li class="partner__item">Возможность состоять в индустриальном клубе Политехнического общества</li>
+                            <li class="partner__item">Доступ к витрине компетенций, возможность разместить заказ/взять задачу</li>
+                            <li class="partner__item">Рекламные возможности площадок и мероприятий Политехнического общества</li>
                         </ul>
-                        <p style="font-size:13px;color:rgba(255,255,255,0.5)">Стоимость обсуждается индивидуально.</p>
+                        <p class="partner__discription-text">Стоимость обсуждается индивидуально.</p>
                     </div>
+                    <button type="button" class="btn partner__btn desk-none" onclick="switchRegType('ur')">Стать партнером</button>
                 </div>
-            </div>
+            </section>
 
         </form>
     </div><!-- /join__wrapper -->
@@ -662,6 +652,43 @@ document.addEventListener('click', function(e) {
             if (icon) icon.style.display = 'none';
         };
         reader.readAsDataURL(file);
+    });
+})();
+
+// Маска ввода даты ДД.ММ.ГГГГ
+(function() {
+    var dob = document.getElementById('fiz-dob');
+    if (!dob) return;
+    dob.addEventListener('keydown', function(e) {
+        // Разрешаем: Backspace, Delete, Tab, Escape, стрелки, Home, End
+        if ([8,9,27,46,35,36,37,38,39,40].indexOf(e.keyCode) !== -1) return;
+        // Разрешаем Ctrl+A, Ctrl+C, Ctrl+V, Ctrl+X
+        if (e.ctrlKey || e.metaKey) return;
+        // Запрещаем нецифровые символы (кроме точки — точку ставим сами)
+        if (e.key < '0' || e.key > '9') { e.preventDefault(); }
+    });
+    dob.addEventListener('input', function() {
+        var digits = this.value.replace(/\D/g, '').slice(0, 8);
+        var out = '';
+        if (digits.length <= 2) {
+            out = digits;
+        } else if (digits.length <= 4) {
+            out = digits.slice(0,2) + '.' + digits.slice(2);
+        } else {
+            out = digits.slice(0,2) + '.' + digits.slice(2,4) + '.' + digits.slice(4);
+        }
+        this.value = out;
+    });
+    dob.addEventListener('blur', function() {
+        var val = this.value;
+        if (val && !/^\d{2}\.\d{2}\.\d{4}$/.test(val)) {
+            this.setCustomValidity('Введите дату в формате ДД.ММ.ГГГГ');
+        } else {
+            this.setCustomValidity('');
+        }
+    });
+    dob.addEventListener('input', function() {
+        this.setCustomValidity('');
     });
 })();
 
