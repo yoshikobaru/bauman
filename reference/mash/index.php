@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 require($_SERVER["DOCUMENT_ROOT"]."/bitrix/header.php");
 $APPLICATION->SetTitle("Референс-визит в МАШ ЮНИТ");
 ?>
