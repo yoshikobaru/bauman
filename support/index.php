@@ -402,24 +402,18 @@ $prefill = [
         if (!projectName) {
             projectName = 'выбранный проект';
         }
-        commentField.value = 'Пожертвование на проект ' + projectName;
+        if (projectName === 'Пожертвование на ведение уставной деятельности') {
+            commentField.value = projectName;
+        } else {
+            commentField.value = 'Пожертвование на проект ' + projectName;
+        }
     }
     updatePaymentComment();
 
     // Next: summ → programm
     var btnNextSumm = document.getElementById('d2_next_summ');
     if (btnNextSumm) btnNextSumm.addEventListener('click', function() {
-        if (priceList) {
-            var activePrice = priceList.querySelector('[data-val].active');
-            if (activePrice && activePrice.getAttribute('data-val') === 'custom') {
-                var customVal = customInput ? (customInput.value || '').trim() : '';
-                if (!customVal || Number(customVal) <= 0) {
-                    alert('Введите корректную сумму.');
-                    if (customInput) customInput.focus();
-                    return;
-                }
-            }
-        }
+        if (!validateSummStep()) return;
         switchTab('programm');
     });
 
@@ -430,13 +424,7 @@ $prefill = [
     // Next: programm → data
     var btnNextProg = document.getElementById('d2_next_prog');
     if (btnNextProg) btnNextProg.addEventListener('click', function() {
-        var sel = document.getElementById('d2_project_select');
-        if (!sel || !sel.value) {
-            alert('Выберите проект.');
-            if (sel) sel.focus();
-            return;
-        }
-        if (sel) projectField.value = sel.value || 'Общий фонд';
+        if (!validateProjectStep()) return;
         updatePaymentComment();
         switchTab('data');
     });
@@ -455,6 +443,36 @@ $prefill = [
     // Next: data → pay
     var btnNextData = document.getElementById('d2_next_data');
     if (btnNextData) btnNextData.addEventListener('click', function() {
+        if (!validateDataStep()) return;
+        switchTab('pay');
+    });
+
+    function validateSummStep() {
+        if (!priceList) return true;
+        var activePrice = priceList.querySelector('[data-val].active');
+        if (activePrice && activePrice.getAttribute('data-val') === 'custom') {
+            var customVal = customInput ? (customInput.value || '').trim() : '';
+            if (!customVal || Number(customVal) <= 0) {
+                alert('Введите корректную сумму.');
+                if (customInput) customInput.focus();
+                return false;
+            }
+        }
+        return true;
+    }
+
+    function validateProjectStep() {
+        var sel = document.getElementById('d2_project_select');
+        if (!sel || !sel.value) {
+            alert('Выберите проект.');
+            if (sel) sel.focus();
+            return false;
+        }
+        if (projectField) projectField.value = sel.value || 'Общий фонд';
+        return true;
+    }
+
+    function validateDataStep() {
         var donor = donorField && donorField.value ? donorField.value : 'fiz';
         var paneSelector = donor === 'ur' ? '[data-tab="your"]' : '[data-tab="fiz"]';
         var pane = document.querySelector('.main-tabs-pane-project' + paneSelector);
@@ -464,16 +482,43 @@ $prefill = [
                 var input = requiredInputs[i];
                 if (!input.checkValidity()) {
                     input.reportValidity();
-                    return;
+                    return false;
                 }
             }
         }
         var agree = document.querySelector('input[name="agree_pd"]:checked');
         if (!agree || agree.value !== 'yes') {
             alert('Подтвердите ознакомление с политикой обработки ПДн.');
-            return;
+            return false;
         }
-        switchTab('pay');
+        return true;
+    }
+
+    // Prevent bypassing validation by clicking top tabs.
+    document.querySelectorAll('.project-programm__tabs .main-tabs-click').forEach(function(tabEl) {
+        tabEl.addEventListener('click', function(e) {
+            var targetTab = tabEl.getAttribute('data-tab');
+            var currentTabEl = document.querySelector('.project-programm__tabs .main-tabs-click.main-tabs-click--active');
+            var currentTab = currentTabEl ? currentTabEl.getAttribute('data-tab') : 'summ';
+            var order = { summ: 1, programm: 2, data: 3, pay: 4 };
+            if (!targetTab || !order[targetTab] || !order[currentTab]) return;
+
+            // Backward navigation is allowed.
+            if (order[targetTab] <= order[currentTab]) return;
+
+            var ok = true;
+            if (order[targetTab] >= 2) ok = ok && validateSummStep();
+            if (order[targetTab] >= 3) ok = ok && validateProjectStep();
+            if (order[targetTab] >= 4) ok = ok && validateDataStep();
+            if (!ok) {
+                e.preventDefault();
+                e.stopImmediatePropagation();
+                return;
+            }
+            switchTab(targetTab);
+            e.preventDefault();
+            e.stopImmediatePropagation();
+        }, true);
     });
 
     // Back: pay → data

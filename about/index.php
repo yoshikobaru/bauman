@@ -17,7 +17,7 @@ $APPLICATION->SetPageProperty('description', 'О Политехническом 
                         </div>
                         <img src="<?=SITE_TEMPLATE_PATH?>/assets/img/reference-page/banner-other-pattern.png" alt="" class="banner-other__pattern">
                     </div>
-                    <img src="<?=SITE_TEMPLATE_PATH?>/assets/img/reference-page/banner-other-img.png" alt="" class="banner-other__image">
+                    <img src="<?=SITE_TEMPLATE_PATH?>/assets/img/about/onas.jpg" alt="" class="banner-other__image">
                 </div>
             </div>
             <!-- /.container -->
@@ -62,7 +62,7 @@ $APPLICATION->SetPageProperty('description', 'О Политехническом 
 			<div class="container">
 				<div class="boards__wrapper">
 					<h2 class="main-title">
-						Члены правления Политехнического общества
+						Члены Совета Политехнического общества
 					</h2>
 					<div class="boards__list">
 <?php
@@ -133,7 +133,7 @@ endif;
 							</div>
 							<div class="history__item">
 								<h3>2024</h3>
-								<p>Перезапуск <br> общества</p>
+								<p>Обновление <br> сообщества</p>
 							</div>
 						</div>
 					</div>
