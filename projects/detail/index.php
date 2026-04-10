@@ -165,7 +165,7 @@ if (!empty($arElement['DETAIL_PICTURE'])) {
             $detailHtml
         );
         $detailHtml = preg_replace(
-            '#<section[^>]*class=(["\'])[^"\']*\bproject-help\b[^"\']*\1[^>]*>.*?</section>#isu',
+            '#<section[^>]*class=(["\'])[^"\']*(?:^|\s)project-help(?:\s|$)[^"\']*\1[^>]*>.*?</section>#isu',
             '',
             $detailHtml
         );
