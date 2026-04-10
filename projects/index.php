@@ -43,7 +43,7 @@ $statusLabels = ['all' => 'Все', 'active' => 'Активные', 'completed' 
                     </div>
                     <img src="<?=SITE_TEMPLATE_PATH?>/assets/img/reference-page/banner-other-pattern.png" alt="" class="banner-other__pattern">
                 </div>
-                <img src="<?=SITE_TEMPLATE_PATH?>/assets/img/projects-page/current-project-img-1.png" alt="" class="banner-other__image">
+                <img src="<?=SITE_TEMPLATE_PATH?>/assets/img/reference-page/banner-other-img.png" alt="" class="banner-other__image">
             </div>
         </div>
     </section>
@@ -86,7 +86,7 @@ $_staticActive = [
                         }
                         $link = !empty($row['PROPERTY_DETAIL_URL_VALUE'])
                             ? $row['PROPERTY_DETAIL_URL_VALUE']
-                            : '/projects/detail/?id=' . (int)$row['ID'];
+                            : (!empty($row['CODE']) ? '/projects/' . rawurlencode($row['CODE']) . '/' : '/projects/detail/?id=' . (int)$row['ID']);
                         ?>
                 <div class="visits__card">
                     <img src="<?= htmlspecialchars($imgSrc) ?>" alt="" class="visits__image">

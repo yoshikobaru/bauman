@@ -5,12 +5,24 @@ use Bitrix\Main\Loader;
 $iblockOk = Loader::includeModule('iblock');
 
 $elementId = (int)($_GET['id'] ?? 0);
+$elementCode = trim((string)($_REQUEST['ELEMENT_CODE'] ?? $_GET['code'] ?? ''));
 $arElement = [];
 $arProps   = [];
 
-if ($iblockOk && $elementId > 0) {
-    $dbEl = CIBlockElement::GetByID($elementId);
+if ($iblockOk && ($elementId > 0 || ($elementCode !== '' && defined('IBLOCK_PROJECTS_ID') && IBLOCK_PROJECTS_ID > 0))) {
+    if ($elementId > 0) {
+        $dbEl = CIBlockElement::GetByID($elementId);
+    } else {
+        $dbEl = CIBlockElement::GetList(
+            ['SORT' => 'ASC'],
+            ['IBLOCK_ID' => IBLOCK_PROJECTS_ID, '=CODE' => $elementCode, 'ACTIVE' => 'Y'],
+            false,
+            ['nTopCount' => 1],
+            ['ID', 'IBLOCK_ID', 'NAME', 'PREVIEW_TEXT', 'DETAIL_TEXT', 'DETAIL_PICTURE', 'PREVIEW_PICTURE', 'DATE_ACTIVE_FROM', 'TIMESTAMP_X', 'CODE']
+        );
+    }
     if ($arElement = $dbEl->GetNext()) {
+        $elementId = (int)$arElement['ID'];
         $APPLICATION->SetTitle(htmlspecialchars($arElement['NAME']));
         $dbProps = CIBlockElement::GetProperty($arElement['IBLOCK_ID'], $elementId);
         while ($prop = $dbProps->Fetch()) {
@@ -37,9 +49,12 @@ if (!empty($arElement['DETAIL_PICTURE'])) {
             <div class="banner-other__wrapper banner-other__wrapper--current">
                 <div class="banner-other__content">
                     <div class="banner-other__info banner-other__info--current">
-                        <?php if (!empty($arProps['PROJECT_STATUS']['VALUE'])): ?>
+                        <?php
+                        $projectStatusRaw = $arProps['PROJECT_STATUS']['VALUE_ENUM'] ?? $arProps['PROJECT_STATUS']['VALUE'] ?? '';
+                        if (!empty($projectStatusRaw)):
+                        ?>
                         <div class="banner-other__date">
-                            <p class="banner-other__status"><?= htmlspecialchars($arProps['PROJECT_STATUS']['VALUE']) ?></p>
+                            <p class="banner-other__status"><?= htmlspecialchars($projectStatusRaw) ?></p>
                             <?php if (!empty($arElement['DATE_ACTIVE_FROM'])): ?>
                             <p class="banner-other__time"><span>Запущен</span> <?= date('d F Y', strtotime($arElement['DATE_ACTIVE_FROM'])) ?></p>
                             <?php endif; ?>
@@ -82,7 +97,7 @@ if (!empty($arElement['DETAIL_PICTURE'])) {
                     <?php endif; ?>
                     <p style="margin-top:24px">
                         <?php
-                        $projectStatus = mb_strtolower($arProps['PROJECT_STATUS']['VALUE'] ?? '');
+                        $projectStatus = mb_strtolower((string)($arProps['PROJECT_STATUS']['VALUE_ENUM'] ?? $arProps['PROJECT_STATUS']['VALUE'] ?? ''));
                         $isActiveProject = in_array($projectStatus, ['active', 'активный', 'в работе', 'активен']);
                         ?>
                         <?php if ($isActiveProject || empty($projectStatus)): ?>
@@ -107,7 +122,9 @@ if (!empty($arElement['DETAIL_PICTURE'])) {
 <?php
 $_projName  = htmlspecialchars($arElement['NAME'], ENT_QUOTES);
 $_projDesc  = htmlspecialchars(strip_tags($arElement['PREVIEW_TEXT'] ?? ''), ENT_QUOTES);
-$_projUrl   = 'https://bauman-polytech.ru/projects/detail/?id=' . $arElement['ID'];
+$_projUrl   = !empty($arElement['CODE'])
+    ? 'https://bauman-polytech.ru/projects/' . rawurlencode($arElement['CODE']) . '/'
+    : 'https://bauman-polytech.ru/projects/detail/?id=' . $arElement['ID'];
 $_projDate  = !empty($arElement['DATE_ACTIVE_FROM']) ? date('c', strtotime($arElement['DATE_ACTIVE_FROM'])) : date('c', strtotime($arElement['TIMESTAMP_X']));
 ?>
 <script type="application/ld+json">

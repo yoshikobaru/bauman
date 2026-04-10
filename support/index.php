@@ -91,7 +91,7 @@ $prefill = [
 
 <main>
     <!-- D2: Форма поддержки проекта -->
-    <section class="project-programm">
+    <section class="project-programm" style="padding-top:140px;">
         <div class="container">
             <div class="project-programm__wrapper">
                 <div class="project-programm__preview">
@@ -191,10 +191,16 @@ $prefill = [
                                     <select id="d2_project_select" name="project">
                                         <option value="">— Выберите программу —</option>
                                         <option value="Пожертвование на ведение уставной деятельности">Пожертвование на ведение уставной деятельности</option>
-                                        <option value="Реставрация Ротонды">Реставрация Ротонды</option>
-                                        <option value="Конференция PolytechExpo">Конференция PolytechExpo</option>
-                                        <option value="Конференция Встреча выпускников">Конференция Встреча выпускников</option>
-                                        <option value="Попечительский совет МТ4">Попечительский совет МТ4</option>
+                                        <?php if (!empty($arProjects)): ?>
+                                            <?php foreach ($arProjects as $projectItem): ?>
+                                                <option value="<?= htmlspecialchars($projectItem['NAME']) ?>"><?= htmlspecialchars($projectItem['NAME']) ?></option>
+                                            <?php endforeach; ?>
+                                        <?php else: ?>
+                                            <option value="Реставрация Ротонды">Реставрация Ротонды</option>
+                                            <option value="Конференция PolytechExpo">Конференция PolytechExpo</option>
+                                            <option value="Конференция Встреча выпускников">Конференция Встреча выпускников</option>
+                                            <option value="Попечительский совет МТ4">Попечительский совет МТ4</option>
+                                        <?php endif; ?>
                                     </select>
                                 </div>
                                 <div class="project-programm__buttons">
