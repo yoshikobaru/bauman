@@ -134,7 +134,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['d5_action'])) {
                 while ($p = $dbP->Fetch()) {
                     if (!in_array($p['CODE'], $refCodes)) continue;
                     $elProps[$p['CODE']] = $p['VALUE_ENUM'] ?: $p['VALUE'];
-                    if ($p['CODE'] === 'REF_STATUS') $statusXml = $p['XML_ID'] ?? '';
+                    if ($p['CODE'] === 'REF_STATUS') $statusXml = $p['VALUE_XML_ID'] ?? '';
                 }
                 $el['_PROPS']      = $elProps;
                 $el['_STATUS_XML'] = $statusXml;
