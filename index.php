@@ -571,42 +571,14 @@ foreach ($_staticProjects as $sp):
 			<div class="join__wrapper">
 				<h2 class="account__title main-title">Индустриальное партнёрство</h2>
 				<p style="margin-bottom:24px;color:#666">Для компаний, НИИ и организаций. После отправки заявки мы свяжемся с вами в течение 5 рабочих дней.</p>
-				<form method="POST" action="/join/#join-ur-block">
-					<input type="hidden" name="d7_action" value="1">
-					<div class="account__personal">
-						<div class="account__chapter"><h3 class="account__subtitle">Данные компании</h3></div>
-						<div class="account__personal-list account__grid">
-							<input type="text" name="d7_company" placeholder="Компания *" required>
-							<input type="url" name="d7_site" placeholder="Сайт компании">
-						</div>
-					</div>
-					<div class="account__personal" style="margin-top:24px">
-						<div class="account__chapter"><h3 class="account__subtitle">Контакты представителя</h3></div>
-						<div class="account__personal-list account__grid">
-							<input type="text" name="d7_contact" placeholder="ФИО представителя *" required>
-							<input type="email" name="d7_email" placeholder="e-mail *" required>
-							<input type="tel" name="d7_phone" placeholder="Телефон">
-							<input type="number" name="d7_count" placeholder="Планируемое кол-во представителей *" min="1" required>
-						</div>
-					</div>
-					<div class="join__politic" style="margin-top:24px">
-						<div class="join__politic-question">
-							<p class="join__politic-link">Согласен с <a href="<?= defined('DOC_POLITIKA_URL') ? DOC_POLITIKA_URL : '#' ?>" target="_blank">политикой обработки ПДн</a></p>
-							<div class="account__graduate-choice">
-								<label class="account__graduate-item">
-									<input type="radio" name="d7_agree_pd" value="yes" class="account__graduate-input">
-									<span class="account__graduate-box"></span>Да
-								</label>
-								<label class="account__graduate-item">
-									<input type="radio" name="d7_agree_pd" value="no" class="account__graduate-input">
-									<span class="account__graduate-box"></span>Нет
-								</label>
-							</div>
-						</div>
-					</div>
-					<p class="form-required-note">* Обязательные поля</p>
-					<button type="submit" class="btn authorization__btn" style="margin-top:24px">Отправить заявку на партнёрство</button>
-				</form>
+				<?php
+				po_render_industrial_partnership_form([
+					'prefix'      => 'd7',
+					'action'      => '/join/#join-ur-block',
+					'hidden_name' => 'd7_action',
+					'post'        => [],
+				]);
+				?>
 			</div>
 		</div>
 	</section>

@@ -83,6 +83,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['d7_action'])) {
     $d7AgreePd = !empty($_POST['d7_agree_pd']);
     if (!$d7Company || !$d7Contact || !$d7Email || !$d7Phone) {
         $d7Error = 'Заполните обязательные поля: Компания, ФИО, Email, Телефон.';
+    } elseif (!po_is_valid_partnership_phone($d7Phone)) {
+        $d7Error = 'Укажите телефон цифрами и символами пробел, + и -.';
     } elseif (!$d7AgreePd) {
         $d7Error = 'Необходимо согласие с политикой ПДн.';
     } else {
@@ -274,38 +276,15 @@ if ($isAuthorized) {
                     <p><?= htmlspecialchars($d7Error) ?></p>
                 </div>
                 <?php endif; ?>
-                <form method="POST" action="/join/#join-ur-block">
-                    <input type="hidden" name="d7_action" value="1">
-                    <div class="account__personal">
-                        <div class="account__chapter"><h3 class="account__subtitle">Данные компании</h3></div>
-                        <div class="account__personal-list account__grid">
-                            <input type="text" name="d7_company" placeholder="Название компании *" required
-                                   value="<?= htmlspecialchars($_POST['d7_company'] ?? '') ?>">
-                            <input type="text" name="d7_site"    placeholder="Сайт компании"
-                                   value="<?= htmlspecialchars($_POST['d7_site'] ?? '') ?>">
-                        </div>
-                    </div>
-                    <div class="account__personal" style="margin-top:24px">
-                        <div class="account__chapter"><h3 class="account__subtitle">Контакты представителя</h3></div>
-                        <div class="account__personal-list account__grid">
-                            <input type="text"   name="d7_contact" placeholder="ФИО представителя *" required
-                                   value="<?= htmlspecialchars($_POST['d7_contact'] ?? '') ?>">
-                            <input type="email"  name="d7_email"   placeholder="Email *" required
-                                   value="<?= htmlspecialchars($_POST['d7_email'] ?? ($arCurUser['EMAIL'] ?? '')) ?>">
-                            <input type="tel"    name="d7_phone"   placeholder="Телефон *" required
-                                   value="<?= htmlspecialchars($_POST['d7_phone'] ?? '') ?>">
-                        </div>
-                    </div>
-                    <div class="join__politic" style="margin-top:24px">
-                        <div class="join__politic-question">
-                            <label style="display:flex;align-items:center;gap:10px;cursor:pointer">
-                                <input type="checkbox" name="d7_agree_pd" id="d7_agree_pd" required style="width:18px;height:18px;flex-shrink:0">
-                                <span class="join__politic-link">Согласен с <a href="<?= defined('DOC_POLITIKA_URL') ? DOC_POLITIKA_URL : '#' ?>" target="_blank">политикой обработки ПДн</a></span>
-                            </label>
-                        </div>
-                    </div>
-                    <button type="submit" class="btn authorization__btn" style="margin-top:24px">Отправить заявку на партнёрство</button>
-                </form>
+                <?php
+                po_render_industrial_partnership_form([
+                    'prefix'      => 'd7',
+                    'action'      => '/join/#join-ur-block',
+                    'hidden_name' => 'd7_action',
+                    'post'        => $_POST,
+                    'defaults'    => ['email' => $arCurUser['EMAIL'] ?? ''],
+                ]);
+                ?>
                 <?php endif; ?>
             </div>
         </div>

@@ -137,7 +137,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['d6_action'])) {
                                 <?php if ($USER->IsAdmin()): ?><a href="/setup_competencies.php">Запустить настройку</a><?php endif; ?>
                             </p>
                             <?php elseif (empty($items)): ?>
-                            <p style="padding:20px;color:#888">Компетенции в этой категории пока не добавлены.</p>
+                            <p style="padding:20px;color:#888">Витрина компетенций в разработке. Следите за новостями.</p>
                             <?php else: ?>
                             <?php foreach ($items as $comp):
                                 $imgSrc = '';

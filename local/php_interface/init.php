@@ -267,6 +267,23 @@ function po_logAction(string $action, string $entityType = '', int $entityId = 0
     }
 }
 
+/**
+ * Телефон в заявке «Индустриальное партнёрство»: только цифры, пробел, + и -, минимум одна цифра.
+ */
+function po_is_valid_partnership_phone(string $phone): bool
+{
+    $phone = trim($phone);
+    if ($phone === '') {
+        return false;
+    }
+    if (!preg_match('/^[\d\s\+\-]+$/u', $phone)) {
+        return false;
+    }
+    return (bool)preg_match('/\d/u', $phone);
+}
+
+require_once __DIR__ . '/partnership_form_markup.php';
+
 // Логирование входа пользователя
 AddEventHandler('main', 'OnAfterUserLogin', function (&$arFields) {
     $login = $arFields['LOGIN'] ?? '';

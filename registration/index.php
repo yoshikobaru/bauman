@@ -189,6 +189,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['reg_ur_action'])) {
 
     if (!$urCompany || !$urContact || !$urEmail || !$urPhone) {
         $urError = 'Заполните обязательные поля: Компания, ФИО, e-mail, Телефон.';
+    } elseif (!po_is_valid_partnership_phone($urPhone)) {
+        $urError = 'Укажите телефон цифрами и символами пробел, + и -.';
     } elseif (!$urPd) {
         $urError = 'Необходимо согласие с политикой ПДн.';
     } else {
@@ -575,44 +577,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['reg_ur_action'])) {
         </div>
         <?php endif; ?>
 
-        <form method="POST" action="/registration/?type=ur">
-            <input type="hidden" name="reg_ur_action" value="1">
-
-            <div class="account__personal">
-                <div class="account__chapter"><h3 class="account__subtitle">Данные компании <span style="color:#e31e24;font-size:13px;font-weight:400;margin-left:8px">* — обязательные поля</span></h3></div>
-                <div class="account__personal-list account__grid">
-                    <input type="text" name="ur_company" placeholder="Название компании *" required
-                           value="<?= htmlspecialchars($_POST['ur_company'] ?? '') ?>">
-                    <input type="text" name="ur_site"    placeholder="Сайт компании"
-                           value="<?= htmlspecialchars($_POST['ur_site'] ?? '') ?>">
-                </div>
-            </div>
-
-            <div class="account__personal" style="margin-top:24px">
-                <div class="account__chapter"><h3 class="account__subtitle">Контакты представителя</h3></div>
-                <div class="account__personal-list account__grid">
-                    <input type="text"  name="ur_contact" placeholder="ФИО представителя *" required
-                           value="<?= htmlspecialchars($_POST['ur_contact'] ?? '') ?>">
-                    <input type="email" name="ur_email"   placeholder="e-mail *" required
-                           value="<?= htmlspecialchars($_POST['ur_email'] ?? '') ?>">
-                    <input type="tel"   name="ur_phone"   placeholder="Телефон *" required
-                           value="<?= htmlspecialchars($_POST['ur_phone'] ?? '') ?>">
-                </div>
-            </div>
-
-            <div class="join__politic" style="margin-top:24px">
-                <div class="join__politic-question">
-                    <label style="display:flex;align-items:center;gap:10px;cursor:pointer">
-                        <input type="checkbox" name="ur_agree_pd" id="ur_agree_pd" required
-                               style="width:18px;height:18px;flex-shrink:0"
-                               <?= !empty($_POST['ur_agree_pd']) ? 'checked' : '' ?>>
-                        <span class="join__politic-link">Ознакомлен с <a href="<?= defined('DOC_POLITIKA_URL') ? DOC_POLITIKA_URL : '#' ?>" target="_blank">политикой обработки ПДн</a> *</span>
-                    </label>
-                    <span id="ur-agree-err" style="display:none;color:#e74c3c;font-size:13px;margin-top:4px">Необходимо согласие с политикой обработки ПДн</span>
-                </div>
-            </div>
-            <button type="submit" class="btn authorization__btn" style="margin-top:24px">Отправить заявку на партнёрство</button>
-        </form>
+        <?php
+        po_render_industrial_partnership_form([
+            'prefix'                 => 'ur',
+            'action'                 => '/registration/?type=ur',
+            'hidden_name'            => 'reg_ur_action',
+            'post'                   => $_POST,
+            'company_subtitle_extra' => ' <span style="color:#e31e24;font-size:13px;font-weight:400;margin-left:8px">* — обязательные поля</span>',
+            'extra_after_consent'    => '<span id="ur-agree-err" style="display:none;color:#e74c3c;font-size:13px;margin-top:4px">Необходимо согласие с политикой обработки ПДн</span>',
+        ]);
+        ?>
     </div>
     <?php endif; ?>
     </div><!-- /block-ur -->
