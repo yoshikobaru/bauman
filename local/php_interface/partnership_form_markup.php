@@ -97,11 +97,13 @@ if (!function_exists('po_render_industrial_partnership_form')) {
                                    placeholder="<?= htmlspecialchars($emailPh, ENT_QUOTES, 'UTF-8') ?>" required
                                    value="<?= $emailVal ?>">
                             <input type="tel" name="<?= htmlspecialchars($phoneKey, ENT_QUOTES, 'UTF-8') ?>"
+                                   class="js-partnership-phone"
                                    placeholder="Телефон *" required
                                    pattern="<?= htmlspecialchars($phonePattern, ENT_QUOTES, 'UTF-8') ?>"
                                    title="<?= htmlspecialchars($phoneTitle, ENT_QUOTES, 'UTF-8') ?>"
                                    inputmode="tel"
                                    autocomplete="tel"
+                                   maxlength="25"
                                    value="<?= $fv($post, $phoneKey) ?>">
                         </div>
                     </div>
@@ -118,6 +120,21 @@ if (!function_exists('po_render_industrial_partnership_form')) {
                     </div>
                     <button type="submit" class="btn authorization__btn" style="margin-top:24px">Отправить заявку на партнёрство</button>
                 </form>
+<script>
+(function () {
+    function bindPartnershipPhone(inp) {
+        if (!inp || inp.dataset.poPhoneMaskBound) return;
+        inp.dataset.poPhoneMaskBound = '1';
+        var maxLen = 25;
+        inp.addEventListener('input', function () {
+            var v = inp.value.replace(/[^\d+\-\s]/g, '');
+            if (v.length > maxLen) v = v.slice(0, maxLen);
+            inp.value = v;
+        });
+    }
+    document.querySelectorAll('input.js-partnership-phone').forEach(bindPartnershipPhone);
+})();
+</script>
         <?php
     }
 }
