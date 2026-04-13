@@ -17,7 +17,7 @@ $APPLICATION->SetPageProperty('description', 'О Политехническом 
                         </div>
                         <img src="<?=SITE_TEMPLATE_PATH?>/assets/img/reference-page/banner-other-pattern.png" alt="" class="banner-other__pattern">
                     </div>
-                    <img src="<?=SITE_TEMPLATE_PATH?>/assets/img/about/onas.jpg" alt="" class="banner-other__image">
+                    <img src="<?=SITE_TEMPLATE_PATH?>/assets/img/about/about.jpg" alt="" class="banner-other__image">
                 </div>
             </div>
             <!-- /.container -->
@@ -102,7 +102,7 @@ endif;
 		 <!-- /.boards -->
 		
 		<!-- history -->
-		<section class="history bg-white">
+		<section class="history bg-white" id="history-section">
 			<div class="container">
 				<h2 class="main-title history__title">
 					С 19 века создаем сеть поддержки и обеспечиваем стабильность и рост общества

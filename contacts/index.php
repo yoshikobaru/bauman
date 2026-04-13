@@ -4,7 +4,7 @@ $APPLICATION->SetTitle("Контакты");
 ?>
 
 <main>
-        <section class="contacts-top">
+        <section class="contacts-top" style="padding-top:60px">
             <div class="container">
                 <a href="mailto:info@bauman-polytech.ru" class="footer-mail">
                     info@bauman-polytech.ru

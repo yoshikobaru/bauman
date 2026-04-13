@@ -414,7 +414,7 @@ foreach ($_staticProjects as $sp):
 									Практика на основе исследований
 								</p>
 							</a>
-						<a href="/about/" class="new-project__card new-project__card--different" style="text-decoration:none;color:#fff;display:block;">
+						<a href="/about/#history-section" class="new-project__card new-project__card--different" style="text-decoration:none;color:#fff;display:block;">
 							<img src="<?=SITE_TEMPLATE_PATH?>/assets/img/new-project-bg.png" alt="">
 							<h3>
 								История и крепкое сообщество

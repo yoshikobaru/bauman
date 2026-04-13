@@ -80,7 +80,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['d7_action'])) {
     $d7Site    = trim($_POST['d7_site']    ?? '');
     $d7Email   = trim($_POST['d7_email']   ?? '');
     $d7Phone   = trim($_POST['d7_phone']   ?? '');
-    $d7AgreePd = ($_POST['d7_agree_pd'] ?? '') === 'yes';
+    $d7AgreePd = !empty($_POST['d7_agree_pd']);
     if (!$d7Company || !$d7Contact || !$d7Email || !$d7Phone) {
         $d7Error = 'Заполните обязательные поля: Компания, ФИО, Email, Телефон.';
     } elseif (!$d7AgreePd) {
@@ -183,7 +183,7 @@ if ($isAuthorized) {
                             <li class="membership-slider__item">Доступ в электронную библиотеку МГТУ (в разработке);</li>
                             <li class="membership-slider__item">Доступ к витрине компетенций партнёров Политехнического общества, кафедр, студенческих конструкторских бюро и научно-образовательных центров МГТУ.</li>
                         </ul>
-                        <button class="membership-slider__join btn btn-empty" data-fancybox data-src="#form-membership" data-plan="basic">Вступить</button>
+                        <button class="membership-slider__join btn btn-empty" onclick="window.location='/registration/'">Вступить</button>
                     </div>
                     <!-- Профессиональное -->
                     <div class="swiper-slide membership-slider__card membership-slider__card--proffesional">
@@ -198,7 +198,7 @@ if ($isAuthorized) {
                             <li class="membership-slider__item">Участие в бизнес-мероприятиях Политехнического общества в онлайн и очном форматах;</li>
                             <li class="membership-slider__item">Доступ к базе резюме выпускников на карьерной платформе Политехнического общества.</li>
                         </ul>
-                        <button class="membership-slider__join btn btn-empty" data-fancybox data-src="#form-membership" data-plan="premium">Вступить</button>
+                        <button class="membership-slider__join btn btn-empty" onclick="window.location='/registration/'">Вступить</button>
                     </div>
                     <!-- Партнёрское -->
                     <div class="swiper-slide membership-slider__card membership-slider__card--honorary">
@@ -222,7 +222,7 @@ if ($isAuthorized) {
                         <ul class="membership-slider__list">
                             <li class="membership-slider__item">Для тех, кто внёс значительный вклад в развитие технической науки, образования, технологий и деятельности Политехнического общества.</li>
                         </ul>
-                        <button type="button" class="membership-slider__join btn btn-empty" data-fancybox data-src="#form-honorary">Вступить</button>
+                        <button type="button" class="membership-slider__join btn btn-empty" onclick="window.location='/registration/'">Вступить</button>
                     </div>
                 </div>
                 <div class="swiper-pagination"></div>
@@ -281,7 +281,7 @@ if ($isAuthorized) {
                         <div class="account__personal-list account__grid">
                             <input type="text" name="d7_company" placeholder="Название компании *" required
                                    value="<?= htmlspecialchars($_POST['d7_company'] ?? '') ?>">
-                            <input type="url"  name="d7_site"    placeholder="Сайт компании"
+                            <input type="text" name="d7_site"    placeholder="Сайт компании"
                                    value="<?= htmlspecialchars($_POST['d7_site'] ?? '') ?>">
                         </div>
                     </div>
@@ -298,17 +298,10 @@ if ($isAuthorized) {
                     </div>
                     <div class="join__politic" style="margin-top:24px">
                         <div class="join__politic-question">
-                            <p class="join__politic-link">Согласен с <a href="<?= defined('DOC_POLITIKA_URL') ? DOC_POLITIKA_URL : '#' ?>" target="_blank">политикой обработки ПДн</a></p>
-                            <div class="account__graduate-choice">
-                                <label class="account__graduate-item">
-                                    <input type="radio" name="d7_agree_pd" value="yes" class="account__graduate-input">
-                                    <span class="account__graduate-box"></span>Да
-                                </label>
-                                <label class="account__graduate-item">
-                                    <input type="radio" name="d7_agree_pd" value="no" class="account__graduate-input">
-                                    <span class="account__graduate-box"></span>Нет
-                                </label>
-                            </div>
+                            <label style="display:flex;align-items:center;gap:10px;cursor:pointer">
+                                <input type="checkbox" name="d7_agree_pd" id="d7_agree_pd" required style="width:18px;height:18px;flex-shrink:0">
+                                <span class="join__politic-link">Согласен с <a href="<?= defined('DOC_POLITIKA_URL') ? DOC_POLITIKA_URL : '#' ?>" target="_blank">политикой обработки ПДн</a></span>
+                            </label>
                         </div>
                     </div>
                     <button type="submit" class="btn authorization__btn" style="margin-top:24px">Отправить заявку на партнёрство</button>

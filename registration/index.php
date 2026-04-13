@@ -26,16 +26,42 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['reg_fiz_action'])) {
     $telegram        = trim($_POST['fiz_telegram']       ?? '');
     $diplomaSer      = trim($_POST['fiz_diploma_ser']    ?? '');
     $diplomaNum      = trim($_POST['fiz_diploma_num']    ?? '');
-    $diplomaDate     = trim($_POST['fiz_diploma_date']   ?? '');
     $achievements    = trim($_POST['fiz_achievements']   ?? '');
     $memberType      = trim($_POST['fiz_membership_type'] ?? 'basic');
     if (!in_array($memberType, ['basic','premium','partner','honorary'])) $memberType = 'basic';
-    $agreeCharter    = ($_POST['fiz_agree_charter'] ?? '') === 'yes';
+    $agreeCharter    = !empty($_POST['fiz_agree_charter']);
+    $wasMember       = ($_POST['fiz_was_member'] ?? '') === 'yes';
+    // diploma date from hidden field (DD.MM.ГГГГ) or fallback from date input
+    $diplomaDateRaw  = trim($_POST['fiz_diploma_date_hidden'] ?? trim($_POST['fiz_diploma_date'] ?? ''));
+    $diplomaDate     = '';
+    if (preg_match('/^\d{2}\.\d{2}\.\d{4}$/', $diplomaDateRaw)) {
+        $diplomaDate = $diplomaDateRaw;
+    } elseif (preg_match('/^\d{4}-\d{2}-\d{2}$/', $diplomaDateRaw)) {
+        // YYYY-MM-DD → DD.MM.YYYY
+        $parts = explode('-', $diplomaDateRaw);
+        $diplomaDate = $parts[2] . '.' . $parts[1] . '.' . $parts[0];
+    }
 
-    // Normalize DOB: accept DD.MM.YYYY
+    // Normalize DOB: accept DD.MM.YYYY or YYYY-MM-DD (from type=date)
+    $dobRaw2 = trim($_POST['fiz_dob_hidden'] ?? $dobRaw);
     $dob = '';
-    if (preg_match('/^\d{2}\.\d{2}\.\d{4}$/', $dobRaw)) {
+    if (preg_match('/^\d{2}\.\d{2}\.\d{4}$/', $dobRaw2)) {
+        $dob = $dobRaw2;
+    } elseif (preg_match('/^\d{4}-\d{2}-\d{2}$/', $dobRaw2)) {
+        $parts = explode('-', $dobRaw2);
+        $dob = $parts[2] . '.' . $parts[1] . '.' . $parts[0];
+    } elseif (preg_match('/^\d{2}\.\d{2}\.\d{4}$/', $dobRaw)) {
         $dob = $dobRaw;
+    }
+
+    // File extension helpers
+    $allowedAvatar  = ['jpg','jpeg','png'];
+    $allowedDiploma = ['pdf','jpg','jpeg'];
+    $allowedScan    = ['pdf','jpg','jpeg','png'];
+    function po_regFileExt($file, $allowed) {
+        if (empty($file['name']) || $file['error'] !== UPLOAD_ERR_OK) return true;
+        $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+        return in_array($ext, $allowed);
     }
 
     if (!$email)                     $errors[] = 'Введите e-mail';
@@ -45,7 +71,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['reg_fiz_action'])) {
     if ($password !== $passwordConfirm) $errors[] = 'Пароли не совпадают';
     if (!$lastName)                  $errors[] = 'Введите фамилию';
     if (!$firstName)                 $errors[] = 'Введите имя';
-    if (!$dob)                       $errors[] = 'Укажите дату рождения в формате ДД.ММ.ГГГГ';
+    if (!$dob)                       $errors[] = 'Укажите дату рождения';
+    // Avatar extension check
+    if (!empty($_FILES['fiz_avatar']['name']) && !po_regFileExt($_FILES['fiz_avatar'], $allowedAvatar)) {
+        $errors[] = 'Аватар: допустимы только jpg, jpeg, png';
+    }
     if ($isGraduate) {
         if (!$agreeCharter)          $errors[] = 'Необходимо согласие с Уставом и политикой ПДн';
         if (!$diplomaSer)            $errors[] = 'Укажите серию бланка диплома';
@@ -56,7 +86,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['reg_fiz_action'])) {
         if ($gradYearInt > 0 && $gradYearInt <= 2020) {
             if (empty($_FILES['fiz_diploma_scan']['name']) || $_FILES['fiz_diploma_scan']['error'] !== UPLOAD_ERR_OK) {
                 $errors[] = 'Прикрепите скан диплома (pdf или jpg) — обязательно для выпускников до 2020 года включительно';
+            } elseif (!po_regFileExt($_FILES['fiz_diploma_scan'], $allowedDiploma)) {
+                $errors[] = 'Скан диплома: допустимы только pdf, jpg, jpeg';
             }
+        }
+        // Membership scan (optional) extension check
+        if (!empty($_FILES['fiz_membership_scan']['name']) && !po_regFileExt($_FILES['fiz_membership_scan'], $allowedScan)) {
+            $errors[] = 'Скан удостоверения: допустимы только pdf, jpg, jpeg, png';
         }
     }
 
@@ -73,6 +109,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['reg_fiz_action'])) {
             $diplomaScanId = CFile::SaveFile(
                 CFile::MakeFileArray($_FILES['fiz_diploma_scan']['tmp_name'], $_FILES['fiz_diploma_scan']['name']),
                 'diploma_scan'
+            );
+        }
+        $membershipScanId = false;
+        if ($wasMember && !empty($_FILES['fiz_membership_scan']['name']) && $_FILES['fiz_membership_scan']['error'] === UPLOAD_ERR_OK) {
+            $membershipScanId = CFile::SaveFile(
+                CFile::MakeFileArray($_FILES['fiz_membership_scan']['tmp_name'], $_FILES['fiz_membership_scan']['name']),
+                'membership_scan'
             );
         }
         $oUser = new CUser();
@@ -95,8 +138,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['reg_fiz_action'])) {
             'UF_DIPLOMA_DATE'      => $diplomaDate,
             'UF_DOB'               => $dob,
         ];
-        if ($avatarFileId)   $userData['PERSONAL_PHOTO']    = $avatarFileId;
-        if ($diplomaScanId)  $userData['UF_DIPLOMA_SCAN']   = $diplomaScanId;
+        if ($avatarFileId)      $userData['PERSONAL_PHOTO']       = $avatarFileId;
+        if ($diplomaScanId)     $userData['UF_DIPLOMA_SCAN']      = $diplomaScanId;
+        if ($membershipScanId)  $userData['UF_MEMBERSHIP_SCAN']   = $membershipScanId;
         $userId = $oUser->Add($userData);
         if ($userId) {
             $USER->Login($email, $password, 'N');
@@ -141,7 +185,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['reg_ur_action'])) {
     $urSite    = trim($_POST['ur_site']    ?? '');
     $urEmail   = trim($_POST['ur_email']   ?? '');
     $urPhone   = trim($_POST['ur_phone']   ?? '');
-    $urPd      = ($_POST['ur_agree_pd']    ?? '') === 'yes';
+    $urPd      = !empty($_POST['ur_agree_pd']);
 
     if (!$urCompany || !$urContact || !$urEmail || !$urPhone) {
         $urError = 'Заполните обязательные поля: Компания, ФИО, e-mail, Телефон.';
@@ -186,7 +230,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['reg_ur_action'])) {
 <div class="container">
 
     <!-- Вкладки физ/юр лицо -->
-    <div style="display:flex;gap:12px;margin-bottom:32px;padding-top:16px">
+    <div style="display:flex;gap:12px;margin-bottom:32px;padding-top:8px">
         <button id="tab-fiz" onclick="switchRegType('fiz')"
                 class="btn <?= $regType !== 'ur' ? '' : 'btn-empty' ?>"
                 style="padding:10px 28px">Физическое лицо</button>
@@ -242,6 +286,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['reg_ur_action'])) {
                 <div class="account__chapter"><h3 class="account__subtitle">Личные данные <span style="color:#e31e24;font-size:13px;font-weight:400;margin-left:8px">* — обязательные поля</span></h3></div>
                 <div class="account__personal-list account__grid">
                     <input type="email" name="fiz_email" placeholder="e-mail *" required
+                           autocomplete="email"
                            value="<?= htmlspecialchars($_POST['fiz_email'] ?? '') ?>">
 
                     <!-- Пароль с показом -->
@@ -273,10 +318,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['reg_ur_action'])) {
                     <input type="text" name="fiz_second_name" placeholder="Отчество"
                            value="<?= htmlspecialchars($_POST['fiz_second_name'] ?? '') ?>">
 
-                    <!-- Дата рождения с маской -->
-                    <input type="text" name="fiz_dob" id="fiz-dob" placeholder="ДД.ММ.ГГГГ *"
-                           maxlength="10" autocomplete="bday" required
-                           value="<?= htmlspecialchars($_POST['fiz_dob'] ?? '') ?>">
+                    <!-- Дата рождения с нативным датапикером -->
+                    <div>
+                        <input type="date" name="fiz_dob" id="fiz-dob"
+                               title="Дата рождения. Обязательное поле"
+                               autocomplete="bday" required
+                               value="<?= htmlspecialchars($_POST['fiz_dob'] ?? '') ?>"
+                               style="width:100%">
+                        <input type="hidden" name="fiz_dob_hidden" id="fiz-dob-hidden">
+                        <span style="font-size:11px;color:#888;display:block;margin-top:2px">Дата рождения (ДД.ММ.ГГГГ) *</span>
+                    </div>
                 </div>
             </div>
 
@@ -297,6 +348,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['reg_ur_action'])) {
                         <span class="account__graduate-box"></span>Нет
                     </label>
                 </div>
+            </div>
+
+            <!-- Вступали ли ранее? -->
+            <div class="account__graduate" style="margin-top:16px" id="fiz-was-member-block">
+                <div class="account__chapter"><h3 class="account__subtitle">Вступали ли вы ранее в Политехническое общество выпускников МВТУ (МГТУ) им. Н.Э. Баумана?</h3></div>
+                <div class="account__graduate-choice">
+                    <label class="account__graduate-item">
+                        <input type="radio" name="fiz_was_member" value="yes" id="fiz-was-member-yes"
+                               class="account__graduate-input"
+                               <?= ($_POST['fiz_was_member'] ?? '') === 'yes' ? 'checked' : '' ?>>
+                        <span class="account__graduate-box"></span>Да
+                    </label>
+                    <label class="account__graduate-item">
+                        <input type="radio" name="fiz_was_member" value="no" id="fiz-was-member-no"
+                               class="account__graduate-input"
+                               <?= ($_POST['fiz_was_member'] ?? '') === 'no' ? 'checked' : '' ?>>
+                        <span class="account__graduate-box"></span>Нет
+                    </label>
+                </div>
+            </div>
+            <!-- Скан удостоверения (если ранее был членом) -->
+            <div id="fiz-membership-scan-block" style="display:<?= ($_POST['fiz_was_member'] ?? '') === 'yes' ? '' : 'none' ?>;margin-top:16px;background:#f0f7ff;border-radius:10px;padding:16px 20px">
+                <p style="font-size:14px;color:#444;line-height:1.6;margin-bottom:12px">
+                    Для подтверждения вашего членства прикрепите скан удостоверения члена Общества и продолжите регистрацию. После подтверждения вашего членства и оплаты членского взноса — ваше членство в Обществе будет продлено.
+                </p>
+                <label style="font-size:14px;color:#333;display:block;margin-bottom:6px">
+                    Скан удостоверения <span style="color:#888;font-size:12px">(необязательно, pdf/jpg/png)</span>
+                </label>
+                <input type="file" name="fiz_membership_scan" id="fiz-membership-scan-input"
+                       accept=".pdf,.jpg,.jpeg,.png" style="font-size:14px">
+                <span id="fiz-membership-scan-name" style="display:block;font-size:12px;color:#555;margin-top:4px"></span>
+                <span id="fiz-membership-scan-err" style="display:none;color:#e74c3c;font-size:12px;margin-top:4px"></span>
             </div>
 
             <!-- Баннер: не выпускник -->
@@ -332,8 +415,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['reg_ur_action'])) {
                                value="<?= htmlspecialchars($_POST['fiz_diploma_ser'] ?? '') ?>">
                         <input type="text" name="fiz_diploma_num"  placeholder="Номер бланка *" id="fiz-dip-num"
                                value="<?= htmlspecialchars($_POST['fiz_diploma_num'] ?? '') ?>">
-                        <input type="text" name="fiz_diploma_date" placeholder="Дата выдачи *" id="fiz-dip-date"
-                               value="<?= htmlspecialchars($_POST['fiz_diploma_date'] ?? '') ?>">
+                        <div>
+                            <input type="date" name="fiz_diploma_date" id="fiz-dip-date"
+                                   title="Дата выдачи диплома"
+                                   value="<?= htmlspecialchars($_POST['fiz_diploma_date'] ?? '') ?>"
+                                   style="width:100%">
+                            <input type="hidden" name="fiz_diploma_date_hidden" id="fiz-dip-date-hidden">
+                            <span style="font-size:11px;color:#888;display:block;margin-top:2px">Дата выдачи *</span>
+                        </div>
                     </div>
                     <!-- Скан диплома (обязателен если год ≤ 2020) -->
                     <div id="fiz-diploma-scan-block" style="margin-top:16px;display:none">
@@ -342,6 +431,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['reg_ur_action'])) {
                         </label>
                         <input type="file" name="fiz_diploma_scan" id="fiz-diploma-scan-input"
                                accept=".pdf,.jpg,.jpeg" style="font-size:14px">
+                        <span id="fiz-diploma-scan-name" style="display:block;font-size:12px;color:#555;margin-top:4px"></span>
+                        <span id="fiz-diploma-scan-err" style="display:none;color:#e74c3c;font-size:12px;margin-top:4px"></span>
                     </div>
                 </div>
 
@@ -418,21 +509,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['reg_ur_action'])) {
                 <!-- Согласие (единое: Устав + ПДн) -->
                 <div class="join__politic" style="margin-top:24px">
                     <div class="join__politic-question">
-                        <p class="join__politic-link">
-                            Ознакомлен(а) и согласен(а) с <a href="<?= defined('DOC_USTAV_URL') ? DOC_USTAV_URL : '#' ?>" target="_blank">Уставом</a> и <a href="<?= defined('DOC_POLITIKA_URL') ? DOC_POLITIKA_URL : '#' ?>" target="_blank">политикой обработки ПДн</a> *
-                        </p>
-                        <div class="account__graduate-choice">
-                            <label class="account__graduate-item">
-                                <input type="radio" name="fiz_agree_charter" value="yes" class="account__graduate-input"
-                                       <?= ($_POST['fiz_agree_charter'] ?? '') === 'yes' ? 'checked' : '' ?>>
-                                <span class="account__graduate-box"></span>Да
-                            </label>
-                            <label class="account__graduate-item">
-                                <input type="radio" name="fiz_agree_charter" value="no" class="account__graduate-input"
-                                       <?= ($_POST['fiz_agree_charter'] ?? '') === 'no' ? 'checked' : '' ?>>
-                                <span class="account__graduate-box"></span>Нет
-                            </label>
-                        </div>
+                        <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer">
+                            <input type="checkbox" name="fiz_agree_charter" id="fiz_agree_charter" required
+                                   style="width:18px;height:18px;flex-shrink:0;margin-top:2px"
+                                   <?= !empty($_POST['fiz_agree_charter']) ? 'checked' : '' ?>>
+                            <span class="join__politic-link">
+                                Ознакомлен(а) и согласен(а) с <a href="<?= defined('DOC_USTAV_URL') ? DOC_USTAV_URL : '#' ?>" target="_blank">Уставом</a> и <a href="<?= defined('DOC_POLITIKA_URL') ? DOC_POLITIKA_URL : '#' ?>" target="_blank">политикой обработки ПДн</a> *
+                            </span>
+                        </label>
+                        <span id="fiz-agree-err" style="display:none;color:#e74c3c;font-size:13px;margin-top:4px">Необходимо согласие с Уставом и политикой ПДн</span>
                     </div>
                 </div>
 
@@ -498,7 +583,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['reg_ur_action'])) {
                 <div class="account__personal-list account__grid">
                     <input type="text" name="ur_company" placeholder="Название компании *" required
                            value="<?= htmlspecialchars($_POST['ur_company'] ?? '') ?>">
-                    <input type="url"  name="ur_site"    placeholder="Сайт компании"
+                    <input type="text" name="ur_site"    placeholder="Сайт компании"
                            value="<?= htmlspecialchars($_POST['ur_site'] ?? '') ?>">
                 </div>
             </div>
@@ -517,19 +602,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['reg_ur_action'])) {
 
             <div class="join__politic" style="margin-top:24px">
                 <div class="join__politic-question">
-                    <p class="join__politic-link">Ознакомлен с <a href="<?= defined('DOC_POLITIKA_URL') ? DOC_POLITIKA_URL : '#' ?>" target="_blank">политикой обработки ПДн</a> *</p>
-                    <div class="account__graduate-choice">
-                        <label class="account__graduate-item">
-                            <input type="radio" name="ur_agree_pd" value="yes" class="account__graduate-input"
-                                   <?= ($_POST['ur_agree_pd'] ?? '') === 'yes' ? 'checked' : '' ?>>
-                            <span class="account__graduate-box"></span>Да
-                        </label>
-                        <label class="account__graduate-item">
-                            <input type="radio" name="ur_agree_pd" value="no" class="account__graduate-input"
-                                   <?= ($_POST['ur_agree_pd'] ?? '') === 'no' ? 'checked' : '' ?>>
-                            <span class="account__graduate-box"></span>Нет
-                        </label>
-                    </div>
+                    <label style="display:flex;align-items:center;gap:10px;cursor:pointer">
+                        <input type="checkbox" name="ur_agree_pd" id="ur_agree_pd" required
+                               style="width:18px;height:18px;flex-shrink:0"
+                               <?= !empty($_POST['ur_agree_pd']) ? 'checked' : '' ?>>
+                        <span class="join__politic-link">Ознакомлен с <a href="<?= defined('DOC_POLITIKA_URL') ? DOC_POLITIKA_URL : '#' ?>" target="_blank">политикой обработки ПДн</a> *</span>
+                    </label>
+                    <span id="ur-agree-err" style="display:none;color:#e74c3c;font-size:13px;margin-top:4px">Необходимо согласие с политикой обработки ПДн</span>
                 </div>
             </div>
             <button type="submit" class="btn authorization__btn" style="margin-top:24px">Отправить заявку на партнёрство</button>
@@ -562,6 +641,14 @@ function switchRegType(type) {
     }
 }
 
+// Конвертация YYYY-MM-DD → DD.MM.YYYY
+function dateToRu(val) {
+    if (!val) return '';
+    var p = val.split('-');
+    if (p.length === 3 && p[0].length === 4) return p[2] + '.' + p[1] + '.' + p[0];
+    return val;
+}
+
 // Показ/скрытие пароля
 document.querySelectorAll('.toggle-pass').forEach(function(btn) {
     btn.addEventListener('click', function() {
@@ -569,8 +656,7 @@ document.querySelectorAll('.toggle-pass').forEach(function(btn) {
         if (!inp) return;
         var isPass = inp.type === 'password';
         inp.type = isPass ? 'text' : 'password';
-        // Переключаем иконки если они есть внутри кнопки
-        var eyes    = this.querySelectorAll('svg');
+        var eyes = this.querySelectorAll('svg');
         if (eyes.length === 2) {
             eyes[0].style.display = isPass ? 'none' : '';
             eyes[1].style.display = isPass ? '' : 'none';
@@ -584,8 +670,21 @@ document.querySelectorAll('[name="fiz_is_graduate"]').forEach(function(r) {
         var isGrad  = this.value === 'yes';
         var section = document.getElementById('fiz-graduate-section');
         var dont    = document.getElementById('fiz-dont-block');
+        var wasMemberBlock = document.getElementById('fiz-was-member-block');
+        var wasMemberScanBlock = document.getElementById('fiz-membership-scan-block');
         if (section) section.style.display = isGrad ? '' : 'none';
         if (dont)    dont.style.display    = isGrad ? 'none' : 'block';
+        // Показываем вопрос о прошлом членстве только выпускникам
+        if (wasMemberBlock) wasMemberBlock.style.display = isGrad ? '' : 'none';
+        if (!isGrad && wasMemberScanBlock) wasMemberScanBlock.style.display = 'none';
+    });
+});
+
+// Переключатель "вступали ли ранее"
+document.querySelectorAll('[name="fiz_was_member"]').forEach(function(r) {
+    r.addEventListener('change', function() {
+        var block = document.getElementById('fiz-membership-scan-block');
+        if (block) block.style.display = (this.value === 'yes') ? '' : 'none';
     });
 });
 
@@ -620,30 +719,33 @@ document.addEventListener('click', function(e) {
     var btn = e.target.closest('.select-plan');
     if (!btn) return;
     var plan = btn.getAttribute('data-plan');
-
     var field = document.getElementById('fiz-membership-type');
     if (field) field.value = plan;
-
     document.querySelectorAll('.select-plan').forEach(function(b) {
         b.textContent = 'Выбрать';
         b.classList.remove('btn--active');
     });
     btn.textContent = '✓ Выбрано';
     btn.classList.add('btn--active');
-
     var submitBtn = document.getElementById('fiz-submit-btn');
     if (submitBtn) {
         submitBtn.textContent = plan === 'honorary' ? 'Подать заявку' : 'Вступить';
     }
 });
 
-// Превью аватара
+// Превью аватара + проверка расширения
 (function() {
     var inp = document.getElementById('fiz-avatar-input');
     if (!inp) return;
     inp.addEventListener('change', function() {
         var file = this.files[0];
         if (!file) return;
+        var ext = file.name.split('.').pop().toLowerCase();
+        if (['jpg','jpeg','png'].indexOf(ext) === -1) {
+            alert('Аватар: допустимы только jpg, jpeg, png');
+            inp.value = '';
+            return;
+        }
         var reader = new FileReader();
         reader.onload = function(e) {
             var img  = document.getElementById('fiz-avatar-img');
@@ -655,69 +757,130 @@ document.addEventListener('click', function(e) {
     });
 })();
 
-// Маска ввода даты ДД.ММ.ГГГГ
+// Проверка расширения скана диплома
 (function() {
-    var dob = document.getElementById('fiz-dob');
-    if (!dob) return;
-    dob.addEventListener('keydown', function(e) {
-        // Разрешаем: Backspace, Delete, Tab, Escape, стрелки, Home, End
-        if ([8,9,27,46,35,36,37,38,39,40].indexOf(e.keyCode) !== -1) return;
-        // Разрешаем Ctrl+A, Ctrl+C, Ctrl+V, Ctrl+X
-        if (e.ctrlKey || e.metaKey) return;
-        // Запрещаем нецифровые символы (кроме точки — точку ставим сами)
-        if (e.key < '0' || e.key > '9') { e.preventDefault(); }
-    });
-    dob.addEventListener('input', function() {
-        var digits = this.value.replace(/\D/g, '').slice(0, 8);
-        var out = '';
-        if (digits.length <= 2) {
-            out = digits;
-        } else if (digits.length <= 4) {
-            out = digits.slice(0,2) + '.' + digits.slice(2);
+    var inp = document.getElementById('fiz-diploma-scan-input');
+    var nameEl = document.getElementById('fiz-diploma-scan-name');
+    var errEl  = document.getElementById('fiz-diploma-scan-err');
+    if (!inp) return;
+    inp.addEventListener('change', function() {
+        if (!inp.files || !inp.files[0]) { if(nameEl) nameEl.textContent=''; return; }
+        var ext = inp.files[0].name.split('.').pop().toLowerCase();
+        if (['pdf','jpg','jpeg'].indexOf(ext) === -1) {
+            if (errEl) { errEl.textContent = 'Недопустимый формат. Разрешены: PDF, JPG'; errEl.style.display = 'block'; }
+            if (nameEl) nameEl.textContent = '';
+            inp.value = '';
         } else {
-            out = digits.slice(0,2) + '.' + digits.slice(2,4) + '.' + digits.slice(4);
+            if (errEl) errEl.style.display = 'none';
+            if (nameEl) nameEl.textContent = '📎 ' + inp.files[0].name;
         }
-        this.value = out;
-    });
-    dob.addEventListener('blur', function() {
-        var val = this.value;
-        if (val && !/^\d{2}\.\d{2}\.\d{4}$/.test(val)) {
-            this.setCustomValidity('Введите дату в формате ДД.ММ.ГГГГ');
-        } else {
-            this.setCustomValidity('');
-        }
-    });
-    dob.addEventListener('input', function() {
-        this.setCustomValidity('');
     });
 })();
 
-// Клиентская валидация перед отправкой
+// Проверка расширения скана удостоверения
+(function() {
+    var inp = document.getElementById('fiz-membership-scan-input');
+    var nameEl = document.getElementById('fiz-membership-scan-name');
+    var errEl  = document.getElementById('fiz-membership-scan-err');
+    if (!inp) return;
+    inp.addEventListener('change', function() {
+        if (!inp.files || !inp.files[0]) { if(nameEl) nameEl.textContent=''; return; }
+        var ext = inp.files[0].name.split('.').pop().toLowerCase();
+        if (['pdf','jpg','jpeg','png'].indexOf(ext) === -1) {
+            if (errEl) { errEl.textContent = 'Недопустимый формат. Разрешены: PDF, JPG, PNG'; errEl.style.display = 'block'; }
+            if (nameEl) nameEl.textContent = '';
+            inp.value = '';
+        } else {
+            if (errEl) errEl.style.display = 'none';
+            if (nameEl) nameEl.textContent = '📎 ' + inp.files[0].name;
+        }
+    });
+})();
+
+// Клиентская валидация перед отправкой — форма физ. лица
 (function() {
     var form = document.getElementById('form-fiz');
     if (!form) return;
     form.addEventListener('submit', function(e) {
+        var errors = [];
         var pass    = document.getElementById('fiz-pass');
         var confirm = document.getElementById('fiz-pass-confirm');
-        if (!pass || !confirm) return;
-        if (pass.value.length < 8) {
-            e.preventDefault();
-            alert('Пароль должен содержать не менее 8 символов.');
-            pass.focus();
-            return;
+        var dobInp  = document.getElementById('fiz-dob');
+        var lname   = form.querySelector('[name="fiz_last_name"]');
+        var fname   = form.querySelector('[name="fiz_first_name"]');
+
+        // Заполнить скрытые поля с датами в RU формате
+        var dobHidden = document.getElementById('fiz-dob-hidden');
+        if (dobHidden && dobInp) dobHidden.value = dateToRu(dobInp.value);
+        var dipDateInp = document.getElementById('fiz-dip-date');
+        var dipDateHidden = document.getElementById('fiz-dip-date-hidden');
+        if (dipDateHidden && dipDateInp) dipDateHidden.value = dateToRu(dipDateInp.value);
+
+        if (!fname || !fname.value.trim()) errors.push('Имя');
+        if (!lname || !lname.value.trim()) errors.push('Фамилия');
+        if (!dobInp || !dobInp.value) errors.push('Дата рождения');
+
+        if (!pass || !confirm) { /* skip if not visible */ }
+        else {
+            if (pass.value.length < 8) { errors.push('Пароль (мин. 8 символов)'); }
+            else {
+                var allowed = /^[A-Za-z0-9@$!%*?&_\-#.]+$/;
+                if (!allowed.test(pass.value)) errors.push('Пароль (допустимые символы: латиница, цифры, @$!%*?&_-#.)');
+                if (pass.value !== confirm.value) errors.push('Подтверждение пароля (пароли не совпадают)');
+            }
         }
-        var allowed = /^[A-Za-z0-9@$!%*?&_\-#.]+$/;
-        if (!allowed.test(pass.value)) {
-            e.preventDefault();
-            alert('Пароль может содержать только латинские буквы, цифры и символы: @$!%*?&_-#.');
-            pass.focus();
-            return;
+
+        // Проверка согласия (только если выпускник)
+        var isGradYes = document.getElementById('fiz-grad-yes');
+        if (isGradYes && isGradYes.checked) {
+            var agree = document.getElementById('fiz_agree_charter');
+            if (!agree || !agree.checked) {
+                errors.push('Согласие с Уставом и политикой ПДн');
+                var agreeErr = document.getElementById('fiz-agree-err');
+                if (agreeErr) agreeErr.style.display = 'block';
+            }
+            // Проверка скана диплома
+            var gradYearEl = document.getElementById('fiz-grad-year');
+            if (gradYearEl && gradYearEl.value) {
+                var yr = parseInt(gradYearEl.value, 10);
+                if (yr > 0 && yr <= 2020) {
+                    var scanInp = document.getElementById('fiz-diploma-scan-input');
+                    if (!scanInp || !scanInp.files || !scanInp.files[0]) {
+                        errors.push('Скан диплома (обязателен для выпускников 2020 и ранее)');
+                    }
+                }
+            }
         }
-        if (pass.value !== confirm.value) {
+
+        if (errors.length > 0) {
             e.preventDefault();
-            alert('Пароли не совпадают.');
-            confirm.focus();
-            return;
+            var box = form.querySelector('.authorization__alert') || document.createElement('div');
+            box.className = 'authorization__alert authorization__alert--error';
+            box.style.marginBottom = '16px';
+            box.innerHTML = errors.map(function(err) { return '<p>' + err + '</p>'; }).join('');
+            var firstField = form.querySelector('input[name="fiz_email"]');
+            if (firstField && !form.querySelector('.authorization__alert')) {
+                firstField.parentNode.insertBefore(box, firstField);
+            }
+            box.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+    });
+})();
+
+// Клиентская валидация — форма юр. лица
+(function() {
+    var form = document.querySelector('[name="reg_ur_action"]');
+    if (!form) return;
+    var parentForm = form.closest('form');
+    if (!parentForm) return;
+    parentForm.addEventListener('submit', function(e) {
+        var agree = document.getElementById('ur_agree_pd');
+        var errEl = document.getElementById('ur-agree-err');
+        if (!agree || !agree.checked) {
+            e.preventDefault();
+            if (errEl) errEl.style.display = 'block';
+        } else {
+            if (errEl) errEl.style.display = 'none';
         }
     });
 })();
