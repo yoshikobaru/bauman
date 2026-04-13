@@ -382,7 +382,7 @@ foreach ($_staticProjects as $sp):
 					</div>
 				</div>
 			</div>
-			<!-- /.container -->
+			<!-- /.conttainer -->
 		</section>
 		<!-- /.culture -->
 		<!-- new-project -->
