@@ -1725,11 +1725,9 @@ strong {
 }
 
 .banner-other--about .banner-other__image {
-    width: 33.333%;
-    max-width: 33.333%;
-    height: auto;
-    object-fit: contain;
-    align-self: center;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
 
 .banner-other__list-initiatives {
