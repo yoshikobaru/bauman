@@ -226,7 +226,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['reg_ur_action'])) {
 ?>
 
 <main>
-<section class="join">
+<section class="join join--registration">
 <div class="container">
 
     <!-- Вкладки физ/юр лицо -->

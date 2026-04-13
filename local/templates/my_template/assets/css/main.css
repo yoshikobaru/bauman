@@ -4275,6 +4275,10 @@ select,
     margin-top: 200px;
 }
 
+.join--registration {
+    margin-top: 100px;
+}
+
 .join__wrapper {
     background-color: #fff;
     padding: 2vw;
