@@ -6,7 +6,7 @@ $APPLICATION->SetPageProperty('description', 'О Политехническом 
 
 <main>
 		<!-- banner-other -->
-		<section class="banner-other banner-other-project banner-other--about">
+		<section class="banner-other banner-other-project">
             <div class="container">
                 <div class="banner-other__wrapper">
                     <div class="banner-other__content">
