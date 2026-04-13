@@ -678,7 +678,7 @@ $currentStatus = $statusLabels[$membershipStatus] ?? null;
 
                         <!-- Привязка соцсетей (статичная заготовка) -->
                         <div class="account__log" style="margin-top:40px">
-                            <div class="account__chapter">
+                                <div class="account__chapter">
                                 <h3 class="account__subtitle">Привязка аккаунта для быстрого входа</h3>
                                 </div>
                                 <div class="account__log-wrapper">
