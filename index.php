@@ -223,7 +223,7 @@ if (defined('IBLOCK_PROJECTS_ID') && IBLOCK_PROJECTS_ID > 0 && \Bitrix\Main\Load
         ['IBLOCK_ID' => IBLOCK_PROJECTS_ID, 'ACTIVE' => 'Y'],
         false,
         ['nTopCount' => 4],
-        ['ID', 'NAME', 'PREVIEW_PICTURE', 'PROPERTY_DETAIL_URL']
+        ['ID', 'NAME', 'PREVIEW_PICTURE', 'PROPERTY_HOME_IMAGE', 'PROPERTY_DETAIL_URL']
     );
     $i = 0;
     while ($proj = $dbProjects->GetNext()) {
@@ -234,9 +234,12 @@ if (defined('IBLOCK_PROJECTS_ID') && IBLOCK_PROJECTS_ID > 0 && \Bitrix\Main\Load
             if (!empty($proj['PROPERTY_DETAIL_URL_VALUE'])) {
                 $_staticProjects[$i]['url'] = $proj['PROPERTY_DETAIL_URL_VALUE'];
             }
-            // Реальное фото из CMS — если не загружено, остаётся заглушка initiative-img-N
-            if (!empty($proj['PREVIEW_PICTURE'])) {
-                $cmsImg = CFile::GetPath($proj['PREVIEW_PICTURE']);
+            // Фото для главной: сначала отдельное поле, затем fallback на PREVIEW_PICTURE.
+            $homeImageId = (int)($proj['PROPERTY_HOME_IMAGE_VALUE'] ?? 0);
+            $previewId   = (int)($proj['PREVIEW_PICTURE'] ?? 0);
+            $cmsImageId  = $homeImageId > 0 ? $homeImageId : $previewId;
+            if ($cmsImageId > 0) {
+                $cmsImg = CFile::GetPath($cmsImageId);
                 if ($cmsImg) {
                     $_staticProjects[$i]['img']       = null; // сигнал что нужен внешний URL
                     $_staticProjects[$i]['mob']       = null;
