@@ -4,7 +4,6 @@ $APPLICATION->SetTitle("Поддержать");
 
 use Bitrix\Main\Loader;
 $hlOk     = Loader::includeModule('highloadblock');
-$iblockOk = Loader::includeModule('iblock');
 
 $d2Done  = false;
 $d2Error = '';
@@ -185,19 +184,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['d2_action'])) {
     exit;
 }
 
-// Список проектов для выпадающего списка
-$arProjects = [];
-if ($iblockOk && defined('IBLOCK_PROJECTS_ID') && IBLOCK_PROJECTS_ID > 0) {
-    $dbProj = CIBlockElement::GetList(
-        ['SORT' => 'ASC'],
-        ['IBLOCK_ID' => IBLOCK_PROJECTS_ID, 'ACTIVE' => 'Y'],
-        false, false, ['ID', 'NAME']
-    );
-    while ($row = $dbProj->GetNext()) {
-        $arProjects[] = $row;
-    }
-}
-
 // Предзаполнение данных для авторизованных
 $prefill = [
     'first_name' => $USER->IsAuthorized() ? $USER->GetParam('NAME')      : '',
@@ -327,16 +313,12 @@ $prefill = [
                                     <select id="d2_project_select" name="project">
                                         <option value="">— Выберите проект —</option>
                                         <option value="Пожертвование на ведение уставной деятельности">Пожертвование на ведение уставной деятельности</option>
-                                        <?php if (!empty($arProjects)): ?>
-                                            <?php foreach ($arProjects as $projectItem): ?>
-                                                <option value="<?= htmlspecialchars($projectItem['NAME']) ?>"><?= htmlspecialchars($projectItem['NAME']) ?></option>
-                                            <?php endforeach; ?>
-                                        <?php else: ?>
-                                            <option value="Реставрация Ротонды">Реставрация Ротонды</option>
-                                            <option value="Конференция PolytechExpo">Конференция PolytechExpo</option>
-                                            <option value="Конференция Встреча выпускников">Конференция Встреча выпускников</option>
-                                            <option value="Попечительский совет МТ4">Попечительский совет МТ4</option>
-                                        <?php endif; ?>
+                                        <option value="Реставрация Ротонды">Реставрация Ротонды</option>
+                                        <option value="Конференция PolytechExpo">Конференция PolytechExpo</option>
+                                        <option value="Конференция Встреча выпускников">Конференция Встреча выпускников</option>
+                                        <option value="Попечительский совет МТ4">Попечительский совет МТ4</option>
+                                        <option value="Попечительский совет ФН">Попечительский совет ФН</option>
+                                        <option value="Студенческие конструкторские бюро">Студенческие конструкторские бюро</option>
                                     </select>
                                 </div>
                                 <div class="project-programm__buttons">
