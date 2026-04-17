@@ -389,9 +389,9 @@ AddEventHandler('main', 'OnBuildGlobalMenu', function (&$globalMenu, &$moduleMen
             [
                 'text'  => 'Настройки PayKeeper',
                 'title' => 'Маршрутизация проектов и счета PayKeeper',
-                'url'   => '/local/admin/po_paykeeper_settings.php',
+                'url'   => '/local/tools/po_paykeeper_settings.php',
                 'icon'  => 'main_menu_settings',
-                'more_url'  => ['/local/admin/po_paykeeper_settings.php'],
+                'more_url'  => ['/local/tools/po_paykeeper_settings.php'],
             ],
             [
                 'text'  => '— Пользователи сайта',
