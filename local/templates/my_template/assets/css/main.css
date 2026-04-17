@@ -3894,9 +3894,11 @@ select,
     padding: 2vw;
     position: relative;
     margin-bottom: 40px;
-    background: linear-gradient(135deg, #0f2f4a 0%, #022032 100%);
+    background: linear-gradient(135deg, #0f2f4a 0%, #022032 100%) !important;
+    background-color: #0f2f4a !important;
     border-radius: 12px;
     overflow: hidden;
+    color: #fff;
 }
 
 .account__rate-conus {
@@ -3960,14 +3962,14 @@ select,
 
 .account__rate-plan {
     font-size: var(--text-32);
-    color: #fff;
+    color: #fff !important;
     font-weight: 500;
     margin-bottom: 8px;
 }
 
 .account__rate-price {
     font-size: 50px;
-    color: #fff;
+    color: #fff !important;
     font-weight: 600;
     margin-bottom: 8px;
 }

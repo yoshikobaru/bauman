@@ -198,22 +198,13 @@ if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $profileDiplomaDateInputValue)) {
 }
 .profile-section.is-view .profile-editable,
 .profile-section.is-view .profile-editable[readonly] {
-    border: none;
-    background: transparent;
-    padding-left: 0;
-    padding-right: 0;
     pointer-events: none;
-    color: #222;
-}
-.profile-section.is-view .profile-editable::placeholder {
-    color: #666;
-    opacity: 1;
+    color: #2a2a2a;
+    border: 1px solid #dddddd;
+    background: #f7f7f7;
 }
 .profile-section.is-view textarea.profile-editable {
     resize: none;
-    min-height: 0;
-    height: auto;
-    overflow: visible;
 }
 .profile-section.is-view .po-date-field__btn,
 .profile-section.is-view .po-date-field__native {
@@ -230,6 +221,9 @@ if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $profileDiplomaDateInputValue)) {
     font-size: 11px;
     font-weight: 700;
     margin-left: 8px;
+}
+#profile-photo-save {
+    margin-top: 12px;
 }
 </style>
 		<section class="account">
@@ -714,13 +708,14 @@ if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $profileDiplomaDateInputValue)) {
                             <input type="hidden" name="update_action" value="1">
 
                             <div class="account__photo">
-                                <img src="<?= htmlspecialchars($avatarSrc) ?>" alt="" class="account__photo-image">
+                                <img src="<?= htmlspecialchars($avatarSrc) ?>" alt="" class="account__photo-image" id="profile-photo-preview">
                                 <div class="account__photo-content">
-                                    <label class="account__photo-upload">
+                                    <label class="account__photo-upload" for="profile-photo-input">
                                         Загрузить аватар
-                                        <input type="file" name="photo" class="account__photo-input" accept="image/png, image/jpeg">
+                                        <input type="file" name="photo" class="account__photo-input" id="profile-photo-input" accept="image/png, image/jpeg">
                                     </label>
                                     <p>Изображение 300x300, формат jpg, png</p>
+                                    <button type="submit" class="btn authorization__btn" id="profile-photo-save" style="display:none">Сохранить аватар</button>
                                 </div>
                             </div>
 
@@ -938,6 +933,32 @@ if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $profileDiplomaDateInputValue)) {
 
     var profileForm = document.querySelector('form[action="/profile/"]');
     if (!profileForm) return;
+
+    var photoInput = document.getElementById('profile-photo-input');
+    var photoPreview = document.getElementById('profile-photo-preview');
+    var photoSaveBtn = document.getElementById('profile-photo-save');
+    if (photoInput && photoPreview && photoSaveBtn) {
+        photoInput.addEventListener('change', function() {
+            var file = this.files && this.files[0] ? this.files[0] : null;
+            if (!file) {
+                photoSaveBtn.style.display = 'none';
+                return;
+            }
+            var allowed = ['image/jpeg', 'image/png'];
+            if (allowed.indexOf(file.type) === -1) {
+                alert('Допустимы только изображения JPG и PNG.');
+                this.value = '';
+                photoSaveBtn.style.display = 'none';
+                return;
+            }
+            var reader = new FileReader();
+            reader.onload = function(event) {
+                photoPreview.src = event.target.result;
+            };
+            reader.readAsDataURL(file);
+            photoSaveBtn.style.display = 'inline-block';
+        });
+    }
 
     function setSectionMode(section, isEdit) {
         section.classList.toggle('is-view', !isEdit);
