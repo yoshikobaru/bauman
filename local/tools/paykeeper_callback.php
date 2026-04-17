@@ -123,4 +123,8 @@ if (function_exists('po_logAction')) {
     po_logAction('payment_success', 'application', $applicationId, 'PayKeeper payment: ' . $paymentId);
 }
 
+if (function_exists('po_sendAdminEmail')) {
+    po_sendAdminEmail('project_support', $data);
+}
+
 echo po_paykeeper_build_callback_ack($paymentId, $secretWord);

@@ -8,6 +8,9 @@ $hlOk     = Loader::includeModule('highloadblock');
 $d2Done  = false;
 $d2Error = '';
 $payResult = in_array((string)($_GET['pay'] ?? ''), ['success', 'fail'], true) ? (string)$_GET['pay'] : '';
+if ($_SERVER['REQUEST_METHOD'] === 'GET' && $payResult === 'fail' && !empty($_GET['order']) && function_exists('po_project_support_process_fail_return')) {
+    po_project_support_process_fail_return((string)$_GET['order']);
+}
 $paykeeperConfig = function_exists('po_get_paykeeper_config') ? po_get_paykeeper_config() : [];
 $paykeeperReady = function_exists('po_is_paykeeper_configured') ? po_is_paykeeper_configured($paykeeperConfig) : false;
 $d2Flash = function_exists('po_flash_get') ? po_flash_get('d2_support') : null;
@@ -134,6 +137,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['d2_action'])) {
                         'client_email' => $email,
                         'client_phone' => $phone,
                     ];
+                    $pkSuccessUrl = (string)($paykeeperAccount['success_url'] ?? '');
+                    $pkFailUrl    = (string)($paykeeperAccount['fail_url'] ?? '');
+                    if ($pkSuccessUrl !== '' && function_exists('po_paykeeper_append_query_param')) {
+                        $paymentRequest['success_url'] = po_paykeeper_append_query_param($pkSuccessUrl, 'order', $orderId);
+                    }
+                    if ($pkFailUrl !== '' && function_exists('po_paykeeper_append_query_param')) {
+                        $paymentRequest['fail_url'] = po_paykeeper_append_query_param($pkFailUrl, 'order', $orderId);
+                    }
 
                     $apiError = '';
                     $invoice = function_exists('po_paykeeper_create_invoice')
@@ -298,7 +309,7 @@ $prefill = [
                                     <div data-val="30000">30 000 Р</div>
                                     <div data-val="custom" class="d2-custom-row">
                                         <span>Другая сумма</span>
-                                        <input type="number" id="d2_custom_amount" placeholder="Введите сумму, руб." min="1" onclick="event.stopPropagation()">
+                                        <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="12" autocomplete="off" id="d2_custom_amount" placeholder="Введите сумму, руб." onclick="event.stopPropagation()">
                                     </div>
                                 </div>
                                 <div class="project-programm__buttons">
@@ -485,6 +496,45 @@ $prefill = [
         });
     });
 
+    function stripAmountDigits(str) {
+        return String(str || '').replace(/\D/g, '');
+    }
+
+    function activatePriceChip(val) {
+        priceList.querySelectorAll('[data-val]').forEach(function(e) { e.classList.remove('active'); });
+        var chip = priceList.querySelector('[data-val="' + val + '"]');
+        if (chip) chip.classList.add('active');
+    }
+
+    function syncAmountFromCustomInput() {
+        if (!amountField || !customInput) return;
+        var digits = stripAmountDigits(customInput.value);
+        if (digits !== customInput.value) {
+            customInput.value = digits;
+        }
+        if (digits) {
+            activatePriceChip('custom');
+            amountField.value = digits + ' руб.';
+        } else {
+            var active = priceList.querySelector('[data-val].active');
+            if (active && active.getAttribute('data-val') === 'custom') {
+                amountField.value = '';
+            }
+        }
+        updatePaySummary();
+    }
+
+    // Ввод суммы: только цифры и авто-выбор «Другая сумма», если поле не пустое
+    if (customInput) {
+        customInput.addEventListener('input', syncAmountFromCustomInput);
+        customInput.addEventListener('focus', function() {
+            activatePriceChip('custom');
+            var digits = stripAmountDigits(customInput.value);
+            amountField.value = digits ? digits + ' руб.' : '';
+            updatePaySummary();
+        });
+    }
+
     // Select price
     priceList.querySelectorAll('[data-val]').forEach(function(el) {
         el.addEventListener('click', function() {
@@ -492,11 +542,9 @@ $prefill = [
             el.classList.add('active');
             var val = el.getAttribute('data-val');
             if (val === 'custom') {
-                amountField.value = (customInput ? customInput.value : '') + ' руб. (другая)';
-                if (customInput) customInput.addEventListener('input', function() {
-                    amountField.value = customInput.value + ' руб.';
-                    updatePaySummary();
-                });
+                var digits = customInput ? stripAmountDigits(customInput.value) : '';
+                amountField.value = digits ? digits + ' руб.' : '';
+                if (customInput) customInput.focus();
             } else {
                 amountField.value = val + ' руб.';
             }

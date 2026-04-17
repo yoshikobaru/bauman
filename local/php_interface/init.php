@@ -192,11 +192,18 @@ function po_sendAdminEmail(string $type, array $data, array $options = []): void
         "Поступила новая заявка с сайта.",
         "",
         "Направление: {$label}",
-        "",
-        "Данные заявки:",
     ];
+    if ($type === 'project_support') {
+        po_project_support_append_payment_notice_lines($lines, $data);
+    }
+    $lines[] = '';
+    $lines[] = 'Данные заявки:';
+
     foreach ($data as $k => $v) {
         if ($v === '' || $v === null) {
+            continue;
+        }
+        if (is_array($v)) {
             continue;
         }
         $lines[] = po_mailLabelForField((string)$k) . ': ' . po_mailNormalizeValue((string)$k, $v);
@@ -218,9 +225,11 @@ function po_sendAdminEmail(string $type, array $data, array $options = []): void
     $to = PO_ADMIN_EMAIL;
     if ($type === 'project_support') {
         $projectTitle = trim((string)($data['project'] ?? ''));
-        $subject      = $projectTitle !== ''
+        $suffix       = po_project_support_payment_email_suffix($data);
+        $base         = $projectTitle !== ''
             ? "[ПОЛИТЕХ] Новая заявка: Поддержка проект ({$projectTitle})"
             : "[ПОЛИТЕХ] Новая заявка: {$label}";
+        $subject      = $base . ' — ' . $suffix;
     } else {
         $subject = "[ПОЛИТЕХ] Новая заявка: {$label}";
     }
@@ -817,6 +826,122 @@ function po_paykeeper_extract_application_id(string $orderId): int
         return (int)$matches[1];
     }
     return 0;
+}
+
+/**
+ * Добавить GET-параметр к URL возврата PayKeeper (success_url / fail_url).
+ */
+function po_paykeeper_append_query_param(string $url, string $name, string $value): string
+{
+    $url = trim($url);
+    if ($url === '') {
+        return '';
+    }
+    $sep = strpos($url, '?') !== false ? '&' : '?';
+
+    return $url . $sep . rawurlencode($name) . '=' . rawurlencode($value);
+}
+
+/**
+ * Текст для темы письма и тела: состояние оплаты по заявке поддержки проекта.
+ */
+function po_project_support_payment_email_suffix(array $data): string
+{
+    $payment = isset($data['payment']) && is_array($data['payment']) ? $data['payment'] : [];
+    $status  = (string)($payment['status'] ?? '');
+
+    switch ($status) {
+        case 'paid':
+            return 'Оплачено';
+        case 'cancelled':
+        case 'failed':
+            return 'Оплата не завершена';
+        case 'pending':
+        case 'new':
+        default:
+            return 'Ожидает оплаты';
+    }
+}
+
+function po_project_support_append_payment_notice_lines(array &$lines, array $data): void
+{
+    $payment = isset($data['payment']) && is_array($data['payment']) ? $data['payment'] : [];
+    $lines[] = '';
+    $lines[] = 'Статус оплаты: ' . po_project_support_payment_email_suffix($data);
+    if (($payment['status'] ?? '') === 'paid') {
+        if (!empty($payment['paid_at'])) {
+            $lines[] = 'Дата оплаты (PayKeeper): ' . (string)$payment['paid_at'];
+        }
+        if (!empty($payment['payment_id'])) {
+            $lines[] = 'ID платежа PayKeeper: ' . (string)$payment['payment_id'];
+        }
+        if (!empty($payment['amount_rub'])) {
+            $lines[] = 'Сумма оплаты: ' . (string)$payment['amount_rub'] . ' руб.';
+        }
+    }
+    if (($payment['status'] ?? '') === 'cancelled' && !empty($payment['cancelled_at'])) {
+        $lines[] = 'Пользователь вернулся с оплаты без завершения: ' . (string)$payment['cancelled_at'];
+    }
+}
+
+/**
+ * Возврат с fail_url: пометить заявку и один раз уведомить админа по почте.
+ */
+function po_project_support_process_fail_return(string $orderId): void
+{
+    $applicationId = po_paykeeper_extract_application_id($orderId);
+    if ($applicationId <= 0) {
+        return;
+    }
+    if (!\Bitrix\Main\Loader::includeModule('highloadblock') || !defined('HL_APPLICATIONS_ID') || HL_APPLICATIONS_ID <= 0) {
+        return;
+    }
+
+    $hlEntity = \Bitrix\Highloadblock\HighloadBlockTable::getById(HL_APPLICATIONS_ID)->fetch();
+    if (!$hlEntity) {
+        return;
+    }
+    $hlClass = \Bitrix\Highloadblock\HighloadBlockTable::compileEntity($hlEntity)->getDataClass();
+    $application = $hlClass::getById($applicationId)->fetch();
+    if (!$application || ($application['UF_TYPE'] ?? '') !== 'project_support') {
+        return;
+    }
+
+    $data = [];
+    if (!empty($application['UF_DATA'])) {
+        $decoded = json_decode((string)$application['UF_DATA'], true);
+        if (is_array($decoded)) {
+            $data = $decoded;
+        }
+    }
+
+    $paymentData = isset($data['payment']) && is_array($data['payment']) ? $data['payment'] : [];
+    if (($paymentData['status'] ?? '') === 'paid') {
+        return;
+    }
+    if (!empty($paymentData['fail_return_email_sent'])) {
+        return;
+    }
+    if (($paymentData['status'] ?? '') !== 'pending') {
+        return;
+    }
+
+    $paymentData['status']                  = 'cancelled';
+    $paymentData['cancelled_at']            = date('c');
+    $paymentData['cancel_reason']           = 'fail_url';
+    $paymentData['fail_return_email_sent']   = true;
+    $data['payment']                        = $paymentData;
+
+    $upd = $hlClass::update($applicationId, [
+        'UF_DATA' => json_encode($data, JSON_UNESCAPED_UNICODE),
+    ]);
+    if (!$upd->isSuccess()) {
+        return;
+    }
+
+    if (function_exists('po_sendAdminEmail')) {
+        po_sendAdminEmail('project_support', $data);
+    }
 }
 
 /**
