@@ -208,61 +208,102 @@ if (defined('IBLOCK_BOARD_ID') && IBLOCK_BOARD_ID > 0 && \Bitrix\Main\Loader::in
 						</p>
 					</div>
 <?php
-// Эталонные данные 4 проектов с заглушками
-$_staticProjects = [
+// Аварийный fallback — только если инфоблок проектов пуст/недоступен.
+$_fallbackProjects = [
     ['name' => 'Конференция PolytechExpo',        'url' => '/projects/politech-expo/', 'img' => 'initiative-img-1.png', 'mob' => 'initiative-img-mob-1.png'],
     ['name' => 'Конференция Встреча выпускников', 'url' => '/projects/conference/',    'img' => 'initiative-img-2.png', 'mob' => 'initiative-img-mob-2.png'],
     ['name' => 'Попечительский совет',            'url' => '/projects/trustees/',      'img' => 'initiative-img-3.png', 'mob' => 'initiative-img-mob-3.png'],
     ['name' => 'Реставрации Ротонды',             'url' => '/projects/restoration/',   'img' => 'initiative-img-4.png', 'mob' => 'initiative-img-mob-4.png'],
 ];
 
-// Переопределяем из инфоблока: имя, URL и фото (если загружено)
+$_projects = [];
+$_localDesktopFallback = ['initiative-img-1.png', 'initiative-img-2.png', 'initiative-img-3.png', 'initiative-img-4.png'];
+$_localMobileFallback  = ['initiative-img-mob-1.png', 'initiative-img-mob-2.png', 'initiative-img-mob-3.png', 'initiative-img-mob-4.png'];
+
 if (defined('IBLOCK_PROJECTS_ID') && IBLOCK_PROJECTS_ID > 0 && \Bitrix\Main\Loader::includeModule('iblock')) {
     $dbProjects = CIBlockElement::GetList(
-        ['SORT' => 'ASC'],
+        ['SORT' => 'ASC', 'ID' => 'ASC'],
         ['IBLOCK_ID' => IBLOCK_PROJECTS_ID, 'ACTIVE' => 'Y'],
         false,
-        ['nTopCount' => 4],
-        ['ID', 'NAME', 'PREVIEW_PICTURE', 'PROPERTY_HOME_IMAGE', 'PROPERTY_DETAIL_URL']
+        false,
+        ['ID', 'NAME', 'DETAIL_PAGE_URL', 'PREVIEW_PICTURE', 'PROPERTY_HOME_IMAGE', 'PROPERTY_HOME_IMAGE_MOB', 'PROPERTY_DETAIL_URL']
     );
-    $i = 0;
+    $projectIndex = 0;
     while ($proj = $dbProjects->GetNext()) {
-        if (isset($_staticProjects[$i])) {
-            if (!empty($proj['NAME'])) {
-                $_staticProjects[$i]['name'] = $proj['NAME'];
+        $homeImageId    = (int)($proj['PROPERTY_HOME_IMAGE_VALUE'] ?? 0);
+        $homeImageMobId = (int)($proj['PROPERTY_HOME_IMAGE_MOB_VALUE'] ?? 0);
+        $previewId      = (int)($proj['PREVIEW_PICTURE'] ?? 0);
+
+        $desktopImage = '';
+        foreach ([$homeImageId, $previewId] as $candidateId) {
+            if ($candidateId <= 0) {
+                continue;
             }
-            if (!empty($proj['PROPERTY_DETAIL_URL_VALUE'])) {
-                $_staticProjects[$i]['url'] = $proj['PROPERTY_DETAIL_URL_VALUE'];
-            }
-            // Фото для главной: сначала отдельное поле, затем fallback на PREVIEW_PICTURE.
-            $homeImageId = (int)($proj['PROPERTY_HOME_IMAGE_VALUE'] ?? 0);
-            $previewId   = (int)($proj['PREVIEW_PICTURE'] ?? 0);
-            $cmsImageId  = $homeImageId > 0 ? $homeImageId : $previewId;
-            if ($cmsImageId > 0) {
-                $cmsImg = CFile::GetPath($cmsImageId);
-                if ($cmsImg) {
-                    $_staticProjects[$i]['img']       = null; // сигнал что нужен внешний URL
-                    $_staticProjects[$i]['mob']       = null;
-                    $_staticProjects[$i]['img_full']  = $cmsImg; // полный путь из CMS
-                }
+            $candidatePath = CFile::GetPath($candidateId);
+            if ($candidatePath) {
+                $desktopImage = $candidatePath;
+                break;
             }
         }
-        $i++;
+
+        $mobileImage = '';
+        foreach ([$homeImageMobId, $homeImageId, $previewId] as $candidateId) {
+            if ($candidateId <= 0) {
+                continue;
+            }
+            $candidatePath = CFile::GetPath($candidateId);
+            if ($candidatePath) {
+                $mobileImage = $candidatePath;
+                break;
+            }
+        }
+
+        if ($desktopImage === '') {
+            $desktopImage = SITE_TEMPLATE_PATH . '/assets/img/' . $_localDesktopFallback[$projectIndex % count($_localDesktopFallback)];
+        }
+        if ($mobileImage === '') {
+            $mobileImage = SITE_TEMPLATE_PATH . '/assets/img/' . $_localMobileFallback[$projectIndex % count($_localMobileFallback)];
+        }
+
+        $detailUrl = trim((string)($proj['PROPERTY_DETAIL_URL_VALUE'] ?? ''));
+        if ($detailUrl === '') {
+            $detailUrl = trim((string)($proj['DETAIL_PAGE_URL'] ?? ''));
+        }
+        if ($detailUrl === '') {
+            $detailUrl = '/projects/detail/?id=' . (int)$proj['ID'];
+        }
+
+        $_projects[] = [
+            'name' => (string)$proj['NAME'],
+            'url'  => $detailUrl,
+            'img'  => $desktopImage,
+            'mob'  => $mobileImage,
+        ];
+        $projectIndex++;
+    }
+}
+
+if (empty($_projects)) {
+    foreach ($_fallbackProjects as $fallbackProject) {
+        $_projects[] = [
+            'name' => $fallbackProject['name'],
+            'url'  => $fallbackProject['url'],
+            'img'  => SITE_TEMPLATE_PATH . '/assets/img/' . $fallbackProject['img'],
+            'mob'  => SITE_TEMPLATE_PATH . '/assets/img/' . $fallbackProject['mob'],
+        ];
     }
 }
 
 // Рендерим карточки — структура точно как в верстке (h3 + img без обёрток)
-foreach ($_staticProjects as $sp):
-    $imgSrc    = isset($sp['img_full']) ? $sp['img_full'] : SITE_TEMPLATE_PATH . '/assets/img/' . $sp['img'];
-    $imgMobSrc = isset($sp['img_full']) ? $sp['img_full'] : SITE_TEMPLATE_PATH . '/assets/img/' . $sp['mob'];
-    $cardUrl   = htmlspecialchars($sp['url']);
+foreach ($_projects as $project):
+    $cardUrl = htmlspecialchars($project['url']);
 ?>
 				<div class="initiative__card" style="cursor:pointer;position:relative;" onclick="window.location='<?= $cardUrl ?>'">
 					<h3>
-						<?= htmlspecialchars($sp['name']) ?>
+						<?= htmlspecialchars($project['name']) ?>
 					</h3>
-					<img src="<?= htmlspecialchars($imgSrc) ?>" alt="<?= htmlspecialchars($sp['name']) ?>" class="initiative__image desk-block" />
-					<img src="<?= htmlspecialchars($imgMobSrc) ?>" alt="<?= htmlspecialchars($sp['name']) ?>" class="initiative__image desk-none" />
+					<img src="<?= htmlspecialchars($project['img']) ?>" alt="<?= htmlspecialchars($project['name']) ?>" class="initiative__image desk-block" />
+					<img src="<?= htmlspecialchars($project['mob']) ?>" alt="<?= htmlspecialchars($project['name']) ?>" class="initiative__image desk-none" />
 				</div>
 <?php endforeach; ?>
 				</div>
