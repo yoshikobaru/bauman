@@ -11,6 +11,11 @@ $arProps     = [];
 $isEvent     = false;
 $regDone     = false;
 $regError    = '';
+$regFlash = function_exists('po_flash_get') ? po_flash_get('d3_event_reg') : null;
+if (is_array($regFlash)) {
+    $regDone = !empty($regFlash['done']);
+    $regError = (string)($regFlash['error'] ?? '');
+}
 
 // — Загрузка элемента инфоблока —
 if ($iblockOk && $elementId > 0) {
@@ -46,6 +51,8 @@ if ($isEvent && $hlOk && defined('HL_APPLICATIONS_ID') && HL_APPLICATIONS_ID > 0
 
             if (!$firstName || !$lastName || !$email) {
                 $regError = 'Заполните обязательные поля: Имя, Фамилия, e-mail';
+            } elseif ($phone !== '' && !po_is_valid_phone_chars($phone)) {
+                $regError = 'Телефон может содержать только цифры, пробел, + и -.';
             } else {
                 $data = json_encode([
                     'last_name'  => $lastName,
@@ -77,6 +84,11 @@ if ($isEvent && $hlOk && defined('HL_APPLICATIONS_ID') && HL_APPLICATIONS_ID > 0
                     $regError = implode('; ', $res->getErrorMessages());
                 }
             }
+            if (function_exists('po_flash_set')) {
+                po_flash_set('d3_event_reg', ['done' => $regDone, 'error' => $regError]);
+            }
+            LocalRedirect('/news/detail/?id=' . $elementId . '&d3=' . ($regDone ? 'success' : 'error'));
+            exit;
         }
     }
 }

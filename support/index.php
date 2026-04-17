@@ -8,6 +8,14 @@ $iblockOk = Loader::includeModule('iblock');
 
 $d2Done  = false;
 $d2Error = '';
+$d2Flash = function_exists('po_flash_get') ? po_flash_get('d2_support') : null;
+if (is_array($d2Flash)) {
+    $d2Done = !empty($d2Flash['done']);
+    $d2Error = (string)($d2Flash['error'] ?? '');
+    if (!empty($d2Flash['form']) && is_array($d2Flash['form'])) {
+        $_POST = array_merge($_POST, $d2Flash['form']);
+    }
+}
 
 // D2: Поддержка проектов — без оплаты, запись в HL-блок
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['d2_action'])) {
@@ -37,6 +45,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['d2_action'])) {
         $d2Error = 'Выберите проект.';
     } elseif (!$ln || !$fn || !$email || !$phone) {
         $d2Error = 'Заполните обязательные поля: Фамилия, Имя, e-mail, Номер телефона.';
+    } elseif (!po_is_valid_phone_chars($phone)) {
+        $d2Error = 'Телефон может содержать только цифры, пробел, + и -.';
     } elseif ($donorType === 'ur' && (!$company || !$site)) {
         $d2Error = 'Для юр. лица заполните обязательные поля: Компания, Сайт.';
     } elseif ($donorType === 'fiz' && !$comment) {
@@ -73,16 +83,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['d2_action'])) {
             $d2Done = true;
             po_logAction('form_submit', 'application', 0, 'D2 поддержка проекта: ' . $project . ', ' . $amount);
             $d2Data = [
-                'first_name' => $fn,    'last_name'  => $ln,
-                'email'      => $email, 'phone'      => $phone,
-                'project'    => $project, 'amount'   => $amount,
-                'donor_type' => $donorType, 'company' => $company,
+                'first_name' => $fn,
+                'last_name'  => $ln,
+                'email'      => $email,
+                'phone'      => $phone,
+                'project'    => $project,
+                'amount'     => $amount,
+                'frequency'  => $frequency,
+                'donor_type' => $donorType,
+                'company'    => $company,
+                'site'       => $site,
                 'payment_comment' => $comment,
+                'agree_pd'   => $agreePd ? 'yes' : 'no',
             ];
             po_sendAdminEmail('project_support', $d2Data);
             po_createCrmLead('project_support', $d2Data);
         }
     }
+    if (function_exists('po_flash_set')) {
+        po_flash_set('d2_support', [
+            'done' => $d2Done,
+            'error' => $d2Error,
+            'form' => $d2Done ? [] : $_POST,
+        ]);
+    }
+    LocalRedirect('/support/?d2=' . ($d2Done ? 'success' : 'error'));
+    exit;
 }
 
 // Список проектов для выпадающего списка

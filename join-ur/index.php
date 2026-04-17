@@ -8,6 +8,14 @@ $hlOk = Loader::includeModule('highloadblock');
 $d7Done  = false;
 $d7Error = '';
 $d7Errors = [];
+$d7Flash = function_exists('po_flash_get') ? po_flash_get('d7_join_ur') : null;
+if (is_array($d7Flash)) {
+    $d7Done = !empty($d7Flash['done']);
+    $d7Error = (string)($d7Flash['error'] ?? '');
+    if (!empty($d7Flash['form']) && is_array($d7Flash['form'])) {
+        $_POST = array_merge($_POST, $d7Flash['form']);
+    }
+}
 
 // D7: Индустриальное партнёрство
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['d7_action'])) {
@@ -42,6 +50,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['d7_action'])) {
                         'second_name' => $sn,  'email'       => $email,
                         'company'     => $company, 'site'    => $site,
                         'rep_count'   => $count,
+                        'agree_charter' => $charter ? 'yes' : 'no',
+                        'agree_pd'      => $pdAgree ? 'yes' : 'no',
                     ], JSON_UNESCAPED_UNICODE),
                 ]);
                 if ($res->isSuccess()) $saved = true;
@@ -57,6 +67,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['d7_action'])) {
                 'second_name' => $sn,     'email'      => $email,
                 'company'     => $company,'site'       => $site,
                 'rep_count'   => $count,
+                'agree_charter' => $charter ? 'yes' : 'no',
+                'agree_pd'      => $pdAgree ? 'yes' : 'no',
             ];
             po_sendAdminEmail('partnership', $d7Data);
             po_createCrmLead('partnership', $d7Data);
@@ -64,6 +76,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['d7_action'])) {
     } else {
         $d7Error = implode('; ', $d7Errors);
     }
+    if (function_exists('po_flash_set')) {
+        po_flash_set('d7_join_ur', [
+            'done' => $d7Done,
+            'error' => $d7Error,
+            'form' => $d7Done ? [] : $_POST,
+        ]);
+    }
+    LocalRedirect('/join-ur/?d7=' . ($d7Done ? 'success' : 'error'));
+    exit;
 }
 ?>
 

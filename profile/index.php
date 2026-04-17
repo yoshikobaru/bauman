@@ -114,9 +114,58 @@ if (!empty($arUser['PERSONAL_PHOTO'])) {
         $avatarSrc = $avatarPath;
     }
 }
+$profileDobInputValue = trim((string)($arUser['UF_DOB'] ?? ''));
+if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $profileDobInputValue)) {
+    [$yyDob, $mmDob, $ddDob] = explode('-', $profileDobInputValue);
+    $profileDobInputValue = $ddDob . '.' . $mmDob . '.' . $yyDob;
+}
+$profileDiplomaDateInputValue = trim((string)($arUser['UF_DIPLOMA_DATE'] ?? ''));
+if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $profileDiplomaDateInputValue)) {
+    [$yyDip, $mmDip, $ddDip] = explode('-', $profileDiplomaDateInputValue);
+    $profileDiplomaDateInputValue = $ddDip . '.' . $mmDip . '.' . $yyDip;
+}
 ?>
 
 <main>
+<style>
+.po-date-field {
+    position: relative;
+}
+.po-date-field input[type="text"] {
+    width: 100%;
+    box-sizing: border-box;
+    padding-right: 42px;
+}
+.po-date-field__btn {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 24px;
+    height: 24px;
+    border: none;
+    background: transparent;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #8a8a8a;
+    cursor: pointer;
+}
+.po-date-field__native {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 24px;
+    height: 24px;
+    opacity: 0;
+    border: none;
+    margin: 0;
+    padding: 0;
+    cursor: pointer;
+}
+</style>
 		<section class="account">
             <div class="container">
                 <div class="account__wrapper">
@@ -614,8 +663,17 @@ if (!empty($arUser['PERSONAL_PHOTO'])) {
                                            title="Email изменяется через раздел Безопасность">
                                     <input type="text" name="first_name"  placeholder="Имя"
                                            value="<?= htmlspecialchars($arUser['NAME']        ?? '') ?>">
-                                    <input type="text" name="dob" placeholder="Дата рождения (ДД.ММ.ГГГГ)"
-                                           value="<?= htmlspecialchars($arUser['UF_DOB'] ?? '') ?>">
+                                    <div class="po-date-field">
+                                        <input type="text" name="dob" id="profile-dob" placeholder="Дата рождения (ДД.ММ.ГГГГ)"
+                                               value="<?= htmlspecialchars($profileDobInputValue) ?>" inputmode="numeric" maxlength="10">
+                                        <button type="button" class="po-date-field__btn" data-picker-target="profile-dob-picker" aria-label="Открыть календарь">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                                                <rect x="3" y="5" width="18" height="16" rx="2" stroke="currentColor" stroke-width="1.8"/>
+                                                <path d="M8 3v4M16 3v4M3 10h18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                                            </svg>
+                                        </button>
+                                        <input type="date" id="profile-dob-picker" class="po-date-field__native" tabindex="-1" aria-hidden="true">
+                                    </div>
                                     <input type="text" name="second_name" placeholder="Отчество"
                                            value="<?= htmlspecialchars($arUser['SECOND_NAME'] ?? '') ?>">
                                 </div>
@@ -646,8 +704,17 @@ if (!empty($arUser['PERSONAL_PHOTO'])) {
                                            value="<?= htmlspecialchars($arUser['UF_DIPLOMA_SERIES'] ?? '') ?>">
                                     <input type="text" name="diploma_number" placeholder="Номер бланка"
                                            value="<?= htmlspecialchars($arUser['UF_DIPLOMA_NUMBER'] ?? '') ?>">
-                                    <input type="text" name="diploma_date"   placeholder="Дата выдачи"
-                                           value="<?= htmlspecialchars($arUser['UF_DIPLOMA_DATE']   ?? '') ?>">
+                                    <div class="po-date-field">
+                                        <input type="text" name="diploma_date" id="profile-diploma-date" placeholder="Дата выдачи (ДД.ММ.ГГГГ)"
+                                               value="<?= htmlspecialchars($profileDiplomaDateInputValue) ?>" inputmode="numeric" maxlength="10">
+                                        <button type="button" class="po-date-field__btn" data-picker-target="profile-diploma-picker" aria-label="Открыть календарь">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                                                <rect x="3" y="5" width="18" height="16" rx="2" stroke="currentColor" stroke-width="1.8"/>
+                                                <path d="M8 3v4M16 3v4M3 10h18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                                            </svg>
+                                        </button>
+                                        <input type="date" id="profile-diploma-picker" class="po-date-field__native" tabindex="-1" aria-hidden="true">
+                                    </div>
                                 </div>
                             </div>
                             <div class="account__personal">
@@ -730,5 +797,65 @@ if (!empty($arUser['PERSONAL_PHOTO'])) {
             </div>
         </section>
 	</main>
+
+<script>
+(function() {
+    function dateToRu(val) {
+        if (!val) return '';
+        var p = val.split('-');
+        if (p.length === 3 && p[0].length === 4) return p[2] + '.' + p[1] + '.' + p[0];
+        return val;
+    }
+    function normalizeRuDate(raw) {
+        var value = (raw || '').trim();
+        if (!value) return '';
+        if (/^\d{4}-\d{2}-\d{2}$/.test(value)) return dateToRu(value);
+        var digits = value.replace(/[^\d]/g, '');
+        if (digits.length === 8) {
+            return digits.slice(0, 2) + '.' + digits.slice(2, 4) + '.' + digits.slice(4, 8);
+        }
+        return value;
+    }
+    function ruToIsoDate(raw) {
+        var value = normalizeRuDate(raw);
+        if (!/^\d{2}\.\d{2}\.\d{4}$/.test(value)) return '';
+        var parts = value.split('.');
+        return parts[2] + '-' + parts[1] + '-' + parts[0];
+    }
+    function setupDateField(textInputId, pickerInputId) {
+        var textInput = document.getElementById(textInputId);
+        var pickerInput = document.getElementById(pickerInputId);
+        if (!textInput || !pickerInput) return;
+        textInput.addEventListener('input', function() {
+            var digits = this.value.replace(/[^\d]/g, '').slice(0, 8);
+            if (digits.length >= 5) this.value = digits.slice(0, 2) + '.' + digits.slice(2, 4) + '.' + digits.slice(4);
+            else if (digits.length >= 3) this.value = digits.slice(0, 2) + '.' + digits.slice(2);
+            else this.value = digits;
+            var iso = ruToIsoDate(this.value);
+            if (iso) pickerInput.value = iso;
+        });
+        textInput.addEventListener('blur', function() {
+            this.value = normalizeRuDate(this.value);
+            var iso = ruToIsoDate(this.value);
+            if (iso) pickerInput.value = iso;
+        });
+        pickerInput.addEventListener('change', function() {
+            textInput.value = dateToRu(this.value);
+        });
+        var isoInitial = ruToIsoDate(textInput.value);
+        if (isoInitial) pickerInput.value = isoInitial;
+    }
+    setupDateField('profile-dob', 'profile-dob-picker');
+    setupDateField('profile-diploma-date', 'profile-diploma-picker');
+    document.querySelectorAll('[data-picker-target]').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            var picker = document.getElementById(this.getAttribute('data-picker-target'));
+            if (!picker) return;
+            if (typeof picker.showPicker === 'function') picker.showPicker();
+            else { picker.focus(); picker.click(); }
+        });
+    });
+})();
+</script>
 
 <?php require($_SERVER["DOCUMENT_ROOT"]."/bitrix/footer.php"); ?>

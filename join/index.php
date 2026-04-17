@@ -12,7 +12,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['honorary_action'])) 
     $hEmail = trim($_POST['honorary_email'] ?? '');
     $hPhone = trim($_POST['honorary_phone'] ?? '');
     $hMsg   = trim($_POST['honorary_msg']   ?? '');
-    if ($hFio && $hEmail) {
+    if ($hPhone !== '' && !po_is_valid_phone_chars($hPhone)) {
+        while (ob_get_level()) ob_end_clean();
+        header('Content-Type: application/json; charset=utf-8');
+        echo json_encode(['success' => false, 'message' => 'Телефон может содержать только цифры, пробел, + и -.']);
+    } elseif ($hFio && $hEmail) {
         po_sendAdminEmail('honorary', ['fio' => $hFio, 'email' => $hEmail, 'phone' => $hPhone, 'msg' => $hMsg]);
         while (ob_get_level()) ob_end_clean();
         header('Content-Type: application/json; charset=utf-8');
@@ -41,6 +45,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['modal_membership_act
         echo json_encode(['success' => false, 'message' => 'Заполните Фамилию, Имя и Email']);
         exit;
     }
+    if ($mPhone !== '' && !po_is_valid_phone_chars($mPhone)) {
+        while (ob_get_level()) ob_end_clean();
+        header('Content-Type: application/json; charset=utf-8');
+        echo json_encode(['success' => false, 'message' => 'Телефон может содержать только цифры, пробел, + и -.']);
+        exit;
+    }
     $typeLabels = ['basic' => 'Базовое', 'premium' => 'Профессиональное', 'partner' => 'Партнёрское', 'honorary' => 'Почётное'];
     if ($hlOk && defined('HL_APPLICATIONS_ID') && HL_APPLICATIONS_ID > 0) {
         $hlData = \Bitrix\Highloadblock\HighloadBlockTable::getById(HL_APPLICATIONS_ID)->fetch();
@@ -60,9 +70,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['modal_membership_act
         }
     }
     po_sendAdminEmail('membership', [
-        'membership_type' => $typeLabels[$mType] ?? $mType,
-        'last_name'  => $mLname, 'first_name' => $mFname,
-        'email' => $mEmail, 'phone' => $mPhone,
+        'membership_type' => $mType,
+        'last_name'       => $mLname,
+        'first_name'      => $mFname,
+        'second_name'     => $mSname,
+        'full_name'       => trim($mLname . ' ' . $mFname . ' ' . $mSname),
+        'email'           => $mEmail,
+        'phone'           => $mPhone,
+        'dept'            => $mDept,
+        'year'            => $mYear,
     ]);
     po_logAction('form_submit', 'application', 0, 'D1 modal membership ' . $mType);
     while (ob_get_level()) ob_end_clean();
@@ -74,6 +90,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['modal_membership_act
 // ─── D7: Индустриальное партнёрство ──────────────────────────────────────
 $d7Done  = false;
 $d7Error = '';
+$d7Flash = function_exists('po_flash_get') ? po_flash_get('join_d7_partnership') : null;
+if (is_array($d7Flash)) {
+    $d7Done = !empty($d7Flash['done']);
+    $d7Error = (string)($d7Flash['error'] ?? '');
+    if (!empty($d7Flash['form']) && is_array($d7Flash['form'])) {
+        $_POST = array_merge($_POST, $d7Flash['form']);
+    }
+}
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['d7_action'])) {
     $d7Company = trim($_POST['d7_company'] ?? '');
     $d7Contact = trim($_POST['d7_contact'] ?? '');
@@ -83,7 +107,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['d7_action'])) {
     $d7AgreePd = !empty($_POST['d7_agree_pd']);
     if (!$d7Company || !$d7Contact || !$d7Email || !$d7Phone) {
         $d7Error = 'Заполните обязательные поля: Компания, ФИО, Email, Телефон.';
-    } elseif (!po_is_valid_partnership_phone($d7Phone)) {
+    } elseif (!po_is_valid_phone_chars($d7Phone)) {
         $d7Error = 'Укажите телефон цифрами и символами пробел, + и -.';
     } elseif (!$d7AgreePd) {
         $d7Error = 'Необходимо согласие с политикой ПДн.';
@@ -119,6 +143,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['d7_action'])) {
             ]);
         }
     }
+    if (function_exists('po_flash_set')) {
+        po_flash_set('join_d7_partnership', [
+            'done' => $d7Done,
+            'error' => $d7Error,
+            'form' => $d7Done ? [] : $_POST,
+        ]);
+    }
+    LocalRedirect('/join/?d7=' . ($d7Done ? 'success' : 'error') . '#join-ur-block');
+    exit;
 }
 $isAuthorized = $USER->IsAuthorized();
 $arCurUser = [];

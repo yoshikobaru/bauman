@@ -3,10 +3,43 @@ document.addEventListener("DOMContentLoaded", () => {
     const menu = document.querySelector('.header-wrapper__menu-mobile');
     const body = document.body;
 
-    burger.addEventListener('click', () => {
-        burger.classList.toggle('active');
-        menu.classList.toggle('active');
-        body.classList.toggle('no-scroll');
+    if (burger && menu) {
+        burger.addEventListener('click', () => {
+            burger.classList.toggle('active');
+            menu.classList.toggle('active');
+            body.classList.toggle('no-scroll');
+        });
+    }
+
+    const updateBitrixPanelOffset = () => {
+        const panel = document.getElementById('bx-panel');
+        const panelHeight = panel ? Math.ceil(panel.getBoundingClientRect().height) : 0;
+        document.documentElement.style.setProperty('--bx-panel-h', `${panelHeight}px`);
+    };
+
+    updateBitrixPanelOffset();
+    window.addEventListener('resize', updateBitrixPanelOffset);
+    setTimeout(updateBitrixPanelOffset, 300);
+
+    const sanitizePhone = (value) => {
+        let normalized = (value || '').replace(/[^\d+\-\s]/g, '');
+        if (normalized.length > 25) {
+            normalized = normalized.slice(0, 25);
+        }
+        return normalized;
+    };
+    document.querySelectorAll('input[type="tel"], input[data-phone-input="1"]').forEach((input) => {
+        input.addEventListener('input', () => {
+            input.value = sanitizePhone(input.value);
+        });
+        input.addEventListener('keypress', (event) => {
+            if (!event.key || event.key.length !== 1) {
+                return;
+            }
+            if (!/[\d+\-\s]/.test(event.key)) {
+                event.preventDefault();
+            }
+        });
     });
 });
 

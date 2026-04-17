@@ -16,6 +16,14 @@ $_isMember   = defined('PO_MEMBER_BASIC_ID') && (
 
 $d6Done  = false;
 $d6Error = '';
+$d6Flash = function_exists('po_flash_get') ? po_flash_get('d6_competencies') : null;
+if (is_array($d6Flash)) {
+    $d6Done = !empty($d6Flash['done']);
+    $d6Error = (string)($d6Flash['error'] ?? '');
+    if (!empty($d6Flash['form']) && is_array($d6Flash['form'])) {
+        $_POST = array_merge($_POST, $d6Flash['form']);
+    }
+}
 
 // D6: Запрос в витрине компетенций (только члены)
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['d6_action'])) {
@@ -24,9 +32,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['d6_action'])) {
     } else {
         $company = trim($_POST['company']     ?? '');
         $fn      = trim($_POST['first_name']  ?? '');
+        $phone   = trim($_POST['phone']       ?? '');
         $em      = trim($_POST['email']       ?? '');
         if (!$fn || !$em) {
             $d6Error = 'Заполните обязательные поля: Имя, Email.';
+        } elseif ($phone !== '' && !po_is_valid_phone_chars($phone)) {
+            $d6Error = 'Телефон может содержать только цифры, пробел, + и -.';
         } else {
             if ($hlOk && defined('HL_APPLICATIONS_ID') && HL_APPLICATIONS_ID > 0) {
                 $hlEntity = \Bitrix\Highloadblock\HighloadBlockTable::getById(HL_APPLICATIONS_ID)->fetch();
@@ -42,7 +53,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['d6_action'])) {
                             'first_name' => $fn,
                             'last_name'  => trim($_POST['last_name'] ?? ''),
                             'email'      => $em,
-                            'phone'      => trim($_POST['phone']  ?? ''),
+                            'phone'      => $phone,
                             'request'    => trim($_POST['request'] ?? ''),
                         ], JSON_UNESCAPED_UNICODE),
                     ]);
@@ -51,7 +62,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['d6_action'])) {
                         po_logAction('form_submit', 'application', 0, 'D6 запрос в витрине компетенций');
                         $d6Data = [
                             'first_name' => $fn,     'last_name' => trim($_POST['last_name'] ?? ''),
-                            'email'      => $em,     'phone'     => trim($_POST['phone'] ?? ''),
+                            'email'      => $em,     'phone'     => $phone,
                             'company'    => $company,'request'   => trim($_POST['request'] ?? ''),
                         ];
                         po_sendAdminEmail('competency_request', $d6Data);
@@ -65,6 +76,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['d6_action'])) {
             }
         }
     }
+    if (function_exists('po_flash_set')) {
+        po_flash_set('d6_competencies', [
+            'done' => $d6Done,
+            'error' => $d6Error,
+            'form' => $d6Done ? [] : $_POST,
+        ]);
+    }
+    LocalRedirect('/competencies/?d6=' . ($d6Done ? 'success' : 'error') . '#form-competencies');
+    exit;
 }
 ?>
 
@@ -227,5 +247,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['d6_action'])) {
 		<?php endif; ?>
 		</div>
 	</div>
+
+<?php if ($d6Done || $d6Error): ?>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    if (window.Fancybox) {
+        Fancybox.show([{ src: '#form-competencies', type: 'inline' }]);
+    }
+});
+</script>
+<?php endif; ?>
 
 <?php require($_SERVER["DOCUMENT_ROOT"]."/bitrix/footer.php");?>

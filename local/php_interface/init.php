@@ -95,6 +95,11 @@ function po_mailLabelForField(string $key): string
         'name' => 'ФИО',
         'first_name' => 'Имя',
         'last_name' => 'Фамилия',
+        'second_name' => 'Отчество',
+        'full_name' => 'ФИО',
+        'membership_type' => 'Тип членства',
+        'agree_pd' => 'Согласие с политикой ПДн',
+        'agree_charter' => 'Согласие с Уставом',
         'contact' => 'Контакт',
         'position' => 'Должность',
         'dob' => 'Дата рождения',
@@ -136,6 +141,21 @@ function po_mailNormalizeValue(string $key, $value): string
             'non_graduate' => 'Невыпускник',
         ];
         return $map[(string)$value] ?? (string)$value;
+    }
+    if ($key === 'membership_type') {
+        $map = [
+            'basic' => 'Базовое',
+            'premium' => 'Профессиональное',
+            'partner' => 'Партнёрское',
+            'honorary' => 'Почётное',
+        ];
+        return $map[(string)$value] ?? (string)$value;
+    }
+    if ($key === 'agree_pd') {
+        return in_array((string)$value, ['1', 'yes', 'true'], true) ? 'Да' : 'Нет';
+    }
+    if ($key === 'agree_charter') {
+        return in_array((string)$value, ['1', 'yes', 'true'], true) ? 'Да' : 'Нет';
     }
 
     return (string)$value;
@@ -271,6 +291,42 @@ function po_sendMembershipConfirmationEmail(string $email): void
     $headers .= "Reply-To: " . PO_ADMIN_EMAIL . "\r\n";
 
     @mail($email, po_mailEncodeSubject($subject), $body, $headers);
+}
+
+function po_is_valid_phone_chars(string $phone): bool
+{
+    $phone = trim($phone);
+    if ($phone === '') {
+        return true;
+    }
+    if (!preg_match('/^[\d\s\+\-]+$/u', $phone)) {
+        return false;
+    }
+    return (bool)preg_match('/\d/u', $phone);
+}
+
+function po_flash_set(string $key, array $payload): void
+{
+    if (session_status() !== PHP_SESSION_ACTIVE) {
+        @session_start();
+    }
+    if (!isset($_SESSION['PO_FLASH']) || !is_array($_SESSION['PO_FLASH'])) {
+        $_SESSION['PO_FLASH'] = [];
+    }
+    $_SESSION['PO_FLASH'][$key] = $payload;
+}
+
+function po_flash_get(string $key): ?array
+{
+    if (session_status() !== PHP_SESSION_ACTIVE) {
+        @session_start();
+    }
+    if (!isset($_SESSION['PO_FLASH'][$key]) || !is_array($_SESSION['PO_FLASH'][$key])) {
+        return null;
+    }
+    $payload = $_SESSION['PO_FLASH'][$key];
+    unset($_SESSION['PO_FLASH'][$key]);
+    return $payload;
 }
 
 /**

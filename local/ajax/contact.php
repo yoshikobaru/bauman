@@ -19,22 +19,19 @@ $message = trim($_POST['message'] ?? '');
 
 if (!$name)  { echo json_encode(['success' => false, 'message' => 'Введите имя']);   die(); }
 if (!$email) { echo json_encode(['success' => false, 'message' => 'Введите email']); die(); }
+if ($phone !== '' && function_exists('po_is_valid_phone_chars') && !po_is_valid_phone_chars($phone)) {
+    echo json_encode(['success' => false, 'message' => 'Телефон может содержать только цифры, пробел, + и -.']);
+    die();
+}
 
-$adminEmail = defined('PO_ADMIN_EMAIL') ? PO_ADMIN_EMAIL : 'info@bauman-polytech.ru';
-
-$subject = 'Связаться с организаторами / Стать партнёром';
-$body = "Имя: $name\nEmail: $email\n";
-if ($phone)   $body .= "Телефон: $phone\n";
-if ($message) $body .= "\nСообщение:\n$message\n";
-
-$headers  = "MIME-Version: 1.0\r\n";
-$headers .= "Content-Type: text/plain; charset=UTF-8\r\n";
-$headers .= "Content-Transfer-Encoding: 8bit\r\n";
-$headers .= "From: {$adminEmail}\r\n";
-$headers .= "Reply-To: " . ($email) . "\r\n";
-
-$encSubject = '=?UTF-8?B?' . base64_encode($subject) . '?=';
-@mail($adminEmail, $encSubject, $body, $headers);
+if (function_exists('po_sendAdminEmail')) {
+    po_sendAdminEmail('contact', [
+        'name'  => $name,
+        'email' => $email,
+        'phone' => $phone,
+        'msg'   => $message,
+    ]);
+}
 
 if (function_exists('po_logAction')) {
     po_logAction('form_submit', 'contact', 0, 'Связаться с организаторами: ' . $name);

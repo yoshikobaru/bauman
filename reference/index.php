@@ -31,40 +31,93 @@ function po_hlSave($type, $userId, array $data, $elementId = 0)
 }
 
 $d5Done  = false; $d5Error  = '';
+$d5Form = [
+    'company' => '',
+    'about' => '',
+    'what_show' => '',
+    'audience' => '',
+    'd5_last_name' => '',
+    'd5_first_name' => '',
+    'd5_phone' => '',
+    'd5_email' => '',
+    'd5_site' => '',
+    'd5_agree' => '',
+];
+$d5Flash = function_exists('po_flash_get') ? po_flash_get('d5_reference_org') : null;
+if (is_array($d5Flash)) {
+    $d5Done = !empty($d5Flash['done']);
+    $d5Error = (string)($d5Flash['error'] ?? '');
+    if (!empty($d5Flash['form']) && is_array($d5Flash['form'])) {
+        $d5Form = array_merge($d5Form, $d5Flash['form']);
+    }
+}
 
 // D5: Организация референс-визита (все)
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['d5_action'])) {
-    $company = trim($_POST['company']     ?? '');
-    $about   = trim($_POST['about']       ?? '');
-    $show    = trim($_POST['what_show']   ?? '');
-    $audience= trim($_POST['audience']    ?? '');
-    $fn      = trim($_POST['d5_first_name']?? '');
-    $ln      = trim($_POST['d5_last_name'] ?? '');
-    $em      = trim($_POST['d5_email']     ?? '');
+    $d5Form = [
+        'company'      => trim($_POST['company']       ?? ''),
+        'about'        => trim($_POST['about']         ?? ''),
+        'what_show'    => trim($_POST['what_show']     ?? ''),
+        'audience'     => trim($_POST['audience']      ?? ''),
+        'd5_last_name' => trim($_POST['d5_last_name']  ?? ''),
+        'd5_first_name'=> trim($_POST['d5_first_name'] ?? ''),
+        'd5_phone'     => trim($_POST['d5_phone']      ?? ''),
+        'd5_email'     => trim($_POST['d5_email']      ?? ''),
+        'd5_site'      => trim($_POST['d5_site']       ?? ''),
+        'd5_agree'     => (string)($_POST['d5_agree']  ?? ''),
+    ];
+    $company = $d5Form['company'];
+    $about = $d5Form['about'];
+    $show = $d5Form['what_show'];
+    $audience = $d5Form['audience'];
+    $fn = $d5Form['d5_first_name'];
+    $ln = $d5Form['d5_last_name'];
+    $em = $d5Form['d5_email'];
+    $phone = $d5Form['d5_phone'];
+    $site = $d5Form['d5_site'];
+    $agreePd = $d5Form['d5_agree'] === 'yes';
     if (!$company || !$fn || !$em) {
         $d5Error = 'Заполните обязательные поля: Компания, Имя, Email.';
+    } elseif ($phone !== '' && !po_is_valid_phone_chars($phone)) {
+        $d5Error = 'Телефон может содержать только цифры, пробел, + и -.';
+    } elseif (!$agreePd) {
+        $d5Error = 'Необходимо согласие с политикой обработки ПДн.';
     } else {
         $saved = $hlOk ? po_hlSave('reference_org', $USER->IsAuthorized() ? $USER->GetID() : 0, [
             'company'    => $company, 'about'     => $about,
             'what_show'  => $show,   'audience'  => $audience,
             'last_name'  => $ln,     'first_name'=> $fn,
-            'email'      => $em,     'phone'     => trim($_POST['d5_phone'] ?? ''),
-            'site'       => trim($_POST['d5_site']  ?? ''),
+            'email'      => $em,     'phone'     => $phone,
+            'site'       => $site,
+            'agree_pd'   => $agreePd ? 'yes' : 'no',
         ]) : false;
         if (!$hlOk || $saved) {
             $d5Done = true;
             po_logAction('form_submit', 'application', 0, 'D5 организация референс-визита');
             $d5Data = [
                 'first_name' => $fn,      'last_name' => $ln,
-                'email'      => $em,      'phone'     => trim($_POST['d5_phone'] ?? ''),
+                'email'      => $em,      'phone'     => $phone,
                 'company'    => $company, 'about'     => $about,
                 'what_show'  => $show,    'audience'  => $audience,
+                'site'       => $site,    'agree_pd'  => $agreePd ? 'yes' : 'no',
             ];
             po_sendAdminEmail('reference_org', $d5Data);
             po_createCrmLead('reference_org', $d5Data);
+            if (function_exists('po_flash_set')) {
+                po_flash_set('d5_reference_org', ['done' => true, 'error' => '', 'form' => []]);
+            }
+            LocalRedirect('/reference/?d5=success#form-reference-visits');
+            exit;
         } else {
             $d5Error = 'Ошибка сохранения. Попробуйте позже.';
         }
+    }
+    if ($d5Error !== '') {
+        if (function_exists('po_flash_set')) {
+            po_flash_set('d5_reference_org', ['done' => false, 'error' => $d5Error, 'form' => $d5Form]);
+        }
+        LocalRedirect('/reference/?d5=error#form-reference-visits');
+        exit;
     }
 }
 ?>
@@ -532,10 +585,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['d5_action'])) {
 					<h3 class="account__subtitle">Данные о компании</h3>
 				</div>
 				<div class="account__personal-list account__personal-list--form">
-					<input type="text" name="company"   placeholder="Компания *" required>
-					<input type="text" name="about"     placeholder="Чем занимается компания?">
-					<input type="text" name="what_show" placeholder="Что хотите показать?">
-					<input type="text" name="audience"  placeholder="Для какой аудитории?">
+					<input type="text" name="company"   placeholder="Компания *" required value="<?= htmlspecialchars($d5Form['company']) ?>">
+					<input type="text" name="about"     placeholder="Чем занимается компания?" value="<?= htmlspecialchars($d5Form['about']) ?>">
+					<input type="text" name="what_show" placeholder="Что хотите показать?" value="<?= htmlspecialchars($d5Form['what_show']) ?>">
+					<input type="text" name="audience"  placeholder="Для какой аудитории?" value="<?= htmlspecialchars($d5Form['audience']) ?>">
 				</div>
 			</div>
 			<div class="account__personal">
@@ -543,11 +596,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['d5_action'])) {
 					<h3 class="account__subtitle">Контактное лицо</h3>
 				</div>
 				<div class="account__personal-list account__grid">
-					<input type="text"  name="d5_last_name"  placeholder="Фамилия">
-					<input type="text"  name="d5_first_name" placeholder="Имя *" required>
-					<input type="tel"   name="d5_phone"      placeholder="Номер телефона">
-					<input type="email" name="d5_email"      placeholder="e-mail *" required>
-					<input type="text"  name="d5_site"       placeholder="Сайт">
+					<input type="text"  name="d5_last_name"  placeholder="Фамилия" value="<?= htmlspecialchars($d5Form['d5_last_name']) ?>">
+					<input type="text"  name="d5_first_name" placeholder="Имя *" required value="<?= htmlspecialchars($d5Form['d5_first_name']) ?>">
+					<input type="tel"   name="d5_phone"      placeholder="Номер телефона" value="<?= htmlspecialchars($d5Form['d5_phone']) ?>">
+					<input type="email" name="d5_email"      placeholder="e-mail *" required value="<?= htmlspecialchars($d5Form['d5_email']) ?>">
+					<input type="text"  name="d5_site"       placeholder="Сайт" value="<?= htmlspecialchars($d5Form['d5_site']) ?>">
 				</div>
 			</div>
 			<div class="join__politic">
@@ -555,11 +608,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['d5_action'])) {
 					<p class="join__politic-link">Согласен с <a href="<?= defined('DOC_POLITIKA_URL') ? DOC_POLITIKA_URL : '#' ?>" target="_blank">политикой обработки ПДн</a></p>
 					<div class="account__graduate-choice">
 						<label class="account__graduate-item">
-							<input type="radio" name="d5_agree" value="yes" class="account__graduate-input" required>
+							<input type="radio" name="d5_agree" value="yes" class="account__graduate-input" required <?= $d5Form['d5_agree'] === 'yes' ? 'checked' : '' ?>>
 							<span class="account__graduate-box"></span>Да
 						</label>
 						<label class="account__graduate-item">
-							<input type="radio" name="d5_agree" value="no" class="account__graduate-input">
+							<input type="radio" name="d5_agree" value="no" class="account__graduate-input" <?= $d5Form['d5_agree'] === 'no' ? 'checked' : '' ?>>
 							<span class="account__graduate-box"></span>Нет
 						</label>
 					</div>
@@ -572,7 +625,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['d5_action'])) {
 	</div>
 </div>
 
-<?php if ($d5Done): ?>
+<?php if ($d5Done || $d5Error): ?>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     if (window.Fancybox) Fancybox.show([{src: '#form-reference-visits', type: 'inline'}]);

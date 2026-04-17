@@ -14,6 +14,11 @@ $_isMember   = defined('PO_MEMBER_BASIC_ID') && (
 
 // D4: Заявка на участие в референс-визите (только члены)
 $d4Done = false; $d4Error = '';
+$d4Flash = function_exists('po_flash_get') ? po_flash_get('d4_reference_visit') : null;
+if (is_array($d4Flash)) {
+    $d4Done = !empty($d4Flash['done']);
+    $d4Error = (string)($d4Flash['error'] ?? '');
+}
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['d4_action'])) {
     if (!$_isMember) {
         $d4Error = 'Участие в референс-визитах доступно только членам общества.';
@@ -23,8 +28,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['d4_action'])) {
         $em        = trim($_POST['email']      ?? '');
         $ph        = trim($_POST['phone']      ?? '');
         $visitName = trim($_POST['visit_name'] ?? '');
+        $agreePd   = !empty($_POST['d4_agree']);
         if (!$fn || !$ln || !$em) {
             $d4Error = 'Заполните обязательные поля: Имя, Фамилия, e-mail.';
+        } elseif ($ph !== '' && !po_is_valid_phone_chars($ph)) {
+            $d4Error = 'Телефон может содержать только цифры, пробел, + и -.';
         } else {
             $saved = false;
             if ($hlOk && defined('HL_APPLICATIONS_ID') && HL_APPLICATIONS_ID > 0) {
@@ -41,6 +49,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['d4_action'])) {
                             'email'      => $em,  'phone'      => $ph,
                             'telegram'   => trim($_POST['telegram'] ?? ''),
                             'visit_name' => $visitName,
+                            'agree_pd'   => $agreePd ? 'yes' : 'no',
                         ], JSON_UNESCAPED_UNICODE),
                     ]);
                     $saved = $res->isSuccess();
@@ -55,6 +64,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['d4_action'])) {
                     'email'       => $em, 'phone'      => $ph,
                     'telegram'    => trim($_POST['telegram'] ?? ''),
                     'visit_name'  => $visitName,
+                    'agree_pd'    => $agreePd ? 'yes' : 'no',
                 ];
                 if (function_exists('po_sendAdminEmail'))  po_sendAdminEmail('reference_visit', $d4Data);
                 if (function_exists('po_createCrmLead'))   po_createCrmLead('reference_visit', $d4Data);
@@ -63,6 +73,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['d4_action'])) {
             }
         }
     }
+    if (function_exists('po_flash_set')) {
+        po_flash_set('d4_reference_visit', ['done' => $d4Done, 'error' => $d4Error]);
+    }
+    $redirectUrl = strtok($_SERVER['REQUEST_URI'], '?');
+    if (!$redirectUrl) {
+        $redirectUrl = '/reference/';
+    }
+    LocalRedirect($redirectUrl . '?d4=' . ($d4Done ? 'success' : 'error') . '#form-d4-visit');
+    exit;
 }
 
 // Получить элемент по символьному коду (ChPU) или ID

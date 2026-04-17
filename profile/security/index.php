@@ -9,6 +9,11 @@ if (!$USER->IsAuthorized()) {
 $userId   = $USER->GetID();
 $saveOk   = false;
 $saveError = '';
+$securityFlash = function_exists('po_flash_get') ? po_flash_get('profile_security') : null;
+if (is_array($securityFlash)) {
+    $saveOk = !empty($securityFlash['done']);
+    $saveError = (string)($securityFlash['error'] ?? '');
+}
 
 // — Смена пароля —
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['security_action'])) {
@@ -52,6 +57,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['security_action'])) 
         }
     }
     }
+    if (function_exists('po_flash_set')) {
+        po_flash_set('profile_security', ['done' => $saveOk, 'error' => $saveError]);
+    }
+    LocalRedirect('/profile/security/?status=' . ($saveOk ? 'success' : 'error'));
+    exit;
 }
 ?>
 

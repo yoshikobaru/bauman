@@ -7,8 +7,28 @@ $hlOk = Loader::includeModule('highloadblock');
 
 $errors   = [];
 $regDone  = false;
+$urDone   = false;
+$urError  = '';
 $regType  = $_GET['type'] ?? 'fiz'; // fiz | ur
 $postType = $_POST['reg_type'] ?? 'fiz';
+$regFlashFiz = function_exists('po_flash_get') ? po_flash_get('registration_fiz') : null;
+if (is_array($regFlashFiz)) {
+    $regDone = !empty($regFlashFiz['done']);
+    $errors = is_array($regFlashFiz['errors'] ?? null) ? $regFlashFiz['errors'] : [];
+    if (!empty($regFlashFiz['form']) && is_array($regFlashFiz['form'])) {
+        $_POST = array_merge($_POST, $regFlashFiz['form']);
+    }
+    $regType = 'fiz';
+}
+$regFlashUr = function_exists('po_flash_get') ? po_flash_get('registration_ur') : null;
+if (is_array($regFlashUr)) {
+    $urDone = !empty($regFlashUr['done']);
+    $urError = (string)($regFlashUr['error'] ?? '');
+    if (!empty($regFlashUr['form']) && is_array($regFlashUr['form'])) {
+        $_POST = array_merge($_POST, $regFlashUr['form']);
+    }
+    $regType = 'ur';
+}
 
 // ─── Физ. лицо: обработка формы ──────────────────────────────────────────
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['reg_fiz_action'])) {
@@ -205,11 +225,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['reg_fiz_action'])) {
             $errors[] = $oUser->LAST_ERROR ?: 'Ошибка при создании аккаунта';
         }
     }
+    if (function_exists('po_flash_set')) {
+        po_flash_set('registration_fiz', [
+            'done' => $regDone,
+            'errors' => $errors,
+            'form' => $regDone ? [] : $_POST,
+        ]);
+    }
+    LocalRedirect('/registration/?type=fiz&status=' . ($regDone ? 'success' : 'error'));
+    exit;
 }
 
 // ─── Юр. лицо (D7: Индустриальное партнёрство) ───────────────────────────
-$urDone  = false;
-$urError = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['reg_ur_action'])) {
     $regType   = 'ur';
     $urCompany = trim($_POST['ur_company'] ?? '');
@@ -256,6 +283,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['reg_ur_action'])) {
             ]);
         }
     }
+    if (function_exists('po_flash_set')) {
+        po_flash_set('registration_ur', [
+            'done' => $urDone,
+            'error' => $urError,
+            'form' => $urDone ? [] : $_POST,
+        ]);
+    }
+    LocalRedirect('/registration/?type=ur&status=' . ($urDone ? 'success' : 'error'));
+    exit;
 }
 
 $fizDobInputValue = trim($_POST['fiz_dob'] ?? '');

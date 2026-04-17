@@ -10,6 +10,28 @@ $resDone  = false;
 $vacError = '';
 $resError = '';
 $activeForm = '';
+$vacFlash = function_exists('po_flash_get') ? po_flash_get('resume_form_vacancy') : null;
+if (is_array($vacFlash)) {
+    $vacDone = !empty($vacFlash['done']);
+    $vacError = (string)($vacFlash['error'] ?? '');
+    if (!empty($vacFlash['form']) && is_array($vacFlash['form'])) {
+        $_POST = array_merge($_POST, $vacFlash['form']);
+    }
+    if ($vacDone || $vacError !== '') {
+        $activeForm = 'vacancy';
+    }
+}
+$resFlash = function_exists('po_flash_get') ? po_flash_get('resume_form_resume') : null;
+if (is_array($resFlash)) {
+    $resDone = !empty($resFlash['done']);
+    $resError = (string)($resFlash['error'] ?? '');
+    if (!empty($resFlash['form']) && is_array($resFlash['form'])) {
+        $_POST = array_merge($_POST, $resFlash['form']);
+    }
+    if ($resDone || $resError !== '') {
+        $activeForm = 'resume';
+    }
+}
 
 $allowedExts = ['pdf', 'doc', 'docx'];
 
@@ -33,6 +55,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['vacancy_action'])) {
 
     if (!$company || !$position) {
         $vacError = 'Заполните обязательные поля: Компания, Должность.';
+    } elseif ($phone !== '' && !po_is_valid_phone_chars($phone)) {
+        $vacError = 'Телефон может содержать только цифры, пробел, + и -.';
     } elseif (!$agreePd) {
         $vacError = 'Необходимо согласие с политикой обработки ПДн.';
     } elseif (!empty($_FILES['vac_attachment']['name']) && !po_checkFileExt($_FILES['vac_attachment'], $allowedExts)) {
@@ -40,20 +64,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['vacancy_action'])) {
     } elseif (empty($_FILES['vac_attachment']['name']) || $_FILES['vac_attachment']['error'] !== UPLOAD_ERR_OK) {
         $vacError = 'Прикрепите файл вакансии (PDF, DOC, DOCX).';
     } else {
-        $attachFileId = CFile::SaveFile(
-            CFile::MakeFileArray($_FILES['vac_attachment']['tmp_name'], $_FILES['vac_attachment']['name']),
-            'applications'
-        );
+        $attachFileId = CFile::SaveFile($_FILES['vac_attachment'], 'applications');
+        $attachPath = $attachFileId ? CFile::GetPath($attachFileId) : '';
+        $vacAttachments = [];
+        if (!empty($_FILES['vac_attachment']['tmp_name']) && is_uploaded_file($_FILES['vac_attachment']['tmp_name'])) {
+            $vacAttachments[] = [
+                'path' => $_FILES['vac_attachment']['tmp_name'],
+                'name' => $_FILES['vac_attachment']['name'] ?: 'vacancy_attachment',
+            ];
+        }
         $vacDone = true;
         po_sendAdminEmail('vacancy', [
-            'company'  => $company, 'site'   => $site,
-            'position' => $position,
-            'contact'  => "$lname $fname $sname",
-            'phone'    => $phone, 'email' => $email,
-        ]);
+            'company'      => $company,
+            'site'         => $site,
+            'position'     => $position,
+            'last_name'    => $lname,
+            'first_name'   => $fname,
+            'second_name'  => $sname,
+            'full_name'    => trim($lname . ' ' . $fname . ' ' . $sname),
+            'phone'        => $phone,
+            'email'        => $email,
+            'agree_pd'     => $agreePd ? 'yes' : 'no',
+            'file_links'   => ['vacancy_attachment' => $attachPath],
+        ], ['attachments' => $vacAttachments]);
         po_logAction('form_submit', 'application', 0, 'Вакансия: ' . $position);
     }
     $activeForm = 'vacancy';
+    if (function_exists('po_flash_set')) {
+        po_flash_set('resume_form_vacancy', [
+            'done' => $vacDone,
+            'error' => $vacError,
+            'form' => $vacDone ? [] : $_POST,
+        ]);
+    }
+    LocalRedirect('/resume-form/?form=vacancy&status=' . ($vacDone ? 'success' : 'error') . '#section-vacancy');
+    exit;
 }
 
 // ── Резюме ────────────────────────────────────────────────────────────────────
@@ -83,20 +128,48 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['resume_action'])) {
     } elseif (empty($_FILES['res_attachment']['name']) || $_FILES['res_attachment']['error'] !== UPLOAD_ERR_OK) {
         $resError = 'Прикрепите файл резюме (PDF, DOC, DOCX).';
     } else {
-        $resumeFileId = CFile::SaveFile(
-            CFile::MakeFileArray($_FILES['res_attachment']['tmp_name'], $_FILES['res_attachment']['name']),
-            'applications'
-        );
+        $resumeFileId = CFile::SaveFile($_FILES['res_attachment'], 'applications');
+        $resumePath = $resumeFileId ? CFile::GetPath($resumeFileId) : '';
+        $resumeAttachments = [];
+        if (!empty($_FILES['res_attachment']['tmp_name']) && is_uploaded_file($_FILES['res_attachment']['tmp_name'])) {
+            $resumeAttachments[] = [
+                'path' => $_FILES['res_attachment']['tmp_name'],
+                'name' => $_FILES['res_attachment']['name'] ?: 'resume_attachment',
+            ];
+        }
         $resDone = true;
         po_sendAdminEmail('resume', [
-            'name'     => "$lname $fname $sname",
-            'dob'      => $dob, 'dept'     => $dept,
-            'year'     => $year, 'sphere'   => $sphere,
-            'exp'      => $exp,  'position' => $position,
-        ]);
+            'last_name'   => $lname,
+            'first_name'  => $fname,
+            'second_name' => $sname,
+            'full_name'   => trim($lname . ' ' . $fname . ' ' . $sname),
+            'dob'         => $dob,
+            'dept'        => $dept,
+            'year'        => $year,
+            'sphere'      => $sphere,
+            'exp'         => $exp,
+            'position'    => $position,
+            'agree_pd'    => $agreePd ? 'yes' : 'no',
+            'file_links'  => ['resume_attachment' => $resumePath],
+        ], ['attachments' => $resumeAttachments]);
         po_logAction('form_submit', 'application', 0, 'Резюме: ' . $position);
     }
     $activeForm = 'resume';
+    if (function_exists('po_flash_set')) {
+        po_flash_set('resume_form_resume', [
+            'done' => $resDone,
+            'error' => $resError,
+            'form' => $resDone ? [] : $_POST,
+        ]);
+    }
+    LocalRedirect('/resume-form/?form=resume&status=' . ($resDone ? 'success' : 'error') . '#section-resume');
+    exit;
+}
+
+$resDobInputValue = trim($_POST['res_dob'] ?? '');
+if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $resDobInputValue)) {
+    [$yy, $mm, $dd] = explode('-', $resDobInputValue);
+    $resDobInputValue = $dd . '.' . $mm . '.' . $yy;
 }
 ?>
 
@@ -123,6 +196,43 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['resume_action'])) {
     margin-bottom: 16px;
     color: #c0392b;
     display: none;
+}
+.po-date-field {
+    position: relative;
+}
+.po-date-field input[type="text"] {
+    width: 100%;
+    box-sizing: border-box;
+    padding-right: 42px;
+}
+.po-date-field__btn {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 24px;
+    height: 24px;
+    border: none;
+    background: transparent;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #8a8a8a;
+    cursor: pointer;
+}
+.po-date-field__native {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 24px;
+    height: 24px;
+    opacity: 0;
+    border: none;
+    margin: 0;
+    padding: 0;
+    cursor: pointer;
 }
 </style>
 
@@ -196,12 +306,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['resume_action'])) {
                                    value="<?= htmlspecialchars($_POST['res_fname'] ?? ($USER->IsAuthorized() ? $USER->GetParam('NAME') : '')) ?>">
                             <input type="text" name="res_sname"  placeholder="Отчество"
                                    value="<?= htmlspecialchars($_POST['res_sname'] ?? ($USER->IsAuthorized() ? $USER->GetParam('SECOND_NAME') : '')) ?>">
-                            <div>
-                                <input type="date" name="res_dob" id="res_dob"
-                                       placeholder="Дата рождения. Обязательное поле"
+                            <div class="po-date-field">
+                                <input type="text" name="res_dob" id="res_dob"
+                                       placeholder="Дата рождения (ДД.ММ.ГГГГ)"
                                        required
-                                       value="<?= htmlspecialchars($_POST['res_dob'] ?? '') ?>"
-                                       style="width:100%">
+                                       inputmode="numeric" maxlength="10"
+                                       value="<?= htmlspecialchars($resDobInputValue) ?>">
+                                <button type="button" class="po-date-field__btn" data-picker-target="res_dob_picker" aria-label="Открыть календарь">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                                        <rect x="3" y="5" width="18" height="16" rx="2" stroke="currentColor" stroke-width="1.8"/>
+                                        <path d="M8 3v4M16 3v4M3 10h18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                                    </svg>
+                                </button>
+                                <input type="date" id="res_dob_picker" class="po-date-field__native" tabindex="-1" aria-hidden="true">
                                 <span class="po-field-error" id="res-dob-err">Укажите дату рождения</span>
                             </div>
                         </div>
@@ -438,6 +555,54 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['resume_action'])) {
         if (parts.length === 3) return parts[2] + '.' + parts[1] + '.' + parts[0];
         return val;
     }
+    function normalizeRuDate(raw) {
+        var value = (raw || '').trim();
+        if (!value) return '';
+        if (/^\d{4}-\d{2}-\d{2}$/.test(value)) return dateToRu(value);
+        var digits = value.replace(/[^\d]/g, '');
+        if (digits.length === 8) {
+            return digits.slice(0, 2) + '.' + digits.slice(2, 4) + '.' + digits.slice(4, 8);
+        }
+        return value;
+    }
+    function ruToIsoDate(raw) {
+        var value = normalizeRuDate(raw);
+        if (!/^\d{2}\.\d{2}\.\d{4}$/.test(value)) return '';
+        var p = value.split('.');
+        return p[2] + '-' + p[1] + '-' + p[0];
+    }
+    function setupDateField(textInputId, pickerInputId) {
+        var textInput = document.getElementById(textInputId);
+        var pickerInput = document.getElementById(pickerInputId);
+        if (!textInput || !pickerInput) return;
+        textInput.addEventListener('input', function() {
+            var digits = this.value.replace(/[^\d]/g, '').slice(0, 8);
+            if (digits.length >= 5) this.value = digits.slice(0, 2) + '.' + digits.slice(2, 4) + '.' + digits.slice(4);
+            else if (digits.length >= 3) this.value = digits.slice(0, 2) + '.' + digits.slice(2);
+            else this.value = digits;
+            var iso = ruToIsoDate(this.value);
+            if (iso) pickerInput.value = iso;
+        });
+        textInput.addEventListener('blur', function() {
+            this.value = normalizeRuDate(this.value);
+            var iso = ruToIsoDate(this.value);
+            if (iso) pickerInput.value = iso;
+        });
+        pickerInput.addEventListener('change', function() {
+            textInput.value = dateToRu(this.value);
+        });
+        var isoInitial = ruToIsoDate(textInput.value);
+        if (isoInitial) pickerInput.value = isoInitial;
+    }
+    setupDateField('res_dob', 'res_dob_picker');
+    document.querySelectorAll('[data-picker-target]').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            var picker = document.getElementById(this.getAttribute('data-picker-target'));
+            if (!picker) return;
+            if (typeof picker.showPicker === 'function') picker.showPicker();
+            else { picker.focus(); picker.click(); }
+        });
+    });
 
     // ── Валидация формы резюме ─────────────────────────────────────────────────
     var formRes = document.getElementById('form-resume');
@@ -461,7 +626,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['resume_action'])) {
             } else {
                 // Заполнить скрытое поле
                 var hidden = document.getElementById('res_dob_hidden');
-                if (hidden) hidden.value = dateToRu(dobInp.value);
+                if (hidden) hidden.value = normalizeRuDate(dobInp.value);
             }
             if (!yearInp || !yearInp.value) {
                 errors.push('Год выпуска');
@@ -491,7 +656,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['resume_action'])) {
             } else {
                 // Заполнить скрытое поле датой
                 var hidden2 = document.getElementById('res_dob_hidden');
-                if (hidden2 && dobInp) hidden2.value = dateToRu(dobInp.value);
+                if (hidden2 && dobInp) hidden2.value = normalizeRuDate(dobInp.value);
             }
         });
     }
