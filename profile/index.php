@@ -23,36 +23,63 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['update_action'])) {
     $firstName   = trim($_POST['first_name']   ?? '');
     $lastName    = trim($_POST['last_name']    ?? '');
     $secondName  = trim($_POST['second_name']  ?? '');
+    $dob         = trim($_POST['dob']          ?? '');
     $telegram    = trim($_POST['telegram']     ?? '');
-    $isGraduate  = ($_POST['is_graduate'] ?? '') === 'yes';
-    $gradYear    = (int)($_POST['grad_year']   ?? 0);
+    $gradYear    = trim($_POST['grad_year']    ?? '');
     $gradDept    = trim($_POST['grad_dept']    ?? '');
     $diplomaSeries = trim($_POST['diploma_series'] ?? '');
     $diplomaNumber = trim($_POST['diploma_number'] ?? '');
     $diplomaDate   = trim($_POST['diploma_date']   ?? '');
+    $achievements  = trim($_POST['achievements']   ?? '');
 
-    $oUser  = new CUser();
-    $result = $oUser->Update($userId, [
-        'NAME'        => $firstName,
-        'LAST_NAME'   => $lastName,
-        'SECOND_NAME' => $secondName,
-        'UF_TELEGRAM'       => $telegram,
-        'UF_GRADUATE_YEAR'  => $isGraduate ? ($gradYear ?: '') : '',
-        'UF_GRADUATE_DEPT'  => $isGraduate ? $gradDept : '',
+    $userUpdateData = [
+        'NAME'            => $firstName,
+        'LAST_NAME'       => $lastName,
+        'SECOND_NAME'     => $secondName,
+        'UF_DOB'          => $dob,
+        'UF_TELEGRAM'     => $telegram,
+        'UF_GRADUATE_YEAR'=> $gradYear,
+        'UF_GRADUATE_DEPT'=> $gradDept,
         'UF_DIPLOMA_SERIES' => $diplomaSeries,
         'UF_DIPLOMA_NUMBER' => $diplomaNumber,
         'UF_DIPLOMA_DATE'   => $diplomaDate,
-    ]);
+        'PERSONAL_NOTES'    => $achievements,
+    ];
+
+    if (!empty($_FILES['photo']['name']) && (int)$_FILES['photo']['error'] === UPLOAD_ERR_OK) {
+        $ext = strtolower(pathinfo($_FILES['photo']['name'], PATHINFO_EXTENSION));
+        if (!in_array($ext, ['jpg', 'jpeg', 'png'], true)) {
+            $saveError = 'Аватар: допустимы только jpg, jpeg, png';
+        } else {
+            $userUpdateData['PERSONAL_PHOTO'] = $_FILES['photo'];
+        }
+    }
+
+    $result = false;
+    $oUser  = new CUser();
+    if ($saveError === '') {
+        $result = $oUser->Update($userId, $userUpdateData);
+    }
 
     if ($result) {
         po_logAction('profile_update', 'user', (int)$userId, 'Обновление профиля');
         LocalRedirect('/profile/?saved=1');
     } else {
-        $saveError = $oUser->LAST_ERROR ?: 'Ошибка сохранения';
+        if ($saveError === '') {
+            $saveError = $oUser->LAST_ERROR ?: 'Ошибка сохранения';
+        }
         // Обновляем arUser свежими данными из POST
         $arUser['NAME']        = $firstName;
         $arUser['LAST_NAME']   = $lastName;
         $arUser['SECOND_NAME'] = $secondName;
+        $arUser['UF_DOB']      = $dob;
+        $arUser['UF_TELEGRAM'] = $telegram;
+        $arUser['UF_GRADUATE_YEAR'] = $gradYear;
+        $arUser['UF_GRADUATE_DEPT'] = $gradDept;
+        $arUser['UF_DIPLOMA_SERIES'] = $diplomaSeries;
+        $arUser['UF_DIPLOMA_NUMBER'] = $diplomaNumber;
+        $arUser['UF_DIPLOMA_DATE']   = $diplomaDate;
+        $arUser['PERSONAL_NOTES']    = $achievements;
     }
 }
 
@@ -60,7 +87,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['update_action'])) {
 $membershipType   = $arUser['UF_MEMBERSHIP_TYPE']   ?? '';
 $membershipStatus = $arUser['UF_MEMBERSHIP_STATUS'] ?? '';
 $membershipExpires = $arUser['UF_MEMBERSHIP_EXPIRES'] ?? '';
-$isGrad           = !empty($arUser['UF_GRADUATE_YEAR']);
 $_ug      = $USER->GetUserGroupArray();
 $isMember = defined('PO_MEMBER_BASIC_ID') && (
     in_array(PO_MEMBER_BASIC_ID,   $_ug) ||
@@ -81,6 +107,13 @@ $statusLabels = [
 ];
 $currentType   = $typeLabels[$membershipType]   ?? null;
 $currentStatus = $statusLabels[$membershipStatus] ?? null;
+$avatarSrc = SITE_TEMPLATE_PATH . '/assets/img/my_profile/avatar.png';
+if (!empty($arUser['PERSONAL_PHOTO'])) {
+    $avatarPath = CFile::GetPath((int)$arUser['PERSONAL_PHOTO']);
+    if ($avatarPath) {
+        $avatarSrc = $avatarPath;
+    }
+}
 ?>
 
 <main>
@@ -558,7 +591,7 @@ $currentStatus = $statusLabels[$membershipStatus] ?? null;
                             <input type="hidden" name="update_action" value="1">
 
                             <div class="account__photo">
-                                <img src="<?=SITE_TEMPLATE_PATH?>/assets/img/my_profile/avatar.png" alt="" class="account__photo-image">
+                                <img src="<?= htmlspecialchars($avatarSrc) ?>" alt="" class="account__photo-image">
                                 <div class="account__photo-content">
                                     <label class="account__photo-upload">
                                         Загрузить аватар
@@ -576,35 +609,19 @@ $currentStatus = $statusLabels[$membershipStatus] ?? null;
                                 <div class="account__personal-list account__grid">
                                     <input type="text" name="last_name"   placeholder="Фамилия"
                                            value="<?= htmlspecialchars($arUser['LAST_NAME']   ?? '') ?>">
-                                    <input type="text" name="first_name"  placeholder="Имя"
-                                           value="<?= htmlspecialchars($arUser['NAME']        ?? '') ?>">
-                                    <input type="text" name="second_name" placeholder="Отчество"
-                                           value="<?= htmlspecialchars($arUser['SECOND_NAME'] ?? '') ?>">
                                     <input type="email" placeholder="e-mail"
                                            value="<?= htmlspecialchars($arUser['EMAIL'] ?? '') ?>" readonly
                                            title="Email изменяется через раздел Безопасность">
+                                    <input type="text" name="first_name"  placeholder="Имя"
+                                           value="<?= htmlspecialchars($arUser['NAME']        ?? '') ?>">
+                                    <input type="text" name="dob" placeholder="Дата рождения (ДД.ММ.ГГГГ)"
+                                           value="<?= htmlspecialchars($arUser['UF_DOB'] ?? '') ?>">
+                                    <input type="text" name="second_name" placeholder="Отчество"
+                                           value="<?= htmlspecialchars($arUser['SECOND_NAME'] ?? '') ?>">
                                 </div>
                             </div>
 
-                            <div class="account__graduate">
-                                <div class="account__chapter">
-                                    <h3 class="account__subtitle">Выпускник МВТУ (МГТУ) им. Н.Э. Баумана?</h3>
-                                </div>
-                                <div class="account__graduate-choice">
-                                    <label class="account__graduate-item">
-                                        <input type="radio" name="is_graduate" value="yes" class="account__graduate-input" id="grad-yes"
-                                               <?= $isGrad ? 'checked' : '' ?>>
-                                        <span class="account__graduate-box"></span>Да
-                                    </label>
-                                    <label class="account__graduate-item">
-                                        <input type="radio" name="is_graduate" value="no"  class="account__graduate-input" id="grad-no"
-                                               <?= !$isGrad ? 'checked' : '' ?>>
-                                        <span class="account__graduate-box"></span>Нет
-                                    </label>
-                                </div>
-                            </div>
-
-                            <div class="account__personal" id="graduate-data" style="<?= !$isGrad ? 'display:none' : '' ?>">
+                            <div class="account__personal" id="graduate-data">
                                 <div class="account__chapter">
                                     <h3 class="account__subtitle">Данные выпускника</h3>
                                     <button type="button" class="account__chapter-edit" data-toggle-edit>Редактировать</button>
@@ -619,7 +636,7 @@ $currentStatus = $statusLabels[$membershipStatus] ?? null;
                                 </div>
                             </div>
 
-                            <div class="account__personal" id="diploma-data" style="<?= !$isGrad ? 'display:none' : '' ?>">
+                            <div class="account__personal" id="diploma-data">
                                 <div class="account__chapter">
                                     <h3 class="account__subtitle">Сведения о дипломе</h3>
                                     <button type="button" class="account__chapter-edit" data-toggle-edit>Редактировать</button>
@@ -631,6 +648,15 @@ $currentStatus = $statusLabels[$membershipStatus] ?? null;
                                            value="<?= htmlspecialchars($arUser['UF_DIPLOMA_NUMBER'] ?? '') ?>">
                                     <input type="text" name="diploma_date"   placeholder="Дата выдачи"
                                            value="<?= htmlspecialchars($arUser['UF_DIPLOMA_DATE']   ?? '') ?>">
+                                </div>
+                            </div>
+                            <div class="account__personal">
+                                <div class="account__chapter">
+                                    <h3 class="account__subtitle">Достижения</h3>
+                                    <button type="button" class="account__chapter-edit" data-toggle-edit>Редактировать</button>
+                                </div>
+                                <div class="account__personal-list">
+                                    <textarea name="achievements" placeholder="Достижения (необязательно)" style="width:100%;box-sizing:border-box;resize:vertical;height:96px"><?= htmlspecialchars($arUser['PERSONAL_NOTES'] ?? '') ?></textarea>
                                 </div>
                             </div>
 
@@ -704,17 +730,5 @@ $currentStatus = $statusLabels[$membershipStatus] ?? null;
             </div>
         </section>
 	</main>
-
-<script>
-document.querySelectorAll('[name="is_graduate"]').forEach(function(r) {
-    r.addEventListener('change', function() {
-        var show = this.value === 'yes';
-        ['graduate-data','diploma-data'].forEach(function(id) {
-            var el = document.getElementById(id);
-            if (el) el.style.display = show ? '' : 'none';
-        });
-    });
-});
-</script>
 
 <?php require($_SERVER["DOCUMENT_ROOT"]."/bitrix/footer.php"); ?>

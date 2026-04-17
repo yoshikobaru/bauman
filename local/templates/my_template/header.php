@@ -108,7 +108,7 @@
 							$_displayName = $_isMember
 								? htmlspecialchars(trim($USER->GetParam('NAME') . ' ' . $USER->GetParam('LAST_NAME')) ?: $USER->GetParam('EMAIL'))
 								: htmlspecialchars($USER->GetParam('EMAIL'));
-							$_logoutUrl = '/auth/?logout=yes&sessid=' . bitrix_sessid();
+							$_logoutUrl = '/?logout=yes&sessid=' . bitrix_sessid() . '&backurl=%2F';
 						?>
 							<?php if (!$_isMember): ?>
 							<a href="/join/" class="btn header-wrapper__btn header-wrapper--join">Вступить</a>

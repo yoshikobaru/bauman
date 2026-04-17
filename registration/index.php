@@ -128,6 +128,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['reg_fiz_action'])) {
             'UF_DIPLOMA_NUMBER'    => $diplomaNum,
             'UF_DIPLOMA_DATE'      => $diplomaDate,
             'UF_DOB'               => $dob,
+            'PERSONAL_NOTES'       => $achievements,
         ];
         if ($avatarFileId)      $userData['PERSONAL_PHOTO']       = $avatarFileId;
         if ($diplomaScanId)     $userData['UF_DIPLOMA_SCAN']      = $diplomaScanId;
@@ -258,14 +259,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['reg_ur_action'])) {
 }
 
 $fizDobInputValue = trim($_POST['fiz_dob'] ?? '');
-if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $fizDobInputValue)) {
-    [$y, $m, $d] = explode('-', $fizDobInputValue);
-    $fizDobInputValue = $d . '.' . $m . '.' . $y;
+if (preg_match('/^\d{2}\.\d{2}\.\d{4}$/', $fizDobInputValue)) {
+    [$d, $m, $y] = explode('.', $fizDobInputValue);
+    $fizDobInputValue = $y . '-' . $m . '-' . $d;
 }
 $fizDiplomaDateInputValue = trim($_POST['fiz_diploma_date'] ?? '');
-if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $fizDiplomaDateInputValue)) {
-    [$y2, $m2, $d2] = explode('-', $fizDiplomaDateInputValue);
-    $fizDiplomaDateInputValue = $d2 . '.' . $m2 . '.' . $y2;
+if (preg_match('/^\d{2}\.\d{2}\.\d{4}$/', $fizDiplomaDateInputValue)) {
+    [$d2, $m2, $y2] = explode('.', $fizDiplomaDateInputValue);
+    $fizDiplomaDateInputValue = $y2 . '-' . $m2 . '-' . $d2;
 }
 ?>
 
@@ -275,22 +276,6 @@ if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $fizDiplomaDateInputValue)) {
 <style>
 .po-date-input {
     color: #4e4e4e;
-}
-.po-date-field {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-.po-date-field__picker {
-    width: 34px;
-    height: 34px;
-    border: 1px solid #d9d9d9;
-    border-radius: 8px;
-    background: #fff;
-    cursor: pointer;
-    font-size: 16px;
-    line-height: 1;
-    padding: 0;
 }
 </style>
 
@@ -380,17 +365,11 @@ if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $fizDiplomaDateInputValue)) {
                     </div>
                     <input type="text" name="fiz_first_name"  placeholder="Имя *" required
                            value="<?= htmlspecialchars($_POST['fiz_first_name'] ?? '') ?>">
-                    <div class="po-date-field">
-                        <input type="text" name="fiz_dob" id="fiz-dob"
-                               placeholder="Дата рождения (ДД.ММ.ГГГГ)"
-                               title="Дата рождения (ДД.ММ.ГГГГ)"
-                               autocomplete="bday" required
-                               inputmode="numeric" maxlength="10"
-                               value="<?= htmlspecialchars($fizDobInputValue) ?>"
-                               class="po-date-input">
-                        <input type="date" id="fiz-dob-picker" style="display:none">
-                        <button type="button" class="po-date-field__picker" data-picker-target="fiz-dob-picker" aria-label="Открыть календарь">📅</button>
-                    </div>
+                    <input type="date" name="fiz_dob" id="fiz-dob"
+                           title="Дата рождения (ДД.ММ.ГГГГ)"
+                           autocomplete="bday" required
+                           value="<?= htmlspecialchars($fizDobInputValue) ?>"
+                           class="po-date-input">
                     <input type="text" name="fiz_second_name" placeholder="Отчество"
                            value="<?= htmlspecialchars($_POST['fiz_second_name'] ?? '') ?>">
                     <input type="hidden" name="fiz_dob_hidden" id="fiz-dob-hidden">
@@ -485,16 +464,10 @@ if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $fizDiplomaDateInputValue)) {
                                value="<?= htmlspecialchars($_POST['fiz_diploma_ser'] ?? '') ?>">
                         <input type="text" name="fiz_diploma_num"  placeholder="Номер бланка *" id="fiz-dip-num"
                                value="<?= htmlspecialchars($_POST['fiz_diploma_num'] ?? '') ?>">
-                        <div class="po-date-field">
-                            <input type="text" name="fiz_diploma_date" id="fiz-dip-date"
-                                   placeholder="Дата выдачи (ДД.ММ.ГГГГ)"
-                                   title="Дата выдачи (ДД.ММ.ГГГГ)"
-                                   inputmode="numeric" maxlength="10"
-                                   value="<?= htmlspecialchars($fizDiplomaDateInputValue) ?>"
-                                   class="po-date-input">
-                            <input type="date" id="fiz-dip-date-picker" style="display:none">
-                            <button type="button" class="po-date-field__picker" data-picker-target="fiz-dip-date-picker" aria-label="Открыть календарь">📅</button>
-                        </div>
+                        <input type="date" name="fiz_diploma_date" id="fiz-dip-date"
+                               title="Дата выдачи (ДД.ММ.ГГГГ)"
+                               value="<?= htmlspecialchars($fizDiplomaDateInputValue) ?>"
+                               class="po-date-input">
                         <input type="hidden" name="fiz_diploma_date_hidden" id="fiz-dip-date-hidden">
                     </div>
                     <!-- Скан диплома (обязателен если год ≤ 2020) -->
@@ -704,57 +677,6 @@ function normalizeRuDate(raw) {
     }
     return value;
 }
-
-function ruToIsoDate(raw) {
-    var value = normalizeRuDate(raw);
-    if (!/^\d{2}\.\d{2}\.\d{4}$/.test(value)) return '';
-    var parts = value.split('.');
-    return parts[2] + '-' + parts[1] + '-' + parts[0];
-}
-
-function setupDateField(textInputId, pickerInputId) {
-    var textInput = document.getElementById(textInputId);
-    var pickerInput = document.getElementById(pickerInputId);
-    if (!textInput || !pickerInput) return;
-
-    textInput.addEventListener('input', function() {
-        var digits = this.value.replace(/[^\d]/g, '').slice(0, 8);
-        if (digits.length >= 5) this.value = digits.slice(0, 2) + '.' + digits.slice(2, 4) + '.' + digits.slice(4);
-        else if (digits.length >= 3) this.value = digits.slice(0, 2) + '.' + digits.slice(2);
-        else this.value = digits;
-        var iso = ruToIsoDate(this.value);
-        if (iso) pickerInput.value = iso;
-    });
-
-    textInput.addEventListener('blur', function() {
-        this.value = normalizeRuDate(this.value);
-        var iso = ruToIsoDate(this.value);
-        if (iso) pickerInput.value = iso;
-    });
-
-    pickerInput.addEventListener('change', function() {
-        textInput.value = dateToRu(this.value);
-    });
-
-    var isoInitial = ruToIsoDate(textInput.value);
-    if (isoInitial) pickerInput.value = isoInitial;
-}
-
-setupDateField('fiz-dob', 'fiz-dob-picker');
-setupDateField('fiz-dip-date', 'fiz-dip-date-picker');
-
-document.querySelectorAll('[data-picker-target]').forEach(function(btn) {
-    btn.addEventListener('click', function() {
-        var picker = document.getElementById(this.getAttribute('data-picker-target'));
-        if (!picker) return;
-        if (typeof picker.showPicker === 'function') {
-            picker.showPicker();
-        } else {
-            picker.focus();
-            picker.click();
-        }
-    });
-});
 
 // Показ/скрытие пароля
 document.querySelectorAll('.toggle-pass').forEach(function(btn) {

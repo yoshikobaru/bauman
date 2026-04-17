@@ -12,6 +12,9 @@ $saveError = '';
 
 // — Смена пароля —
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['security_action'])) {
+    if (!check_bitrix_sessid()) {
+        $saveError = 'Сессия устарела. Обновите страницу и попробуйте снова.';
+    } else {
     $currentPwd  = $_POST['current_password']  ?? '';
     $newPwd      = $_POST['new_password']      ?? '';
     $confirmPwd  = $_POST['confirm_password']  ?? '';
@@ -28,21 +31,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['security_action'])) 
         $arUserData = $dbUser->Fetch();
         $login = $arUserData['LOGIN'] ?? $arUserData['EMAIL'];
 
-        $checkResult = CUser::Login($login, $currentPwd, 'N');
+        $checkUser = new CUser();
+        $checkResult = $checkUser->Login($login, $currentPwd, 'N');
         if ($checkResult !== true) {
             $saveError = 'Текущий пароль введён неверно.';
         } else {
+            // Возвращаем сессию текущего пользователя и обновляем пароль
+            $USER->Authorize((int)$userId);
             $oUser  = new CUser();
             $result = $oUser->Update($userId, [
                 'PASSWORD'         => $newPwd,
                 'CONFIRM_PASSWORD' => $confirmPwd,
             ]);
             if ($result) {
+                $USER->Authorize((int)$userId);
                 $saveOk = true;
             } else {
                 $saveError = $oUser->LAST_ERROR ?: 'Ошибка смены пароля.';
             }
         }
+    }
     }
 }
 ?>
@@ -76,6 +84,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['security_action'])) 
 
                         <form method="POST" action="/profile/security/">
                             <input type="hidden" name="security_action" value="1">
+                            <?= bitrix_sessid_post() ?>
 
                             <div class="account__personal">
                                 <div class="account__chapter">
