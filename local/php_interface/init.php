@@ -387,6 +387,13 @@ AddEventHandler('main', 'OnBuildGlobalMenu', function (&$globalMenu, &$moduleMen
                 'icon'  => 'main_menu_search',
             ],
             [
+                'text'  => 'Настройки PayKeeper',
+                'title' => 'Маршрутизация проектов и счета PayKeeper',
+                'url'   => '/local/admin/po_paykeeper_settings.php',
+                'icon'  => 'main_menu_settings',
+                'more_url'  => ['/local/admin/po_paykeeper_settings.php'],
+            ],
+            [
                 'text'  => '— Пользователи сайта',
                 'title' => 'Список всех пользователей',
                 'url'   => '/bitrix/admin/user_admin.php?lang=ru',
@@ -540,6 +547,24 @@ function po_get_paykeeper_config(): array
         $rawConfig = [];
     }
 
+    // Админские оверрайды (редактируются в /local/admin/po_paykeeper_settings.php)
+    $adminPaykeeperRaw = '';
+    try {
+        $adminPaykeeperRaw = (string)\COption::GetOptionString('main', 'po_paykeeper_config_json', '');
+    } catch (\Throwable $e) {
+        $adminPaykeeperRaw = '';
+    }
+    if ($adminPaykeeperRaw !== '') {
+        $adminPaykeeperConfig = json_decode($adminPaykeeperRaw, true);
+        if (is_array($adminPaykeeperConfig)) {
+            foreach (['default_account', 'project_accounts', 'accounts', 'project_aliases'] as $key) {
+                if (array_key_exists($key, $adminPaykeeperConfig)) {
+                    $rawConfig[$key] = $adminPaykeeperConfig[$key];
+                }
+            }
+        }
+    }
+
     $baseUrl = trim((string)($rawConfig['base_url'] ?? ''));
     if ($baseUrl !== '') {
         $baseUrl = rtrim($baseUrl, '/');
@@ -553,16 +578,197 @@ function po_get_paykeeper_config(): array
         'success_url' => trim((string)($rawConfig['success_url'] ?? '')),
         'fail_url' => trim((string)($rawConfig['fail_url'] ?? '')),
         'callback_url' => trim((string)($rawConfig['callback_url'] ?? '')),
+        'default_account' => trim((string)($rawConfig['default_account'] ?? '')),
+        'project_accounts' => isset($rawConfig['project_accounts']) && is_array($rawConfig['project_accounts'])
+            ? $rawConfig['project_accounts']
+            : [],
+        'accounts' => isset($rawConfig['accounts']) && is_array($rawConfig['accounts'])
+            ? $rawConfig['accounts']
+            : [],
+        'project_aliases' => isset($rawConfig['project_aliases']) && is_array($rawConfig['project_aliases'])
+            ? $rawConfig['project_aliases']
+            : [],
     ];
+}
+
+function po_paykeeper_normalize_project_name(string $name): string
+{
+    $name = trim(mb_strtolower($name, 'UTF-8'));
+    $name = preg_replace('/\s+/u', ' ', $name);
+    if (!is_string($name)) {
+        return '';
+    }
+    $name = preg_replace('/^на\s+/u', '', $name);
+    $name = preg_replace('/^для\s+/u', '', $name);
+    $name = preg_replace('/^поддержка\s+/u', 'поддержку ', $name);
+    return trim((string)$name);
+}
+
+/**
+ * Список аккаунтов PayKeeper (single + multi-account режимы).
+ * На выходе каждый аккаунт содержит base_url, username, password, secret_word и account_key.
+ */
+function po_paykeeper_get_accounts(array $config): array
+{
+    $accounts = [];
+    $shared = [
+        'username' => (string)($config['username'] ?? ''),
+        'password' => (string)($config['password'] ?? ''),
+        'success_url' => (string)($config['success_url'] ?? ''),
+        'fail_url' => (string)($config['fail_url'] ?? ''),
+        'callback_url' => (string)($config['callback_url'] ?? ''),
+    ];
+
+    if (!empty($config['accounts']) && is_array($config['accounts'])) {
+        foreach ($config['accounts'] as $key => $accountRaw) {
+            if (!is_array($accountRaw)) {
+                continue;
+            }
+            $baseUrl = trim((string)($accountRaw['base_url'] ?? ''));
+            $secretWord = (string)($accountRaw['secret_word'] ?? '');
+            $username = trim((string)($accountRaw['username'] ?? $shared['username']));
+            $password = (string)($accountRaw['password'] ?? $shared['password']);
+            if ($baseUrl === '' || $secretWord === '' || $username === '' || $password === '') {
+                continue;
+            }
+            $accounts[(string)$key] = [
+                'account_key' => (string)$key,
+                'base_url' => rtrim($baseUrl, '/'),
+                'secret_word' => $secretWord,
+                'username' => $username,
+                'password' => $password,
+                'success_url' => trim((string)($accountRaw['success_url'] ?? $shared['success_url'])),
+                'fail_url' => trim((string)($accountRaw['fail_url'] ?? $shared['fail_url'])),
+                'callback_url' => trim((string)($accountRaw['callback_url'] ?? $shared['callback_url'])),
+                'projects' => isset($accountRaw['projects']) && is_array($accountRaw['projects']) ? $accountRaw['projects'] : [],
+                'project_patterns' => isset($accountRaw['project_patterns']) && is_array($accountRaw['project_patterns']) ? $accountRaw['project_patterns'] : [],
+            ];
+        }
+    }
+
+    // Обратная совместимость с single-account конфигом.
+    if (empty($accounts)) {
+        $baseUrl = trim((string)($config['base_url'] ?? ''));
+        $secretWord = (string)($config['secret_word'] ?? '');
+        $username = trim((string)($config['username'] ?? ''));
+        $password = (string)($config['password'] ?? '');
+        if ($baseUrl !== '' && $secretWord !== '' && $username !== '' && $password !== '') {
+            $accounts['default'] = [
+                'account_key' => 'default',
+                'base_url' => rtrim($baseUrl, '/'),
+                'secret_word' => $secretWord,
+                'username' => $username,
+                'password' => $password,
+                'success_url' => (string)($config['success_url'] ?? ''),
+                'fail_url' => (string)($config['fail_url'] ?? ''),
+                'callback_url' => (string)($config['callback_url'] ?? ''),
+                'projects' => [],
+                'project_patterns' => [],
+            ];
+        }
+    }
+
+    return $accounts;
 }
 
 function po_is_paykeeper_configured(?array $config = null): bool
 {
     $cfg = $config ?? po_get_paykeeper_config();
-    return !empty($cfg['base_url'])
-        && !empty($cfg['username'])
-        && $cfg['password'] !== ''
-        && !empty($cfg['secret_word']);
+    return !empty(po_paykeeper_get_accounts($cfg));
+}
+
+/**
+ * Выбрать аккаунт PayKeeper по проекту.
+ * Приоритет: project_accounts (exact) -> account.projects (exact) -> account.project_patterns (contains) -> default_account -> первый.
+ */
+function po_paykeeper_get_account_for_project(string $project, array $config, string &$error = ''): ?array
+{
+    $accounts = po_paykeeper_get_accounts($config);
+    if (empty($accounts)) {
+        $error = 'PayKeeper не настроен.';
+        return null;
+    }
+
+    $project = trim($project);
+    if ($project === '') {
+        $project = 'Пожертвование на ведение уставной деятельности';
+    }
+    $normalizedProject = po_paykeeper_normalize_project_name($project);
+
+    $projectMap = isset($config['project_accounts']) && is_array($config['project_accounts'])
+        ? $config['project_accounts']
+        : [];
+    $projectAliases = isset($config['project_aliases']) && is_array($config['project_aliases'])
+        ? $config['project_aliases']
+        : [];
+    if (isset($projectAliases[$project])) {
+        $aliasTarget = (string)$projectAliases[$project];
+        if ($aliasTarget !== '') {
+            $project = $aliasTarget;
+            $normalizedProject = po_paykeeper_normalize_project_name($project);
+        }
+    }
+
+    if (isset($projectMap[$project])) {
+        $mappedKey = (string)$projectMap[$project];
+        if (isset($accounts[$mappedKey])) {
+            return $accounts[$mappedKey];
+        }
+    }
+    foreach ($projectMap as $projectName => $accountKey) {
+        if (po_paykeeper_normalize_project_name((string)$projectName) === $normalizedProject) {
+            $mappedKey = (string)$accountKey;
+            if (isset($accounts[$mappedKey])) {
+                return $accounts[$mappedKey];
+            }
+        }
+    }
+
+    $projectLower = mb_strtolower($project, 'UTF-8');
+    foreach ($accounts as $account) {
+        $projects = isset($account['projects']) && is_array($account['projects']) ? $account['projects'] : [];
+        foreach ($projects as $projectName) {
+            $projectNameRaw = trim((string)$projectName);
+            if (mb_strtolower($projectNameRaw, 'UTF-8') === $projectLower
+                || po_paykeeper_normalize_project_name($projectNameRaw) === $normalizedProject) {
+                return $account;
+            }
+        }
+    }
+    foreach ($accounts as $account) {
+        $patterns = isset($account['project_patterns']) && is_array($account['project_patterns']) ? $account['project_patterns'] : [];
+        foreach ($patterns as $pattern) {
+            $needle = mb_strtolower(trim((string)$pattern), 'UTF-8');
+            if ($needle !== '' && mb_stripos($projectLower, $needle, 0, 'UTF-8') !== false) {
+                return $account;
+            }
+        }
+    }
+
+    $defaultKey = trim((string)($config['default_account'] ?? ''));
+    if ($defaultKey !== '' && isset($accounts[$defaultKey])) {
+        return $accounts[$defaultKey];
+    }
+
+    return reset($accounts) ?: null;
+}
+
+/**
+ * Определить аккаунт PayKeeper по подписи callback.
+ */
+function po_paykeeper_get_account_for_callback_payload(array $payload, array $config): ?array
+{
+    $accounts = po_paykeeper_get_accounts($config);
+    foreach ($accounts as $account) {
+        $secretWord = (string)($account['secret_word'] ?? '');
+        if ($secretWord === '') {
+            continue;
+        }
+        if (po_paykeeper_validate_callback_signature($payload, $secretWord)) {
+            return $account;
+        }
+    }
+    return null;
 }
 
 /**

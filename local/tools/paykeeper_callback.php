@@ -7,21 +7,23 @@ require $_SERVER['DOCUMENT_ROOT'] . '/bitrix/modules/main/include/prolog_before.
 
 header('Content-Type: text/plain; charset=UTF-8');
 
-if (!function_exists('po_get_paykeeper_config') || !function_exists('po_paykeeper_validate_callback_signature')) {
+if (!function_exists('po_get_paykeeper_config') || !function_exists('po_paykeeper_get_account_for_callback_payload')) {
     http_response_code(500);
     echo 'Configuration error';
     exit;
 }
 
 $config = po_get_paykeeper_config();
-$secretWord = (string)($config['secret_word'] ?? '');
 $payload = $_POST;
 
-if (!po_paykeeper_validate_callback_signature($payload, $secretWord)) {
+$paykeeperAccount = po_paykeeper_get_account_for_callback_payload($payload, $config);
+if (!$paykeeperAccount) {
     http_response_code(400);
     echo 'Invalid signature';
     exit;
 }
+$secretWord = (string)($paykeeperAccount['secret_word'] ?? '');
+$accountKey = (string)($paykeeperAccount['account_key'] ?? '');
 
 $orderId = (string)($payload['orderid'] ?? '');
 $paymentId = (string)($payload['id'] ?? '');
@@ -69,6 +71,11 @@ $paymentData = [];
 if (!empty($data['payment']) && is_array($data['payment'])) {
     $paymentData = $data['payment'];
 }
+if (!empty($paymentData['account_key']) && (string)$paymentData['account_key'] !== $accountKey) {
+    http_response_code(400);
+    echo 'Account mismatch';
+    exit;
+}
 
 $expectedAmount = '';
 if (!empty($paymentData['amount_rub'])) {
@@ -94,6 +101,8 @@ $paymentData['payment_id'] = $paymentId;
 $paymentData['order_id'] = $orderId;
 $paymentData['amount_rub'] = $paidAmount;
 $paymentData['paid_at'] = date('c');
+$paymentData['account_key'] = $accountKey;
+$paymentData['account_base_url'] = (string)($paykeeperAccount['base_url'] ?? '');
 $paymentData['ps_id'] = (string)($payload['ps_id'] ?? '');
 $paymentData['client_email'] = (string)($payload['client_email'] ?? '');
 $paymentData['client_phone'] = (string)($payload['client_phone'] ?? '');

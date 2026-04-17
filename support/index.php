@@ -113,6 +113,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['d2_action'])) {
                 } elseif ($applicationId <= 0 || $hlClass === null) {
                     $d2Error = 'Не удалось подготовить заявку к оплате. Попробуйте позже.';
                 } else {
+                    $accountError = '';
+                    $paykeeperAccount = function_exists('po_paykeeper_get_account_for_project')
+                        ? po_paykeeper_get_account_for_project($project, $paykeeperConfig, $accountError)
+                        : null;
+                    if (!$paykeeperAccount) {
+                        $d2Error = 'Для выбранного проекта оплата пока не настроена.';
+                    } else {
                     $serviceName = $project === 'Пожертвование на ведение уставной деятельности'
                         ? $project
                         : ('Пожертвование на проект ' . $project);
@@ -131,7 +138,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['d2_action'])) {
 
                     $apiError = '';
                     $invoice = function_exists('po_paykeeper_create_invoice')
-                        ? po_paykeeper_create_invoice($paykeeperConfig, $paymentRequest, $apiError)
+                        ? po_paykeeper_create_invoice($paykeeperAccount, $paymentRequest, $apiError)
                         : null;
 
                     if (!$invoice || empty($invoice['invoice_url'])) {
@@ -146,6 +153,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['d2_action'])) {
                             'invoice_id' => (string)$invoice['invoice_id'],
                             'invoice_url' => (string)$invoice['invoice_url'],
                             'amount_rub' => $payAmount,
+                            'account_key' => (string)($paykeeperAccount['account_key'] ?? ''),
+                            'account_base_url' => (string)($paykeeperAccount['base_url'] ?? ''),
                             'created_at' => date('c'),
                         ];
                         $hlClass::update($applicationId, [
@@ -158,6 +167,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['d2_action'])) {
 
                         LocalRedirect((string)$invoice['invoice_url']);
                         exit;
+                    }
                     }
                 }
             }
