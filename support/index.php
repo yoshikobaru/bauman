@@ -165,7 +165,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['d2_action'])) {
                         po_sendAdminEmail('project_support', $d2Data);
                         po_createCrmLead('project_support', $d2Data);
 
-                        LocalRedirect((string)$invoice['invoice_url']);
+                        LocalRedirect((string)$invoice['invoice_url'], true);
                         exit;
                     }
                     }
