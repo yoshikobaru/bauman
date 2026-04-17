@@ -215,8 +215,15 @@ function po_sendAdminEmail(string $type, array $data, array $options = []): void
 
     $body = implode("\n", $lines);
 
-    $to      = PO_ADMIN_EMAIL;
-    $subject = "[ПОЛИТЕХ] Новая заявка: {$label}";
+    $to = PO_ADMIN_EMAIL;
+    if ($type === 'project_support') {
+        $projectTitle = trim((string)($data['project'] ?? ''));
+        $subject      = $projectTitle !== ''
+            ? "[ПОЛИТЕХ] Новая заявка: Поддержка проект ({$projectTitle})"
+            : "[ПОЛИТЕХ] Новая заявка: {$label}";
+    } else {
+        $subject = "[ПОЛИТЕХ] Новая заявка: {$label}";
+    }
     $from    = PO_ADMIN_EMAIL;
     $replyTo = isset($data['email']) && $data['email'] ? (string)$data['email'] : $from;
 
