@@ -99,24 +99,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['reg_fiz_action'])) {
     if (empty($errors)) {
         $avatarFileId = false;
         if (!empty($_FILES['fiz_avatar']['name']) && $_FILES['fiz_avatar']['error'] === UPLOAD_ERR_OK) {
-            $avatarFileId = CFile::SaveFile(
-                CFile::MakeFileArray($_FILES['fiz_avatar']['tmp_name'], $_FILES['fiz_avatar']['name']),
-                'user_photo'
-            );
+            $avatarFileId = CFile::SaveFile($_FILES['fiz_avatar'], 'user_photo');
         }
         $diplomaScanId = false;
         if ($isGraduate && !empty($_FILES['fiz_diploma_scan']['name']) && $_FILES['fiz_diploma_scan']['error'] === UPLOAD_ERR_OK) {
-            $diplomaScanId = CFile::SaveFile(
-                CFile::MakeFileArray($_FILES['fiz_diploma_scan']['tmp_name'], $_FILES['fiz_diploma_scan']['name']),
-                'diploma_scan'
-            );
+            $diplomaScanId = CFile::SaveFile($_FILES['fiz_diploma_scan'], 'diploma_scan');
         }
         $membershipScanId = false;
         if ($wasMember && !empty($_FILES['fiz_membership_scan']['name']) && $_FILES['fiz_membership_scan']['error'] === UPLOAD_ERR_OK) {
-            $membershipScanId = CFile::SaveFile(
-                CFile::MakeFileArray($_FILES['fiz_membership_scan']['tmp_name'], $_FILES['fiz_membership_scan']['name']),
-                'membership_scan'
-            );
+            $membershipScanId = CFile::SaveFile($_FILES['fiz_membership_scan'], 'membership_scan');
         }
         $oUser = new CUser();
         $userData = [
@@ -166,30 +157,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['reg_fiz_action'])) {
             $filesMeta = [];
             $host = (isset($_SERVER['HTTP_HOST']) && $_SERVER['HTTP_HOST']) ? ('https://' . $_SERVER['HTTP_HOST']) : '';
 
-            if (!empty($_FILES['fiz_avatar']['name']) && !empty($_FILES['fiz_avatar']['tmp_name']) && is_uploaded_file($_FILES['fiz_avatar']['tmp_name'])) {
-                $avatarPath = $avatarFileId ? CFile::GetPath($avatarFileId) : '';
-                if ($avatarPath) {
-                    $fileLinks['avatar'] = $host . $avatarPath;
+            $appendFileData = function(string $fieldName, $fileId, string $label, string $linkKey) use (&$fileLinks, &$attachments, &$filesMeta, $host) {
+                if (!$fileId) return;
+                $filePath = CFile::GetPath((int)$fileId);
+                if (!$filePath) return;
+                $fileLinks[$linkKey] = $host . $filePath;
+                $originalName = $_FILES[$fieldName]['name'] ?? basename($filePath);
+                $filesMeta[] = $label . ': ' . $originalName;
+                $absolutePath = $_SERVER['DOCUMENT_ROOT'] . $filePath;
+                if (is_file($absolutePath)) {
+                    $attachments[] = ['path' => $absolutePath, 'name' => $originalName];
                 }
-                $filesMeta[] = 'Аватар: ' . $_FILES['fiz_avatar']['name'];
-                $attachments[] = ['path' => $_FILES['fiz_avatar']['tmp_name'], 'name' => $_FILES['fiz_avatar']['name']];
-            }
-            if (!empty($_FILES['fiz_diploma_scan']['name']) && !empty($_FILES['fiz_diploma_scan']['tmp_name']) && is_uploaded_file($_FILES['fiz_diploma_scan']['tmp_name'])) {
-                $diplomaPath = $diplomaScanId ? CFile::GetPath($diplomaScanId) : '';
-                if ($diplomaPath) {
-                    $fileLinks['diploma_scan'] = $host . $diplomaPath;
-                }
-                $filesMeta[] = 'Скан диплома: ' . $_FILES['fiz_diploma_scan']['name'];
-                $attachments[] = ['path' => $_FILES['fiz_diploma_scan']['tmp_name'], 'name' => $_FILES['fiz_diploma_scan']['name']];
-            }
-            if (!empty($_FILES['fiz_membership_scan']['name']) && !empty($_FILES['fiz_membership_scan']['tmp_name']) && is_uploaded_file($_FILES['fiz_membership_scan']['tmp_name'])) {
-                $membershipPath = $membershipScanId ? CFile::GetPath($membershipScanId) : '';
-                if ($membershipPath) {
-                    $fileLinks['membership_scan'] = $host . $membershipPath;
-                }
-                $filesMeta[] = 'Скан удостоверения: ' . $_FILES['fiz_membership_scan']['name'];
-                $attachments[] = ['path' => $_FILES['fiz_membership_scan']['tmp_name'], 'name' => $_FILES['fiz_membership_scan']['name']];
-            }
+            };
+            $appendFileData('fiz_avatar', $avatarFileId, 'Аватар', 'avatar');
+            $appendFileData('fiz_diploma_scan', $diplomaScanId, 'Скан диплома', 'diploma_scan');
+            $appendFileData('fiz_membership_scan', $membershipScanId, 'Скан удостоверения', 'membership_scan');
 
             po_sendAdminEmail('membership', [
                 'email'                    => $email,
@@ -273,6 +255,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['reg_ur_action'])) {
             ]);
         }
     }
+}
+
+$fizDobInputValue = trim($_POST['fiz_dob'] ?? '');
+if (preg_match('/^\d{2}\.\d{2}\.\d{4}$/', $fizDobInputValue)) {
+    [$d, $m, $y] = explode('.', $fizDobInputValue);
+    $fizDobInputValue = $y . '-' . $m . '-' . $d;
+}
+$fizDiplomaDateInputValue = trim($_POST['fiz_diploma_date'] ?? '');
+if (preg_match('/^\d{2}\.\d{2}\.\d{4}$/', $fizDiplomaDateInputValue)) {
+    [$d2, $m2, $y2] = explode('.', $fizDiplomaDateInputValue);
+    $fizDiplomaDateInputValue = $y2 . '-' . $m2 . '-' . $d2;
 }
 ?>
 
@@ -359,16 +352,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['reg_ur_action'])) {
 
                     <input type="text" name="fiz_last_name"   placeholder="Фамилия *" required
                            value="<?= htmlspecialchars($_POST['fiz_last_name'] ?? '') ?>">
-                    <input type="text" name="fiz_first_name"  placeholder="Имя *" required
-                           value="<?= htmlspecialchars($_POST['fiz_first_name'] ?? '') ?>">
-
-                    <input type="text" name="fiz_dob" id="fiz-dob"
-                           placeholder="Дата рождения (ДД.ММ.ГГГГ)" required
-                           autocomplete="bday" inputmode="numeric" maxlength="10"
-                           value="<?= htmlspecialchars($_POST['fiz_dob'] ?? '') ?>"
-                           class="po-date-input">
-                    <input type="text" name="fiz_second_name" placeholder="Отчество"
-                           value="<?= htmlspecialchars($_POST['fiz_second_name'] ?? '') ?>">
 
                     <!-- Подтверждение пароля -->
                     <div style="position:relative">
@@ -379,6 +362,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['reg_ur_action'])) {
                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
                         </button>
                     </div>
+                    <input type="text" name="fiz_first_name"  placeholder="Имя *" required
+                           value="<?= htmlspecialchars($_POST['fiz_first_name'] ?? '') ?>">
+                    <input type="date" name="fiz_dob" id="fiz-dob"
+                           placeholder="Дата рождения (ДД.ММ.ГГГГ)"
+                           title="Дата рождения (ДД.ММ.ГГГГ)"
+                           autocomplete="bday" required
+                           value="<?= htmlspecialchars($fizDobInputValue) ?>"
+                           class="po-date-input">
+                    <input type="text" name="fiz_second_name" placeholder="Отчество"
+                           value="<?= htmlspecialchars($_POST['fiz_second_name'] ?? '') ?>">
                     <input type="hidden" name="fiz_dob_hidden" id="fiz-dob-hidden">
                 </div>
             </div>
@@ -471,10 +464,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['reg_ur_action'])) {
                                value="<?= htmlspecialchars($_POST['fiz_diploma_ser'] ?? '') ?>">
                         <input type="text" name="fiz_diploma_num"  placeholder="Номер бланка *" id="fiz-dip-num"
                                value="<?= htmlspecialchars($_POST['fiz_diploma_num'] ?? '') ?>">
-                        <input type="text" name="fiz_diploma_date" id="fiz-dip-date"
+                        <input type="date" name="fiz_diploma_date" id="fiz-dip-date"
                                placeholder="Дата выдачи (ДД.ММ.ГГГГ)"
-                               value="<?= htmlspecialchars($_POST['fiz_diploma_date'] ?? '') ?>"
-                               inputmode="numeric" maxlength="10" class="po-date-input">
+                               title="Дата выдачи (ДД.ММ.ГГГГ)"
+                               value="<?= htmlspecialchars($fizDiplomaDateInputValue) ?>"
+                               class="po-date-input">
                         <input type="hidden" name="fiz_diploma_date_hidden" id="fiz-dip-date-hidden">
                     </div>
                     <!-- Скан диплома (обязателен если год ≤ 2020) -->
@@ -684,22 +678,6 @@ function normalizeRuDate(raw) {
     }
     return value;
 }
-
-function setupDateMask(inputId) {
-    var input = document.getElementById(inputId);
-    if (!input) return;
-    input.addEventListener('input', function() {
-        var digits = this.value.replace(/[^\d]/g, '').slice(0, 8);
-        if (digits.length >= 5) this.value = digits.slice(0, 2) + '.' + digits.slice(2, 4) + '.' + digits.slice(4);
-        else if (digits.length >= 3) this.value = digits.slice(0, 2) + '.' + digits.slice(2);
-        else this.value = digits;
-    });
-    input.addEventListener('blur', function() {
-        this.value = normalizeRuDate(this.value);
-    });
-}
-setupDateMask('fiz-dob');
-setupDateMask('fiz-dip-date');
 
 // Показ/скрытие пароля
 document.querySelectorAll('.toggle-pass').forEach(function(btn) {
