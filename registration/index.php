@@ -161,12 +161,61 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['reg_fiz_action'])) {
                     ]);
                 }
             }
+            $fileLinks = [];
+            $attachments = [];
+            $filesMeta = [];
+            $host = (isset($_SERVER['HTTP_HOST']) && $_SERVER['HTTP_HOST']) ? ('https://' . $_SERVER['HTTP_HOST']) : '';
+
+            if (!empty($_FILES['fiz_avatar']['name']) && !empty($_FILES['fiz_avatar']['tmp_name']) && is_uploaded_file($_FILES['fiz_avatar']['tmp_name'])) {
+                $avatarPath = $avatarFileId ? CFile::GetPath($avatarFileId) : '';
+                if ($avatarPath) {
+                    $fileLinks['avatar'] = $host . $avatarPath;
+                }
+                $filesMeta[] = 'Аватар: ' . $_FILES['fiz_avatar']['name'];
+                $attachments[] = ['path' => $_FILES['fiz_avatar']['tmp_name'], 'name' => $_FILES['fiz_avatar']['name']];
+            }
+            if (!empty($_FILES['fiz_diploma_scan']['name']) && !empty($_FILES['fiz_diploma_scan']['tmp_name']) && is_uploaded_file($_FILES['fiz_diploma_scan']['tmp_name'])) {
+                $diplomaPath = $diplomaScanId ? CFile::GetPath($diplomaScanId) : '';
+                if ($diplomaPath) {
+                    $fileLinks['diploma_scan'] = $host . $diplomaPath;
+                }
+                $filesMeta[] = 'Скан диплома: ' . $_FILES['fiz_diploma_scan']['name'];
+                $attachments[] = ['path' => $_FILES['fiz_diploma_scan']['tmp_name'], 'name' => $_FILES['fiz_diploma_scan']['name']];
+            }
+            if (!empty($_FILES['fiz_membership_scan']['name']) && !empty($_FILES['fiz_membership_scan']['tmp_name']) && is_uploaded_file($_FILES['fiz_membership_scan']['tmp_name'])) {
+                $membershipPath = $membershipScanId ? CFile::GetPath($membershipScanId) : '';
+                if ($membershipPath) {
+                    $fileLinks['membership_scan'] = $host . $membershipPath;
+                }
+                $filesMeta[] = 'Скан удостоверения: ' . $_FILES['fiz_membership_scan']['name'];
+                $attachments[] = ['path' => $_FILES['fiz_membership_scan']['tmp_name'], 'name' => $_FILES['fiz_membership_scan']['name']];
+            }
+
             po_sendAdminEmail('membership', [
-                'type'       => $isGraduate ? $memberType : 'non_graduate',
-                'last_name'  => $lastName, 'first_name' => $firstName,
-                'email'      => $email,
-                'is_graduate'=> $isGraduate ? 'да' : 'нет',
+                'email'                    => $email,
+                'тип_заявки'               => $isGraduate ? 'выпускник' : 'не выпускник',
+                'тип_членства'             => $isGraduate ? $memberType : 'non_graduate',
+                'фамилия'                  => $lastName,
+                'имя'                      => $firstName,
+                'отчество'                 => $secondName,
+                'дата_рождения'            => $dob,
+                'выпускник_бауманки'       => $isGraduate ? 'да' : 'нет',
+                'год_окончания'            => $gradYear,
+                'выпускающая_кафедра'      => $gradDept,
+                'telegram'                 => $telegram,
+                'вступал_ранее'            => $wasMember ? 'да' : 'нет',
+                'серия_диплома'            => $diplomaSer,
+                'номер_диплома'            => $diplomaNum,
+                'дата_выдачи_диплома'      => $diplomaDate,
+                'достижения'               => $achievements,
+                'согласие_с_уставом_и_пдн' => $agreeCharter ? 'да' : 'нет',
+                'id_пользователя'          => (string)$userId,
+                'загруженные_файлы'        => $filesMeta ? implode('; ', $filesMeta) : 'Нет',
+                'file_links'               => $fileLinks,
+            ], [
+                'attachments' => $attachments,
             ]);
+            po_sendMembershipConfirmationEmail($email);
             po_logAction('form_submit', 'application', (int)$userId, 'D1 registration fiz');
             $regDone = true;
         } else {
@@ -230,6 +279,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['reg_ur_action'])) {
 <main>
 <section class="join join--registration">
 <div class="container">
+<style>
+.po-date-input {
+    color: #4e4e4e;
+}
+</style>
 
     <!-- Вкладки физ/юр лицо -->
     <div style="display:flex;gap:12px;margin-bottom:32px;padding-top:8px">
@@ -303,6 +357,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['reg_ur_action'])) {
                         </button>
                     </div>
 
+                    <input type="text" name="fiz_last_name"   placeholder="Фамилия *" required
+                           value="<?= htmlspecialchars($_POST['fiz_last_name'] ?? '') ?>">
+                    <input type="text" name="fiz_first_name"  placeholder="Имя *" required
+                           value="<?= htmlspecialchars($_POST['fiz_first_name'] ?? '') ?>">
+
+                    <input type="text" name="fiz_dob" id="fiz-dob"
+                           placeholder="Дата рождения (ДД.ММ.ГГГГ)" required
+                           autocomplete="bday" inputmode="numeric" maxlength="10"
+                           value="<?= htmlspecialchars($_POST['fiz_dob'] ?? '') ?>"
+                           class="po-date-input">
+                    <input type="text" name="fiz_second_name" placeholder="Отчество"
+                           value="<?= htmlspecialchars($_POST['fiz_second_name'] ?? '') ?>">
+
                     <!-- Подтверждение пароля -->
                     <div style="position:relative">
                         <input type="password" name="fiz_password_confirm" id="fiz-pass-confirm" placeholder="Повторите пароль *" required
@@ -312,24 +379,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['reg_ur_action'])) {
                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
                         </button>
                     </div>
-
-                    <input type="text" name="fiz_last_name"   placeholder="Фамилия *" required
-                           value="<?= htmlspecialchars($_POST['fiz_last_name'] ?? '') ?>">
-                    <input type="text" name="fiz_first_name"  placeholder="Имя *" required
-                           value="<?= htmlspecialchars($_POST['fiz_first_name'] ?? '') ?>">
-                    <input type="text" name="fiz_second_name" placeholder="Отчество"
-                           value="<?= htmlspecialchars($_POST['fiz_second_name'] ?? '') ?>">
-
-                    <!-- Дата рождения с нативным датапикером -->
-                    <div>
-                        <input type="date" name="fiz_dob" id="fiz-dob"
-                               title="Дата рождения. Обязательное поле"
-                               autocomplete="bday" required
-                               value="<?= htmlspecialchars($_POST['fiz_dob'] ?? '') ?>"
-                               style="width:100%">
-                        <input type="hidden" name="fiz_dob_hidden" id="fiz-dob-hidden">
-                        <span style="font-size:11px;color:#888;display:block;margin-top:2px">Дата рождения (ДД.ММ.ГГГГ) *</span>
-                    </div>
+                    <input type="hidden" name="fiz_dob_hidden" id="fiz-dob-hidden">
                 </div>
             </div>
 
@@ -401,8 +451,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['reg_ur_action'])) {
                 <div class="account__personal" style="margin-top:24px">
                     <div class="account__chapter"><h3 class="account__subtitle">Данные выпускника</h3></div>
                     <div class="account__personal-list account__personal-list--short account__grid">
-                        <input type="number" name="fiz_grad_year" id="fiz-grad-year" placeholder="Год окончания" min="1900" max="2099"
-                               value="<?= htmlspecialchars($_POST['fiz_grad_year'] ?? '') ?>">
+                        <select name="fiz_grad_year" id="fiz-grad-year">
+                            <option value="">Год окончания</option>
+                            <?php for ($y = date('Y'); $y >= 1950; $y--): ?>
+                            <option value="<?=$y?>" <?= ($_POST['fiz_grad_year'] ?? '') == (string)$y ? 'selected' : '' ?>><?=$y?></option>
+                            <?php endfor; ?>
+                        </select>
                         <input type="text"   name="fiz_grad_dept" placeholder="Выпускающая кафедра"
                                value="<?= htmlspecialchars($_POST['fiz_grad_dept'] ?? '') ?>">
                         <input type="text"   name="fiz_telegram"  placeholder="Telegram"
@@ -417,14 +471,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['reg_ur_action'])) {
                                value="<?= htmlspecialchars($_POST['fiz_diploma_ser'] ?? '') ?>">
                         <input type="text" name="fiz_diploma_num"  placeholder="Номер бланка *" id="fiz-dip-num"
                                value="<?= htmlspecialchars($_POST['fiz_diploma_num'] ?? '') ?>">
-                        <div>
-                            <input type="date" name="fiz_diploma_date" id="fiz-dip-date"
-                                   title="Дата выдачи диплома"
-                                   value="<?= htmlspecialchars($_POST['fiz_diploma_date'] ?? '') ?>"
-                                   style="width:100%">
-                            <input type="hidden" name="fiz_diploma_date_hidden" id="fiz-dip-date-hidden">
-                            <span style="font-size:11px;color:#888;display:block;margin-top:2px">Дата выдачи *</span>
-                        </div>
+                        <input type="text" name="fiz_diploma_date" id="fiz-dip-date"
+                               placeholder="Дата выдачи (ДД.ММ.ГГГГ)"
+                               value="<?= htmlspecialchars($_POST['fiz_diploma_date'] ?? '') ?>"
+                               inputmode="numeric" maxlength="10" class="po-date-input">
+                        <input type="hidden" name="fiz_diploma_date_hidden" id="fiz-dip-date-hidden">
                     </div>
                     <!-- Скан диплома (обязателен если год ≤ 2020) -->
                     <div id="fiz-diploma-scan-block" style="margin-top:16px;display:none">
@@ -623,6 +674,33 @@ function dateToRu(val) {
     return val;
 }
 
+function normalizeRuDate(raw) {
+    var value = (raw || '').trim();
+    if (!value) return '';
+    if (/^\d{4}-\d{2}-\d{2}$/.test(value)) return dateToRu(value);
+    var digits = value.replace(/[^\d]/g, '');
+    if (digits.length === 8) {
+        return digits.slice(0, 2) + '.' + digits.slice(2, 4) + '.' + digits.slice(4, 8);
+    }
+    return value;
+}
+
+function setupDateMask(inputId) {
+    var input = document.getElementById(inputId);
+    if (!input) return;
+    input.addEventListener('input', function() {
+        var digits = this.value.replace(/[^\d]/g, '').slice(0, 8);
+        if (digits.length >= 5) this.value = digits.slice(0, 2) + '.' + digits.slice(2, 4) + '.' + digits.slice(4);
+        else if (digits.length >= 3) this.value = digits.slice(0, 2) + '.' + digits.slice(2);
+        else this.value = digits;
+    });
+    input.addEventListener('blur', function() {
+        this.value = normalizeRuDate(this.value);
+    });
+}
+setupDateMask('fiz-dob');
+setupDateMask('fiz-dip-date');
+
 // Показ/скрытие пароля
 document.querySelectorAll('.toggle-pass').forEach(function(btn) {
     btn.addEventListener('click', function() {
@@ -663,29 +741,23 @@ document.querySelectorAll('[name="fiz_was_member"]').forEach(function(r) {
 });
 
 // Показывать поле скана диплома если год ≤ 2020
-document.addEventListener('input', function(e) {
-    if (e.target && e.target.id === 'fiz-grad-year') {
-        var year = parseInt(e.target.value, 10);
-        var scanBlock = document.getElementById('fiz-diploma-scan-block');
-        var scanInput = document.getElementById('fiz-diploma-scan-input');
-        if (!scanBlock) return;
-        var show = year > 0 && year <= 2020;
-        scanBlock.style.display = show ? 'block' : 'none';
-        if (scanInput) scanInput.required = show;
-    }
-});
+function updateDiplomaScanRequirement() {
+    var yearEl = document.getElementById('fiz-grad-year');
+    var scanBlock = document.getElementById('fiz-diploma-scan-block');
+    var scanInput = document.getElementById('fiz-diploma-scan-input');
+    if (!yearEl || !scanBlock) return;
+    var year = parseInt(yearEl.value, 10);
+    var show = year > 0 && year <= 2020;
+    scanBlock.style.display = show ? 'block' : 'none';
+    if (scanInput) scanInput.required = show;
+}
+var gradYearSelect = document.getElementById('fiz-grad-year');
+if (gradYearSelect) {
+    gradYearSelect.addEventListener('change', updateDiplomaScanRequirement);
+}
 // Инициализация скана при загрузке (если год уже заполнен после ошибки)
 (function() {
-    var yearEl = document.getElementById('fiz-grad-year');
-    if (yearEl && yearEl.value) {
-        var year = parseInt(yearEl.value, 10);
-        var scanBlock = document.getElementById('fiz-diploma-scan-block');
-        var scanInput = document.getElementById('fiz-diploma-scan-input');
-        if (scanBlock && year > 0 && year <= 2020) {
-            scanBlock.style.display = 'block';
-            if (scanInput) scanInput.required = true;
-        }
-    }
+    updateDiplomaScanRequirement();
 })();
 
 // Выбор тарифа
@@ -785,10 +857,10 @@ document.addEventListener('click', function(e) {
 
         // Заполнить скрытые поля с датами в RU формате
         var dobHidden = document.getElementById('fiz-dob-hidden');
-        if (dobHidden && dobInp) dobHidden.value = dateToRu(dobInp.value);
+        if (dobHidden && dobInp) dobHidden.value = normalizeRuDate(dobInp.value);
         var dipDateInp = document.getElementById('fiz-dip-date');
         var dipDateHidden = document.getElementById('fiz-dip-date-hidden');
-        if (dipDateHidden && dipDateInp) dipDateHidden.value = dateToRu(dipDateInp.value);
+        if (dipDateHidden && dipDateInp) dipDateHidden.value = normalizeRuDate(dipDateInp.value);
 
         if (!fname || !fname.value.trim()) errors.push('Имя');
         if (!lname || !lname.value.trim()) errors.push('Фамилия');

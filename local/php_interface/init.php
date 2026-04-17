@@ -74,7 +74,77 @@ define('DOC_POLITIKA_URL', '/local/templates/my_template/assets/POLITIKA.docx');
  * @param string $type  Тип заявки (project_support, event_reg, reference_visit, …)
  * @param array  $data  Данные формы
  */
-function po_sendAdminEmail(string $type, array $data): void
+function po_mailEncodeSubject(string $subject): string
+{
+    return '=?UTF-8?B?' . base64_encode($subject) . '?=';
+}
+
+function po_mailLabelForField(string $key): string
+{
+    static $fieldLabels = [
+        'type' => 'Тип',
+        'тип_заявки' => 'Тип заявки',
+        'тип_членства' => 'Тип членства',
+        'company' => 'Компания',
+        'contact_name' => 'Контактное лицо',
+        'site' => 'Сайт',
+        'email' => 'Email',
+        'phone' => 'Телефон',
+        'msg' => 'Комментарий',
+        'fio' => 'ФИО',
+        'name' => 'ФИО',
+        'first_name' => 'Имя',
+        'last_name' => 'Фамилия',
+        'contact' => 'Контакт',
+        'position' => 'Должность',
+        'dob' => 'Дата рождения',
+        'dept' => 'Кафедра',
+        'year' => 'Год выпуска',
+        'sphere' => 'Сфера деятельности',
+        'exp' => 'Стаж (лет)',
+        'is_graduate' => 'Выпускник',
+        'выпускник_бауманки' => 'Выпускник Бауманки',
+        'год_окончания' => 'Год окончания',
+        'выпускающая_кафедра' => 'Выпускающая кафедра',
+        'telegram' => 'Telegram',
+        'вступал_ранее' => 'Ранее состоял в обществе',
+        'серия_диплома' => 'Серия диплома',
+        'номер_диплома' => 'Номер диплома',
+        'дата_выдачи_диплома' => 'Дата выдачи диплома',
+        'достижения' => 'Достижения',
+        'согласие_с_уставом_и_пдн' => 'Согласие с Уставом и ПДн',
+        'id_пользователя' => 'ID пользователя',
+        'загруженные_файлы' => 'Загруженные файлы',
+    ];
+
+    if (isset($fieldLabels[$key])) {
+        return $fieldLabels[$key];
+    }
+
+    $label = str_replace('_', ' ', $key);
+    return mb_convert_case($label, MB_CASE_TITLE, 'UTF-8');
+}
+
+function po_mailNormalizeValue(string $key, $value): string
+{
+    if ($key === 'тип_членства') {
+        $map = [
+            'basic' => 'Базовое',
+            'premium' => 'Профессиональное',
+            'partner' => 'Партнёрское',
+            'honorary' => 'Почётное',
+            'non_graduate' => 'Невыпускник',
+        ];
+        return $map[(string)$value] ?? (string)$value;
+    }
+
+    return (string)$value;
+}
+
+/**
+ * @param array $options ['attachments' => [['path' => '/tmp/php123', 'name' => 'file.pdf']]]
+ */
+function po_sendAdminEmail(string $type, array $data, array $options = []): void
 {
     $typeLabels = [
         'membership'         => 'Вступление в общество (D1)',
@@ -92,26 +162,115 @@ function po_sendAdminEmail(string $type, array $data): void
     ];
     $label = $typeLabels[$type] ?? $type;
 
-    $body = "Новая заявка: {$label}\n\n";
+    $fileLinks = [];
+    if (isset($data['file_links']) && is_array($data['file_links'])) {
+        $fileLinks = $data['file_links'];
+    }
+    unset($data['file_links']);
+
+    $lines = [
+        "Поступила новая заявка с сайта.",
+        "",
+        "Направление: {$label}",
+        "",
+        "Данные заявки:",
+    ];
     foreach ($data as $k => $v) {
-        if ($v !== '' && $v !== null) {
-            $body .= mb_strtoupper($k) . ": {$v}\n";
+        if ($v === '' || $v === null) {
+            continue;
+        }
+        $lines[] = po_mailLabelForField((string)$k) . ': ' . po_mailNormalizeValue((string)$k, $v);
+    }
+
+    if (!empty($fileLinks)) {
+        $lines[] = '';
+        $lines[] = 'Ссылки на загруженные файлы:';
+        foreach ($fileLinks as $name => $url) {
+            if (!$url) {
+                continue;
+            }
+            $lines[] = '- ' . po_mailLabelForField((string)$name) . ': ' . $url;
         }
     }
 
+    $body = implode("\n", $lines);
+
     $to      = PO_ADMIN_EMAIL;
     $subject = "[ПОЛИТЕХ] Новая заявка: {$label}";
-    // From = тот же ящик что получает — сервер точно авторизован его отправлять
     $from    = PO_ADMIN_EMAIL;
+    $replyTo = isset($data['email']) && $data['email'] ? (string)$data['email'] : $from;
+
+    $attachments = [];
+    if (isset($options['attachments']) && is_array($options['attachments'])) {
+        foreach ($options['attachments'] as $file) {
+            $path = $file['path'] ?? '';
+            if (!$path || !is_file($path)) {
+                continue;
+            }
+            $attachments[] = [
+                'path' => $path,
+                'name' => (string)($file['name'] ?? basename($path)),
+            ];
+        }
+    }
+
+    $headers  = "MIME-Version: 1.0\r\n";
+    $headers .= "From: {$from}\r\n";
+    $headers .= "Reply-To: {$replyTo}\r\n";
+
+    if (empty($attachments)) {
+        $headers .= "Content-Type: text/plain; charset=UTF-8\r\n";
+        $headers .= "Content-Transfer-Encoding: 8bit\r\n";
+        @mail($to, po_mailEncodeSubject($subject), $body, $headers);
+        return;
+    }
+
+    $boundary = '==Multipart_Boundary_x' . md5((string)microtime(true)) . 'x';
+    $headers .= "Content-Type: multipart/mixed; boundary=\"{$boundary}\"\r\n";
+
+    $message  = "--{$boundary}\r\n";
+    $message .= "Content-Type: text/plain; charset=UTF-8\r\n";
+    $message .= "Content-Transfer-Encoding: 8bit\r\n\r\n";
+    $message .= $body . "\r\n";
+
+    foreach ($attachments as $file) {
+        $content = @file_get_contents($file['path']);
+        if ($content === false) {
+            continue;
+        }
+        $encodedName = rawurlencode($file['name']);
+        $message .= "--{$boundary}\r\n";
+        $message .= "Content-Type: application/octet-stream; name=\"{$encodedName}\"\r\n";
+        $message .= "Content-Disposition: attachment; filename=\"{$encodedName}\"\r\n";
+        $message .= "Content-Transfer-Encoding: base64\r\n\r\n";
+        $message .= chunk_split(base64_encode($content)) . "\r\n";
+    }
+    $message .= "--{$boundary}--";
+
+    @mail($to, po_mailEncodeSubject($subject), $message, $headers);
+}
+
+function po_sendMembershipConfirmationEmail(string $email): void
+{
+    $email = trim($email);
+    if ($email === '') {
+        return;
+    }
+
+    $subject = 'Заявление на вступление Политехническое общество выпускников МВТУ (МГТУ) им. Н.Э. Баумана';
+    $body = "Уважаемый Бауманец!\n\n"
+        . "Благодарим вас за подачу заявления на вступление в Политехническое общество выпускников. "
+        . "В течении 5 рабочих дней ваша заявка будет обработана, и мы свяжемся с вами.\n\n"
+        . "С уважением,\n"
+        . "Политехническое общество выпускников МВТУ (МГТУ) им. Н.Э. Баумана";
 
     $headers  = "MIME-Version: 1.0\r\n";
     $headers .= "Content-Type: text/plain; charset=UTF-8\r\n";
     $headers .= "Content-Transfer-Encoding: 8bit\r\n";
-    $headers .= "From: {$from}\r\n";
-    $headers .= "Reply-To: " . ($data['email'] ?? $from) . "\r\n";
+    $headers .= "From: " . PO_ADMIN_EMAIL . "\r\n";
+    $headers .= "Reply-To: " . PO_ADMIN_EMAIL . "\r\n";
 
-    $encSubject = '=?UTF-8?B?' . base64_encode($subject) . '?=';
-    @mail($to, $encSubject, $body, $headers);
+    @mail($email, po_mailEncodeSubject($subject), $body, $headers);
 }
 
 /**
