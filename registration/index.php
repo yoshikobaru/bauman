@@ -117,10 +117,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['reg_fiz_action'])) {
     }
 
     if (empty($errors)) {
-        $avatarFileId = false;
-        if (!empty($_FILES['fiz_avatar']['name']) && $_FILES['fiz_avatar']['error'] === UPLOAD_ERR_OK) {
-            $avatarFileId = CFile::SaveFile($_FILES['fiz_avatar'], 'user_photo');
-        }
         $diplomaScanId = false;
         if ($isGraduate && !empty($_FILES['fiz_diploma_scan']['name']) && $_FILES['fiz_diploma_scan']['error'] === UPLOAD_ERR_OK) {
             $diplomaScanId = CFile::SaveFile($_FILES['fiz_diploma_scan'], 'diploma_scan');
@@ -150,11 +146,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['reg_fiz_action'])) {
             'UF_DOB'               => $dob,
             'PERSONAL_NOTES'       => $achievements,
         ];
-        if ($avatarFileId)      $userData['PERSONAL_PHOTO']       = $avatarFileId;
+        if (!empty($_FILES['fiz_avatar']['name']) && $_FILES['fiz_avatar']['error'] === UPLOAD_ERR_OK) {
+            $userData['PERSONAL_PHOTO'] = $_FILES['fiz_avatar'];
+        }
         if ($diplomaScanId)     $userData['UF_DIPLOMA_SCAN']      = $diplomaScanId;
         if ($membershipScanId)  $userData['UF_MEMBERSHIP_SCAN']   = $membershipScanId;
         $userId = $oUser->Add($userData);
         if ($userId) {
+            $avatarFileId = 0;
+            $createdUser = CUser::GetByID((int)$userId)->Fetch();
+            if (!empty($createdUser['PERSONAL_PHOTO'])) {
+                $avatarFileId = (int)$createdUser['PERSONAL_PHOTO'];
+            }
             $USER->Login($email, $password, 'N');
             if ($isGraduate && $hlOk && defined('HL_APPLICATIONS_ID') && HL_APPLICATIONS_ID > 0) {
                 $hlData = \Bitrix\Highloadblock\HighloadBlockTable::getById(HL_APPLICATIONS_ID)->fetch();
@@ -218,7 +221,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['reg_fiz_action'])) {
             ], [
                 'attachments' => $attachments,
             ]);
-            po_sendMembershipConfirmationEmail($email);
+            $confirmationSent = po_sendMembershipConfirmationEmail($email);
+            if (!$confirmationSent) {
+                error_log('[registration] confirmation email not sent for user #' . (int)$userId . ', email=' . $email);
+            }
             po_logAction('form_submit', 'application', (int)$userId, 'D1 registration fiz');
             $regDone = true;
         } else {

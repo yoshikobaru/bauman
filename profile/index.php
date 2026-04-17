@@ -84,9 +84,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['update_action'])) {
 }
 
 // Вспомогательные переменные
-$membershipType   = $arUser['UF_MEMBERSHIP_TYPE']   ?? '';
-$membershipStatus = $arUser['UF_MEMBERSHIP_STATUS'] ?? '';
-$membershipExpires = $arUser['UF_MEMBERSHIP_EXPIRES'] ?? '';
+$membershipType   = (string)($arUser['UF_MEMBERSHIP_TYPE']   ?? '');
+$membershipStatus = (string)($arUser['UF_MEMBERSHIP_STATUS'] ?? '');
+$membershipExpires = (string)($arUser['UF_MEMBERSHIP_EXPIRES'] ?? '');
 $_ug      = $USER->GetUserGroupArray();
 $isMember = defined('PO_MEMBER_BASIC_ID') && (
     in_array(PO_MEMBER_BASIC_ID,   $_ug) ||
@@ -94,20 +94,51 @@ $isMember = defined('PO_MEMBER_BASIC_ID') && (
     in_array(PO_PARTNER_ID,        $_ug)
 );
 
+$groupMembershipType = '';
+if (defined('PO_PARTNER_ID') && in_array(PO_PARTNER_ID, $_ug, true)) {
+    $groupMembershipType = 'partner';
+} elseif (defined('PO_MEMBER_PREMIUM_ID') && in_array(PO_MEMBER_PREMIUM_ID, $_ug, true)) {
+    $groupMembershipType = 'premium';
+} elseif (defined('PO_MEMBER_BASIC_ID') && in_array(PO_MEMBER_BASIC_ID, $_ug, true)) {
+    $groupMembershipType = 'basic';
+}
+if ($groupMembershipType !== '') {
+    $membershipType = $groupMembershipType;
+}
+if ($membershipStatus === 'approved') {
+    $membershipStatus = 'active';
+}
+if ($membershipStatus === 'new') {
+    $membershipStatus = 'pending';
+}
+if ($membershipStatus === '' && $isMember) {
+    $membershipStatus = 'active';
+}
+
 $typeLabels = [
-    'basic'   => ['label' => 'Базовое',         'price' => '5 000 Р',          'class' => ''],
+    'basic'   => ['label' => 'Базовое',         'price' => '1 000 Р',          'class' => 'account__rate--basic'],
     'premium' => ['label' => 'Профессиональное', 'price' => '50 000 Р',         'class' => 'account__rate--proff'],
     'partner' => ['label' => 'Партнёрское',      'price' => 'Инд. условия',     'class' => 'account__rate--proff'],
-    'honorary'=> ['label' => 'Почётное',         'price' => 'Безвозмездно',     'class' => ''],
+    'honorary'=> ['label' => 'Почётное',         'price' => 'Безвозмездно',     'class' => 'account__rate--basic'],
 ];
 $statusLabels = [
     'pending'  => ['label' => 'На рассмотрении', 'class' => 'account__rate-status--pending'],
-    'active'   => ['label' => 'Активный',         'class' => ''],
+    'in_review'=> ['label' => 'На модерации',    'class' => 'account__rate-status--in-review'],
+    'active'   => ['label' => 'Активен',         'class' => 'account__rate-status--active'],
+    'expired'  => ['label' => 'Истёк',           'class' => 'account__rate-status--expired'],
     'rejected' => ['label' => 'Отклонено',        'class' => 'account__rate-status--error'],
 ];
 $currentType   = $typeLabels[$membershipType]   ?? null;
 $currentStatus = $statusLabels[$membershipStatus] ?? null;
-$avatarSrc = SITE_TEMPLATE_PATH . '/assets/img/my_profile/avatar.png';
+$verificationColors = [
+    'basic' => '#7f8c8d',
+    'premium' => '#f0a500',
+    'partner' => '#2980b9',
+    'honorary' => '#8e44ad',
+];
+$verificationBadgeColor = $verificationColors[$membershipType] ?? '#7f8c8d';
+$showVerificationBadge = $membershipStatus === 'active';
+$avatarSrc = 'data:image/svg+xml;utf8,' . rawurlencode('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160"><rect width="160" height="160" fill="#f1f1f1"/><circle cx="80" cy="58" r="26" fill="#c7c7c7"/><path d="M24 142c8-28 30-44 56-44s48 16 56 44" fill="#c7c7c7"/></svg>');
 if (!empty($arUser['PERSONAL_PHOTO'])) {
     $avatarPath = CFile::GetPath((int)$arUser['PERSONAL_PHOTO']);
     if ($avatarPath) {
@@ -165,6 +196,41 @@ if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $profileDiplomaDateInputValue)) {
     padding: 0;
     cursor: pointer;
 }
+.profile-section.is-view .profile-editable,
+.profile-section.is-view .profile-editable[readonly] {
+    border: none;
+    background: transparent;
+    padding-left: 0;
+    padding-right: 0;
+    pointer-events: none;
+    color: #222;
+}
+.profile-section.is-view .profile-editable::placeholder {
+    color: #666;
+    opacity: 1;
+}
+.profile-section.is-view textarea.profile-editable {
+    resize: none;
+    min-height: 0;
+    height: auto;
+    overflow: visible;
+}
+.profile-section.is-view .po-date-field__btn,
+.profile-section.is-view .po-date-field__native {
+    display: none;
+}
+.profile-verification-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    margin-left: 8px;
+}
 </style>
 		<section class="account">
             <div class="container">
@@ -202,13 +268,21 @@ if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $profileDiplomaDateInputValue)) {
                                 </div>
                                 <?php endif; ?>
                             </div>
-                            <h4 class="account__rate-plan"><?= htmlspecialchars($currentType['label']) ?></h4>
+                            <h4 class="account__rate-plan">
+                                <?= htmlspecialchars($currentType['label']) ?>
+                                <?php if ($showVerificationBadge): ?>
+                                <span class="profile-verification-badge" style="background:<?= htmlspecialchars($verificationBadgeColor) ?>">✓</span>
+                                <?php endif; ?>
+                            </h4>
                             <p class="account__rate-price"><?= htmlspecialchars($currentType['price']) ?></p>
                             <p class="account__rate-when">ежегодно</p>
                             <?php if ($membershipStatus === 'active'): ?>
                             <div class="account__rate-buttons account__grid">
-                                <button class="account__rate-btn btn" disabled title="Оплата будет доступна после подключения Газпромбанк-эквайринга">Продлить</button>
+                                <?php if ($membershipType === 'basic'): ?>
+                                <a href="/join/" class="account__rate-btn btn">Продлить или изменить тип членства</a>
+                                <?php else: ?>
                                 <a href="/join/" class="account__rate-btn account__rate-btn--changes btn">Изменить тариф</a>
+                                <?php endif; ?>
                             </div>
                             <?php elseif ($membershipStatus === 'pending'): ?>
                             <div style="margin-top:16px;padding:12px 16px;background:#fff9e6;border-radius:8px;border-left:3px solid #f0a500">
@@ -650,21 +724,21 @@ if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $profileDiplomaDateInputValue)) {
                                 </div>
                             </div>
 
-                            <div class="account__personal">
+                            <div class="account__personal profile-section is-view" data-section-id="personal">
                                 <div class="account__chapter">
                                     <h3 class="account__subtitle">Личные данные</h3>
                                     <button type="button" class="account__chapter-edit" data-toggle-edit>Редактировать</button>
                                 </div>
                                 <div class="account__personal-list account__grid">
-                                    <input type="text" name="last_name"   placeholder="Фамилия"
+                                    <input type="text" name="last_name" class="profile-editable" placeholder="Фамилия"
                                            value="<?= htmlspecialchars($arUser['LAST_NAME']   ?? '') ?>">
                                     <input type="email" placeholder="e-mail"
                                            value="<?= htmlspecialchars($arUser['EMAIL'] ?? '') ?>" readonly
                                            title="Email изменяется через раздел Безопасность">
-                                    <input type="text" name="first_name"  placeholder="Имя"
+                                    <input type="text" name="first_name" class="profile-editable" placeholder="Имя"
                                            value="<?= htmlspecialchars($arUser['NAME']        ?? '') ?>">
                                     <div class="po-date-field">
-                                        <input type="text" name="dob" id="profile-dob" placeholder="Дата рождения (ДД.ММ.ГГГГ)"
+                                        <input type="text" name="dob" id="profile-dob" class="profile-editable" placeholder="Дата рождения (ДД.ММ.ГГГГ)"
                                                value="<?= htmlspecialchars($profileDobInputValue) ?>" inputmode="numeric" maxlength="10">
                                         <button type="button" class="po-date-field__btn" data-picker-target="profile-dob-picker" aria-label="Открыть календарь">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -674,38 +748,38 @@ if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $profileDiplomaDateInputValue)) {
                                         </button>
                                         <input type="date" id="profile-dob-picker" class="po-date-field__native" tabindex="-1" aria-hidden="true">
                                     </div>
-                                    <input type="text" name="second_name" placeholder="Отчество"
+                                    <input type="text" name="second_name" class="profile-editable" placeholder="Отчество"
                                            value="<?= htmlspecialchars($arUser['SECOND_NAME'] ?? '') ?>">
                                 </div>
                             </div>
 
-                            <div class="account__personal" id="graduate-data">
+                            <div class="account__personal profile-section is-view" id="graduate-data" data-section-id="graduate">
                                 <div class="account__chapter">
                                     <h3 class="account__subtitle">Данные выпускника</h3>
                                     <button type="button" class="account__chapter-edit" data-toggle-edit>Редактировать</button>
                                 </div>
                                 <div class="account__personal-list account__personal-list--short account__grid">
-                                    <input type="number" name="grad_year" placeholder="Год окончания" min="1900" max="2099"
+                                    <input type="number" name="grad_year" class="profile-editable" placeholder="Год окончания" min="1900" max="2099"
                                            value="<?= htmlspecialchars($arUser['UF_GRADUATE_YEAR'] ?? '') ?>">
-                                    <input type="text" name="grad_dept" placeholder="Выпускающая кафедра"
+                                    <input type="text" name="grad_dept" class="profile-editable" placeholder="Выпускающая кафедра"
                                            value="<?= htmlspecialchars($arUser['UF_GRADUATE_DEPT'] ?? '') ?>">
-                                    <input type="text" name="telegram" placeholder="Telegram"
+                                    <input type="text" name="telegram" class="profile-editable" placeholder="Telegram"
                                            value="<?= htmlspecialchars($arUser['UF_TELEGRAM'] ?? '') ?>">
                                 </div>
                             </div>
 
-                            <div class="account__personal" id="diploma-data">
+                            <div class="account__personal profile-section is-view" id="diploma-data" data-section-id="diploma">
                                 <div class="account__chapter">
                                     <h3 class="account__subtitle">Сведения о дипломе</h3>
                                     <button type="button" class="account__chapter-edit" data-toggle-edit>Редактировать</button>
                                 </div>
                                 <div class="account__personal-list account__personal-list--short account__grid">
-                                    <input type="text" name="diploma_series" placeholder="Серия бланка"
+                                    <input type="text" name="diploma_series" class="profile-editable" placeholder="Серия бланка"
                                            value="<?= htmlspecialchars($arUser['UF_DIPLOMA_SERIES'] ?? '') ?>">
-                                    <input type="text" name="diploma_number" placeholder="Номер бланка"
+                                    <input type="text" name="diploma_number" class="profile-editable" placeholder="Номер бланка"
                                            value="<?= htmlspecialchars($arUser['UF_DIPLOMA_NUMBER'] ?? '') ?>">
                                     <div class="po-date-field">
-                                        <input type="text" name="diploma_date" id="profile-diploma-date" placeholder="Дата выдачи (ДД.ММ.ГГГГ)"
+                                        <input type="text" name="diploma_date" id="profile-diploma-date" class="profile-editable" placeholder="Дата выдачи (ДД.ММ.ГГГГ)"
                                                value="<?= htmlspecialchars($profileDiplomaDateInputValue) ?>" inputmode="numeric" maxlength="10">
                                         <button type="button" class="po-date-field__btn" data-picker-target="profile-diploma-picker" aria-label="Открыть календарь">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -717,17 +791,15 @@ if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $profileDiplomaDateInputValue)) {
                                     </div>
                                 </div>
                             </div>
-                            <div class="account__personal">
+                            <div class="account__personal profile-section is-view" data-section-id="achievements">
                                 <div class="account__chapter">
                                     <h3 class="account__subtitle">Достижения</h3>
                                     <button type="button" class="account__chapter-edit" data-toggle-edit>Редактировать</button>
                                 </div>
                                 <div class="account__personal-list">
-                                    <textarea name="achievements" placeholder="Достижения (необязательно)" style="width:100%;box-sizing:border-box;resize:vertical;height:96px"><?= htmlspecialchars($arUser['PERSONAL_NOTES'] ?? '') ?></textarea>
+                                    <textarea name="achievements" class="profile-editable" placeholder="Достижения (необязательно)" style="width:100%;box-sizing:border-box;resize:vertical;height:96px"><?= htmlspecialchars($arUser['PERSONAL_NOTES'] ?? '') ?></textarea>
                                 </div>
                             </div>
-
-                            <button type="submit" class="btn authorization__btn" style="margin-top:24px">Сохранить</button>
                         </form>
 
                         <!-- Блок тарифа -->
@@ -748,13 +820,21 @@ if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $profileDiplomaDateInputValue)) {
                                 </div>
                                 <?php endif; ?>
                             </div>
-                            <h4 class="account__rate-plan"><?= htmlspecialchars($currentType['label']) ?></h4>
+                            <h4 class="account__rate-plan">
+                                <?= htmlspecialchars($currentType['label']) ?>
+                                <?php if ($showVerificationBadge): ?>
+                                <span class="profile-verification-badge" style="background:<?= htmlspecialchars($verificationBadgeColor) ?>">✓</span>
+                                <?php endif; ?>
+                            </h4>
                             <p class="account__rate-price"><?= htmlspecialchars($currentType['price']) ?></p>
                             <p class="account__rate-when">ежегодно</p>
                             <?php if ($membershipStatus === 'active'): ?>
                                 <div class="account__rate-buttons account__grid">
-                                    <button class="account__rate-btn btn">Продлить</button>
-                                <a href="/join/" class="account__rate-btn account__rate-btn--changes btn">Изменить тариф</a>
+                                    <?php if ($membershipType === 'basic'): ?>
+                                    <a href="/join/" class="account__rate-btn btn">Продлить или изменить тип членства</a>
+                                    <?php else: ?>
+                                    <a href="/join/" class="account__rate-btn account__rate-btn--changes btn">Изменить тариф</a>
+                                    <?php endif; ?>
                             </div>
                             <?php elseif ($membershipStatus === 'pending'): ?>
                             <p style="margin-top:12px;color:#666">
@@ -853,6 +933,43 @@ if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $profileDiplomaDateInputValue)) {
             if (!picker) return;
             if (typeof picker.showPicker === 'function') picker.showPicker();
             else { picker.focus(); picker.click(); }
+        });
+    });
+
+    var profileForm = document.querySelector('form[action="/profile/"]');
+    if (!profileForm) return;
+
+    function setSectionMode(section, isEdit) {
+        section.classList.toggle('is-view', !isEdit);
+        section.classList.toggle('is-edit', isEdit);
+        var controls = section.querySelectorAll('.profile-editable');
+        controls.forEach(function(control) {
+            if (isEdit) {
+                control.removeAttribute('readonly');
+            } else {
+                control.setAttribute('readonly', 'readonly');
+            }
+        });
+        var button = section.querySelector('[data-toggle-edit]');
+        if (button) {
+            button.textContent = isEdit ? 'Сохранить' : 'Редактировать';
+        }
+    }
+
+    var sections = Array.prototype.slice.call(profileForm.querySelectorAll('.profile-section'));
+    sections.forEach(function(section) {
+        setSectionMode(section, false);
+        var button = section.querySelector('[data-toggle-edit]');
+        if (!button) return;
+        button.addEventListener('click', function() {
+            if (section.classList.contains('is-view')) {
+                sections.forEach(function(other) {
+                    if (other !== section) setSectionMode(other, false);
+                });
+                setSectionMode(section, true);
+            } else {
+                profileForm.submit();
+            }
         });
     });
 })();

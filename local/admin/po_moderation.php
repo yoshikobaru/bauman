@@ -119,8 +119,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && check_bitrix_sessid() && $hlClass) 
                         $newGroups = array_values(array_filter($currentGroups, fn($g) => !in_array((int)$g, $removeGroups)));
                         $newGroups[] = $targetGroup;
                         CUser::SetUserGroup($app['UF_USER_ID'], $newGroups);
+                        $oUserUpdate = new CUser();
+                        $oUserUpdate->Update((int)$app['UF_USER_ID'], [
+                            'UF_MEMBERSHIP_STATUS'  => 'active',
+                            'UF_MEMBERSHIP_TYPE'    => $membershipType,
+                            'UF_MEMBERSHIP_EXPIRES' => date('d.m.Y', strtotime('+1 year')),
+                        ]);
                         $actionResult['msg'] .= ' Пользователь переведён в группу «' . ($typeLabels['membership'] ?? '') . '».';
                     }
+                }
+                if (in_array($newStatus, ['in_review', 'rejected'], true) && $app['UF_TYPE'] === 'membership' && $app['UF_USER_ID'] > 0) {
+                    $statusForUser = $newStatus === 'in_review' ? 'in_review' : 'rejected';
+                    $membershipType = $appData['membership_type'] ?? '';
+                    $oUserUpdate = new CUser();
+                    $oUserUpdate->Update((int)$app['UF_USER_ID'], [
+                        'UF_MEMBERSHIP_STATUS' => $statusForUser,
+                        'UF_MEMBERSHIP_TYPE'   => $membershipType,
+                    ]);
                 }
 
                 // --- Email-уведомление пользователю при смене статуса ---

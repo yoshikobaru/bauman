@@ -270,11 +270,15 @@ function po_sendAdminEmail(string $type, array $data, array $options = []): void
     @mail($to, po_mailEncodeSubject($subject), $message, $headers);
 }
 
-function po_sendMembershipConfirmationEmail(string $email): void
+function po_sendMembershipConfirmationEmail(string $email): bool
 {
     $email = trim($email);
     if ($email === '') {
-        return;
+        return false;
+    }
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        error_log('[po_sendMembershipConfirmationEmail] invalid email: ' . $email);
+        return false;
     }
 
     $subject = 'Заявление на вступление Политехническое общество выпускников МВТУ (МГТУ) им. Н.Э. Баумана';
@@ -290,7 +294,12 @@ function po_sendMembershipConfirmationEmail(string $email): void
     $headers .= "From: " . PO_ADMIN_EMAIL . "\r\n";
     $headers .= "Reply-To: " . PO_ADMIN_EMAIL . "\r\n";
 
-    @mail($email, po_mailEncodeSubject($subject), $body, $headers);
+    $sent = mail($email, po_mailEncodeSubject($subject), $body, $headers);
+    if (!$sent) {
+        $lastError = error_get_last();
+        error_log('[po_sendMembershipConfirmationEmail] mail() failed for ' . $email . '; error=' . ($lastError['message'] ?? 'unknown'));
+    }
+    return $sent;
 }
 
 function po_is_valid_phone_chars(string $phone): bool

@@ -3894,6 +3894,9 @@ select,
     padding: 2vw;
     position: relative;
     margin-bottom: 40px;
+    background: linear-gradient(135deg, #0f2f4a 0%, #022032 100%);
+    border-radius: 12px;
+    overflow: hidden;
 }
 
 .account__rate-conus {
@@ -3904,6 +3907,10 @@ select,
 
 .account__rate--proff {
     background: url(../img/my_profile/rate-bg-proff.png) no-repeat center/cover;
+}
+
+.account__rate--basic {
+    background: linear-gradient(135deg, #0f2f4a 0%, #022032 100%);
 }
 
 .account__rate-info {
@@ -3917,6 +3924,28 @@ select,
     padding: 8px 12px;
     color: #fff;
     font-size: var(--text-size);
+    border-radius: 8px;
+}
+
+.account__rate-status--pending {
+    background: rgba(240, 165, 0, 0.25);
+    color: #ffe7b3;
+}
+
+.account__rate-status--in-review {
+    background: rgba(41, 128, 185, 0.25);
+    color: #d8edff;
+}
+
+.account__rate-status--active {
+    background: rgba(39, 174, 96, 0.25);
+    color: #d4f8e3;
+}
+
+.account__rate-status--expired,
+.account__rate-status--error {
+    background: rgba(231, 76, 60, 0.25);
+    color: #ffd9d5;
 }
 
 .account__rate-date {
