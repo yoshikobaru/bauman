@@ -8,6 +8,9 @@ $iblockOk = Loader::includeModule('iblock');
 
 $d2Done  = false;
 $d2Error = '';
+$payResult = in_array((string)($_GET['pay'] ?? ''), ['success', 'fail'], true) ? (string)$_GET['pay'] : '';
+$paykeeperConfig = function_exists('po_get_paykeeper_config') ? po_get_paykeeper_config() : [];
+$paykeeperReady = function_exists('po_is_paykeeper_configured') ? po_is_paykeeper_configured($paykeeperConfig) : false;
 $d2Flash = function_exists('po_flash_get') ? po_flash_get('d2_support') : null;
 if (is_array($d2Flash)) {
     $d2Done = !empty($d2Flash['done']);
@@ -17,7 +20,7 @@ if (is_array($d2Flash)) {
     }
 }
 
-// D2: Поддержка проектов — без оплаты, запись в HL-блок
+// D2: Поддержка проектов — инициализация оплаты через PayKeeper
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['d2_action'])) {
     $amount    = trim($_POST['amount']     ?? '');
     $project   = trim($_POST['project']   ?? '');
@@ -55,6 +58,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['d2_action'])) {
         $d2Error = 'Необходимо согласие с политикой обработки ПДн.';
     } else {
         $saved = false;
+        $applicationId = 0;
+        $hlClass = null;
+        $paymentMeta = [
+            'status' => 'new',
+        ];
+        $d2Data = [
+            'first_name' => $fn,
+            'last_name'  => $ln,
+            'email'      => $email,
+            'phone'      => $phone,
+            'project'    => $project,
+            'amount'     => $amount,
+            'frequency'  => $frequency,
+            'donor_type' => $donorType,
+            'company'    => $company,
+            'site'       => $site,
+            'payment_comment' => $comment,
+            'agree_pd'   => $agreePd ? 'yes' : 'no',
+            'payment'    => $paymentMeta,
+        ];
+
         if ($hlOk && defined('HL_APPLICATIONS_ID') && HL_APPLICATIONS_ID > 0) {
             $hlEntity = \Bitrix\Highloadblock\HighloadBlockTable::getById(HL_APPLICATIONS_ID)->fetch();
             if ($hlEntity) {
@@ -64,50 +88,90 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['d2_action'])) {
                     'UF_TYPE'        => 'project_support',
                     'UF_STATUS'      => 'new',
                     'UF_DATE_CREATE' => new \Bitrix\Main\Type\DateTime(),
-                    'UF_DATA'        => json_encode([
-                        'amount'     => $amount,    'project'    => $project,
-                        'frequency'  => $frequency, 'donor_type' => $donorType,
-                        'first_name' => $fn,        'last_name'  => $ln,
-                        'email'      => $email,     'phone'      => $phone,
-                        'company'    => $company,   'site'       => $site,
-                        'payment_comment' => $comment,
-                    ], JSON_UNESCAPED_UNICODE),
+                    'UF_DATA'        => json_encode($d2Data, JSON_UNESCAPED_UNICODE),
                 ]);
-                if ($res->isSuccess()) $saved = true;
-                else $d2Error = 'Ошибка сохранения. Попробуйте позже.';
+                if ($res->isSuccess()) {
+                    $saved = true;
+                    $applicationId = (int)$res->getId();
+                } else {
+                    $d2Error = 'Ошибка сохранения. Попробуйте позже.';
+                }
             }
         } else {
             $saved = true;
         }
+
         if ($saved) {
-            $d2Done = true;
-            po_logAction('form_submit', 'application', 0, 'D2 поддержка проекта: ' . $project . ', ' . $amount);
-            $d2Data = [
-                'first_name' => $fn,
-                'last_name'  => $ln,
-                'email'      => $email,
-                'phone'      => $phone,
-                'project'    => $project,
-                'amount'     => $amount,
-                'frequency'  => $frequency,
-                'donor_type' => $donorType,
-                'company'    => $company,
-                'site'       => $site,
-                'payment_comment' => $comment,
-                'agree_pd'   => $agreePd ? 'yes' : 'no',
-            ];
-            po_sendAdminEmail('project_support', $d2Data);
-            po_createCrmLead('project_support', $d2Data);
+            if (!$paykeeperReady) {
+                $d2Error = 'Онлайн-оплата временно недоступна. Попробуйте позже.';
+            } else {
+                $payAmount = function_exists('po_paykeeper_normalize_amount')
+                    ? po_paykeeper_normalize_amount($amount)
+                    : null;
+                if ($payAmount === null) {
+                    $d2Error = 'Укажите корректную сумму пожертвования.';
+                } elseif ($applicationId <= 0 || $hlClass === null) {
+                    $d2Error = 'Не удалось подготовить заявку к оплате. Попробуйте позже.';
+                } else {
+                    $serviceName = $project === 'Пожертвование на ведение уставной деятельности'
+                        ? $project
+                        : ('Пожертвование на проект ' . $project);
+                    $clientId = trim($ln . ' ' . $fn);
+                    $orderId = function_exists('po_paykeeper_build_support_order_id')
+                        ? po_paykeeper_build_support_order_id($applicationId)
+                        : ('SUPPORT-' . $applicationId . '-' . date('YmdHis'));
+                    $paymentRequest = [
+                        'pay_amount' => $payAmount,
+                        'clientid' => $clientId,
+                        'orderid' => $orderId,
+                        'service_name' => $serviceName,
+                        'client_email' => $email,
+                        'client_phone' => $phone,
+                    ];
+
+                    $apiError = '';
+                    $invoice = function_exists('po_paykeeper_create_invoice')
+                        ? po_paykeeper_create_invoice($paykeeperConfig, $paymentRequest, $apiError)
+                        : null;
+
+                    if (!$invoice || empty($invoice['invoice_url'])) {
+                        $d2Error = 'Не удалось инициализировать оплату. Попробуйте позже.';
+                        if ($apiError !== '') {
+                            po_logAction('form_submit', 'application', $applicationId, 'PayKeeper init error: ' . $apiError);
+                        }
+                    } else {
+                        $d2Data['payment'] = [
+                            'status' => 'pending',
+                            'order_id' => $orderId,
+                            'invoice_id' => (string)$invoice['invoice_id'],
+                            'invoice_url' => (string)$invoice['invoice_url'],
+                            'amount_rub' => $payAmount,
+                            'created_at' => date('c'),
+                        ];
+                        $hlClass::update($applicationId, [
+                            'UF_DATA' => json_encode($d2Data, JSON_UNESCAPED_UNICODE),
+                        ]);
+
+                        po_logAction('form_submit', 'application', $applicationId, 'D2 PayKeeper init: ' . $orderId . ', ' . $payAmount);
+                        po_sendAdminEmail('project_support', $d2Data);
+                        po_createCrmLead('project_support', $d2Data);
+
+                        LocalRedirect((string)$invoice['invoice_url']);
+                        exit;
+                    }
+                }
+            }
         }
     }
+
     if (function_exists('po_flash_set')) {
         po_flash_set('d2_support', [
             'done' => $d2Done,
             'error' => $d2Error,
-            'form' => $d2Done ? [] : $_POST,
+            'form' => $_POST,
         ]);
     }
-    LocalRedirect('/support/?d2=' . ($d2Done ? 'success' : 'error'));
+    LocalRedirect('/support/?d2=error');
     exit;
 }
 
@@ -145,13 +209,17 @@ $prefill = [
                     <img src="<?=SITE_TEMPLATE_PATH?>/assets/img/projects-page/project-donate-img-ellips.png" alt="" class="project-programm__preview-ellips">
                 </div>
                 <div class="project-programm__donate">
-                    <?php if ($d2Done): ?>
-                    <div class="authorization__alert authorization__alert--success" style="margin:24px 0;padding:24px">
-                        <h3>Заявка принята!</h3>
-                        <p style="margin-top:8px">Спасибо за поддержку. Мы свяжемся с вами в ближайшее время.</p>
-                        <a href="/projects/" class="btn" style="margin-top:16px">К проектам</a>
+                    <?php if ($payResult === 'success'): ?>
+                    <div class="authorization__alert authorization__alert--success" style="margin:0 0 16px;padding:18px 20px">
+                        <h3 style="margin-bottom:8px">Спасибо! Оплата успешно завершена.</h3>
+                        <p>Платеж обрабатывается автоматически. Если статус не обновился сразу, это произойдет в течение минуты.</p>
                     </div>
-                    <?php else: ?>
+                    <?php elseif ($payResult === 'fail'): ?>
+                    <div class="authorization__alert authorization__alert--error" style="margin:0 0 16px;padding:18px 20px">
+                        <h3 style="margin-bottom:8px">Оплата не завершена.</h3>
+                        <p>Проверьте данные карты или попробуйте еще раз.</p>
+                    </div>
+                    <?php endif; ?>
                     <?php if ($d2Error): ?>
                     <div class="authorization__alert authorization__alert--error" style="margin-bottom:16px">
                         <p><?= htmlspecialchars($d2Error) ?></p>
@@ -192,6 +260,20 @@ $prefill = [
                                 outline: none;
                                 padding: 2px 0;
                             }
+                            .d2-pay-summary {
+                                margin: 0 auto;
+                                max-width: 420px;
+                                text-align: left;
+                                background: #f8f8f8;
+                                border-radius: 12px;
+                                padding: 14px 18px;
+                            }
+                            .d2-pay-summary p {
+                                margin: 0 0 8px;
+                                font-size: 14px;
+                                color: #333;
+                            }
+                            .d2-pay-summary p:last-child { margin-bottom: 0; }
                         </style>
 
                         <div class="project-programm__tabs">
@@ -337,18 +419,26 @@ $prefill = [
                                 <div style="padding:24px 0 8px;text-align:center">
                                     <div style="font-size:40px;margin-bottom:12px">💳</div>
                                     <p style="font-size:15px;color:#555;line-height:1.6;margin-bottom:20px">
-                                        Онлайн-оплата будет доступна после подключения эквайринга.<br>
-                                        Чтобы поддержать проект сейчас — оставьте заявку и мы свяжемся с вами.
+                                        Проверьте данные платежа и нажмите кнопку оплаты.
                                     </p>
+                                    <div class="d2-pay-summary">
+                                        <p><strong>Сумма:</strong> <span id="d2_pay_amount_text">300 руб.</span></p>
+                                        <p><strong>Проект:</strong> <span id="d2_pay_project_text">не выбран</span></p>
+                                        <p><strong>Тип:</strong> <span id="d2_pay_donor_text">Физ. лицо</span></p>
+                                    </div>
+                                    <?php if (!$paykeeperReady): ?>
+                                    <p style="font-size:14px;color:#b42318;line-height:1.5;margin:18px 0 0">
+                                        Эквайринг еще не настроен: заполните конфиг PayKeeper на сервере.
+                                    </p>
+                                    <?php endif; ?>
                                 </div>
                                 <div class="project-programm__buttons">
                                     <button type="button" class="btn project-programm__btn project-programm__btn--back" id="d2_back_pay">Назад</button>
-                                    <button type="submit" class="btn project-programm__btn">Отправить заявку</button>
+                                    <button type="submit" class="btn project-programm__btn"<?= $paykeeperReady ? '' : ' disabled' ?>>Перейти к оплате</button>
                                 </div>
                             </div>
                         </div>
                     </form>
-                    <?php endif; ?>
                 </div>
             </div>
         </div>
@@ -388,6 +478,9 @@ $prefill = [
     var donorField   = document.getElementById('d2_donor_type');
     var customInput  = document.getElementById('d2_custom_amount');
     var freqField    = document.getElementById('d2_frequency');
+    var payAmountText = document.getElementById('d2_pay_amount_text');
+    var payProjectText = document.getElementById('d2_pay_project_text');
+    var payDonorText = document.getElementById('d2_pay_donor_text');
 
     if (!priceList) return;
 
@@ -410,14 +503,33 @@ $prefill = [
                 amountField.value = (customInput ? customInput.value : '') + ' руб. (другая)';
                 if (customInput) customInput.addEventListener('input', function() {
                     amountField.value = customInput.value + ' руб.';
+                    updatePaySummary();
                 });
             } else {
                 amountField.value = val + ' руб.';
             }
+            updatePaySummary();
         });
     });
     // Init default
     amountField.value = '300 руб.';
+
+    function updatePaySummary() {
+        if (payAmountText && amountField) {
+            payAmountText.textContent = amountField.value || '-';
+        }
+        if (payProjectText) {
+            var summaryProject = projectField && projectField.value ? projectField.value : '';
+            if (!summaryProject && projectSelect) {
+                summaryProject = projectSelect.value || '';
+            }
+            payProjectText.textContent = summaryProject || 'не выбран';
+        }
+        if (payDonorText && donorField) {
+            payDonorText.textContent = donorField.value === 'ur' ? 'Юр. лицо' : 'Физ. лицо';
+        }
+    }
+    updatePaySummary();
 
     function updatePaymentComment() {
         if (!commentField) return;
@@ -452,6 +564,7 @@ $prefill = [
     if (btnNextProg) btnNextProg.addEventListener('click', function() {
         if (!validateProjectStep()) return;
         updatePaymentComment();
+        updatePaySummary();
         switchTab('data');
     });
 
@@ -459,6 +572,7 @@ $prefill = [
         projectSelect.addEventListener('change', function() {
             if (projectField) projectField.value = projectSelect.value || '';
             updatePaymentComment();
+            updatePaySummary();
         });
     }
 
@@ -470,6 +584,7 @@ $prefill = [
     var btnNextData = document.getElementById('d2_next_data');
     if (btnNextData) btnNextData.addEventListener('click', function() {
         if (!validateDataStep()) return;
+        updatePaySummary();
         switchTab('pay');
     });
 
@@ -556,6 +671,7 @@ $prefill = [
         el.addEventListener('click', function() {
             donorField.value = el.getAttribute('data-donor');
             applyRequiredByDonor();
+            updatePaySummary();
         });
     });
 
@@ -576,6 +692,9 @@ $prefill = [
     applyRequiredByDonor();
 
     function switchTab(tab) {
+        if (tab === 'pay') {
+            updatePaySummary();
+        }
         document.querySelectorAll('.project-programm__tabs .main-tabs-click').forEach(function(li) {
             li.classList.toggle('main-tabs-click--active', li.getAttribute('data-tab') === tab);
         });

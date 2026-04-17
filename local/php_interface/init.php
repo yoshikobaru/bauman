@@ -506,6 +506,258 @@ function po_is_valid_partnership_phone(string $phone): bool
     return (bool)preg_match('/\d/u', $phone);
 }
 
+/**
+ * Получить конфиг PayKeeper из Bitrix Configuration.
+ * Ожидаемая структура в .settings_extra.php:
+ * [
+ *   'paykeeper' => [
+ *     'value' => [
+ *       'base_url' => 'https://xxxxx.server.paykeeper.ru',
+ *       'username' => '...',
+ *       'password' => '...',
+ *       'secret_word' => '...',
+ *       'success_url' => 'https://site/support/?pay=success',
+ *       'fail_url' => 'https://site/support/?pay=fail',
+ *       'callback_url' => 'https://site/local/tools/paykeeper_callback.php',
+ *     ],
+ *     'readonly' => true,
+ *   ],
+ * ]
+ */
+function po_get_paykeeper_config(): array
+{
+    $rawConfig = [];
+    try {
+        $rawConfig = \Bitrix\Main\Config\Configuration::getValue('paykeeper');
+    } catch (\Throwable $e) {
+        $rawConfig = [];
+    }
+
+    if (isset($rawConfig['value']) && is_array($rawConfig['value'])) {
+        $rawConfig = $rawConfig['value'];
+    }
+    if (!is_array($rawConfig)) {
+        $rawConfig = [];
+    }
+
+    $baseUrl = trim((string)($rawConfig['base_url'] ?? ''));
+    if ($baseUrl !== '') {
+        $baseUrl = rtrim($baseUrl, '/');
+    }
+
+    return [
+        'base_url' => $baseUrl,
+        'username' => trim((string)($rawConfig['username'] ?? '')),
+        'password' => (string)($rawConfig['password'] ?? ''),
+        'secret_word' => (string)($rawConfig['secret_word'] ?? ''),
+        'success_url' => trim((string)($rawConfig['success_url'] ?? '')),
+        'fail_url' => trim((string)($rawConfig['fail_url'] ?? '')),
+        'callback_url' => trim((string)($rawConfig['callback_url'] ?? '')),
+    ];
+}
+
+function po_is_paykeeper_configured(?array $config = null): bool
+{
+    $cfg = $config ?? po_get_paykeeper_config();
+    return !empty($cfg['base_url'])
+        && !empty($cfg['username'])
+        && $cfg['password'] !== ''
+        && !empty($cfg['secret_word']);
+}
+
+/**
+ * Преобразовать сумму вида "10 000 руб." в строку "10000.00".
+ */
+function po_paykeeper_normalize_amount(string $rawAmount): ?string
+{
+    $rawAmount = trim($rawAmount);
+    if ($rawAmount === '') {
+        return null;
+    }
+
+    $compact = preg_replace('/[\s\x{00A0}]+/u', '', $rawAmount);
+    if (!is_string($compact) || $compact === '') {
+        return null;
+    }
+
+    if (!preg_match('/\d+(?:[.,]\d+)?/u', $compact, $matches)) {
+        return null;
+    }
+
+    $numeric = str_replace(',', '.', $matches[0]);
+    $amount = (float)$numeric;
+    if ($amount <= 0) {
+        return null;
+    }
+
+    return number_format($amount, 2, '.', '');
+}
+
+function po_paykeeper_build_support_order_id(int $applicationId): string
+{
+    return 'SUPPORT-' . $applicationId . '-' . date('YmdHis');
+}
+
+function po_paykeeper_extract_application_id(string $orderId): int
+{
+    if (preg_match('/^SUPPORT-(\d+)-\d{14}$/', $orderId, $matches)) {
+        return (int)$matches[1];
+    }
+    return 0;
+}
+
+/**
+ * Выполнить запрос к JSON API PayKeeper.
+ *
+ * @return array ['ok' => bool, 'data' => array, 'error' => string]
+ */
+function po_paykeeper_api_call(array $config, string $uri, string $method = 'GET', array $params = []): array
+{
+    if (!function_exists('curl_init')) {
+        return ['ok' => false, 'data' => [], 'error' => 'cURL не доступен на сервере.'];
+    }
+
+    $baseUrl = rtrim((string)($config['base_url'] ?? ''), '/');
+    if ($baseUrl === '') {
+        return ['ok' => false, 'data' => [], 'error' => 'Не задан base_url PayKeeper.'];
+    }
+
+    $url = $baseUrl . $uri;
+    $method = strtoupper($method);
+    if ($method === 'GET' && !empty($params)) {
+        $query = http_build_query($params);
+        if ($query !== '') {
+            $url .= (strpos($url, '?') === false ? '?' : '&') . $query;
+        }
+    }
+
+    $curl = curl_init();
+    if ($curl === false) {
+        return ['ok' => false, 'data' => [], 'error' => 'Не удалось инициализировать cURL.'];
+    }
+
+    $headers = [
+        'Authorization: Basic ' . base64_encode((string)$config['username'] . ':' . (string)$config['password']),
+        'Accept: application/json',
+    ];
+    if ($method === 'POST') {
+        $headers[] = 'Content-Type: application/x-www-form-urlencoded';
+    }
+
+    $options = [
+        CURLOPT_URL => $url,
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_CUSTOMREQUEST => $method,
+        CURLOPT_HTTPHEADER => $headers,
+        CURLOPT_HEADER => false,
+        CURLOPT_TIMEOUT => 20,
+        CURLOPT_CONNECTTIMEOUT => 10,
+        CURLOPT_SSL_VERIFYPEER => true,
+        CURLOPT_SSL_VERIFYHOST => 2,
+    ];
+    if ($method === 'POST') {
+        $options[CURLOPT_POSTFIELDS] = http_build_query($params);
+    }
+
+    curl_setopt_array($curl, $options);
+    $rawResponse = curl_exec($curl);
+    $curlError = curl_error($curl);
+    $httpCode = (int)curl_getinfo($curl, CURLINFO_HTTP_CODE);
+    curl_close($curl);
+
+    if ($rawResponse === false) {
+        return ['ok' => false, 'data' => [], 'error' => 'Ошибка cURL: ' . $curlError];
+    }
+
+    $decoded = json_decode($rawResponse, true);
+    if (!is_array($decoded)) {
+        return [
+            'ok' => false,
+            'data' => [],
+            'error' => 'Некорректный JSON-ответ PayKeeper (HTTP ' . $httpCode . ').',
+        ];
+    }
+
+    if (isset($decoded['result']) && $decoded['result'] === 'fail') {
+        $msg = (string)($decoded['msg'] ?? 'Неизвестная ошибка PayKeeper');
+        return ['ok' => false, 'data' => $decoded, 'error' => $msg];
+    }
+
+    return ['ok' => true, 'data' => $decoded, 'error' => ''];
+}
+
+function po_paykeeper_request_token(array $config, string &$error = ''): ?string
+{
+    $result = po_paykeeper_api_call($config, '/info/settings/token/', 'GET');
+    if (!$result['ok']) {
+        $error = (string)$result['error'];
+        return null;
+    }
+
+    $token = (string)($result['data']['token'] ?? '');
+    if ($token === '') {
+        $error = 'PayKeeper не вернул token.';
+        return null;
+    }
+
+    return $token;
+}
+
+/**
+ * @return array|null ['invoice_id' => string, 'invoice_url' => string]
+ */
+function po_paykeeper_create_invoice(array $config, array $paymentData, string &$error = ''): ?array
+{
+    $token = po_paykeeper_request_token($config, $error);
+    if ($token === null) {
+        return null;
+    }
+
+    $request = array_merge($paymentData, ['token' => $token]);
+    $result = po_paykeeper_api_call($config, '/change/invoice/preview/', 'POST', $request);
+    if (!$result['ok']) {
+        $error = (string)$result['error'];
+        return null;
+    }
+
+    $invoiceId = (string)($result['data']['invoice_id'] ?? '');
+    if ($invoiceId === '') {
+        $error = 'PayKeeper не вернул invoice_id.';
+        return null;
+    }
+
+    $invoiceUrl = (string)($result['data']['invoice_url'] ?? '');
+    if ($invoiceUrl === '') {
+        $invoiceUrl = rtrim((string)$config['base_url'], '/') . '/bill/' . $invoiceId . '/';
+    }
+
+    return [
+        'invoice_id' => $invoiceId,
+        'invoice_url' => $invoiceUrl,
+    ];
+}
+
+function po_paykeeper_validate_callback_signature(array $payload, string $secretWord): bool
+{
+    $id = (string)($payload['id'] ?? '');
+    $sum = (string)($payload['sum'] ?? '');
+    $clientId = (string)($payload['clientid'] ?? '');
+    $orderId = (string)($payload['orderid'] ?? '');
+    $key = strtolower((string)($payload['key'] ?? ''));
+
+    if ($id === '' || $sum === '' || $key === '' || $secretWord === '') {
+        return false;
+    }
+
+    $expectedKey = md5($id . $sum . $clientId . $orderId . $secretWord);
+    return hash_equals($expectedKey, $key);
+}
+
+function po_paykeeper_build_callback_ack(string $id, string $secretWord): string
+{
+    return 'OK ' . md5($id . $secretWord);
+}
+
 require_once __DIR__ . '/partnership_form_markup.php';
 
 // Логирование входа пользователя
