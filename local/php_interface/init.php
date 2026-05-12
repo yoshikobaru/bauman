@@ -32,6 +32,28 @@ define('IBLOCK_PROJECTS_ID', 8); // Проекты // Проекты // Прое
 define('IBLOCK_BOARD_ID', 7); // Правление // Правление // Правление // Правление
 
 /**
+ * Рендереры секций для разделения PHP и HTML.
+ * Подключаем все рендереры из папки renderers/
+ * Это позволяет контент-менеджерам редактировать HTML в визуальном редакторе
+ * без риска сломать PHP-логику.
+ */
+$renderersDir = __DIR__ . '/renderers/';
+if (is_dir($renderersDir)) {
+    $renderers = [
+        'board_section.php',   // Члены Совета
+        'projects_section.php', // Проекты общества
+        'news_section.php',    // Новости и события
+        'board_modals.php',    // Модальные окна членов Совета
+    ];
+    foreach ($renderers as $renderer) {
+        $rendererPath = $renderersDir . $renderer;
+        if (file_exists($rendererPath)) {
+            require_once $rendererPath;
+        }
+    }
+}
+
+/**
  * HL-блок заявок.
  */
 define('HL_APPLICATIONS_ID', 2);

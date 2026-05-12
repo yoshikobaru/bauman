@@ -46,46 +46,14 @@ $APPLICATION->SetPageProperty('description', 'О Политехническом 
 		</div>
 	</div>
 </div>
- </section> <section class="boards boards--about">
-<div class="container">
-	<div class="boards__wrapper">
-		<h2 class="main-title">
-		Члены Совета Политехнического общества </h2>
-		<div class="boards__list">
-			 <?php
-$boardMembers = [];
-if (defined('IBLOCK_BOARD_ID') && IBLOCK_BOARD_ID > 0 && \Bitrix\Main\Loader::includeModule('iblock')):
-    $dbBoardAbout = CIBlockElement::GetList(
-        ['SORT' => 'ASC'],
-        ['IBLOCK_ID' => IBLOCK_BOARD_ID, 'ACTIVE' => 'Y'],
-        false,
-        false,
-        ['ID', 'NAME', 'PREVIEW_PICTURE', 'PREVIEW_TEXT', 'DETAIL_TEXT']
-    );
-    while ($bm = $dbBoardAbout->GetNext()):
-        $boardMembers[] = $bm;
-        $photoSrc = $bm['PREVIEW_PICTURE']
-            ? CFile::GetPath($bm['PREVIEW_PICTURE'])
-            : SITE_TEMPLATE_PATH . '/assets/img/board-placeholder.png';
-?>
-			<div class="boards__item" data-fancybox="" data-src="#board-modal-&lt;span id=" bxid186643096"="" title="Код PHP: &lt;?= (int)$bm['ID'] ?&gt;">
-				 <?= (int)$bm['ID'] ?><span class="bxhtmled-surrogate-inner"><span class="bxhtmled-right-side-item-icon"></span><span class="bxhtmled-comp-lable" unselectable="on" spellcheck="false">Код PHP</span></span>" style="cursor:pointer;"&gt; <img alt="<?= htmlspecialchars($bm['NAME']) ?>" src="<?= htmlspecialchars($photoSrc) ?>
-				 " class="boards__item-image">
-				<h3 class="boards__item-title">
-				<?= htmlspecialchars($bm['NAME']) ?> </h3>
-				<p class="boards__item-text">
-					 <?= htmlspecialchars($bm['PREVIEW_TEXT']) ?>
-				</p>
-			</div>
-			 <?php
-    endwhile;
-endif;
-?>
-		</div>
-	</div>
-</div>
- <!-- /.container --> </section>
-<!-- /.boards --> <!-- history --> <section class="history bg-white" id="history-section">
+</section>
+
+<!-- Рендерер: Члены Совета (с fancybox для модальных окон) -->
+<?php po_render_board_section('Члены Совета Политехнического общества', 12, true); ?>
+
+<!-- /.boards -->
+
+<!-- history -->
 <div class="container">
 	<h2 class="main-title history__title">
 	С 19 века создаем сеть поддержки и обеспечиваем стабильность и рост общества </h2>
@@ -351,29 +319,11 @@ endif;
 	</div>
  <button class="documents__btn btn">Все документы</button>
 </div>
- </section> </main>
-<?php foreach ($boardMembers as $bm):
-    $mPhotoSrc = $bm['PREVIEW_PICTURE']
-        ? CFile::GetPath($bm['PREVIEW_PICTURE'])
-        : SITE_TEMPLATE_PATH . '/assets/img/board-placeholder.png';
-?>
-<div class="form-boards" id="board-modal-&lt;span id=" bxid393565794"="" title="Код PHP: &lt;?= (int)$bm['ID'] ?&gt;">
-	 <?= (int)$bm['ID'] ?><span class="bxhtmled-surrogate-inner"><span class="bxhtmled-right-side-item-icon"></span><span class="bxhtmled-comp-lable" unselectable="on" spellcheck="false">Код PHP</span></span>" style="display:none;max-width:1100px;"&gt;
-	<div class="form-boards__wrapper">
- <img alt="<?= htmlspecialchars($bm['NAME']) ?>" src="<?= htmlspecialchars($mPhotoSrc) ?>
-		 " class="form-boards__image">
-		<div class="form-boards__content">
-			<h2><?= htmlspecialchars($bm['NAME']) ?></h2>
-			 <?php if (!empty($bm['DETAIL_TEXT'])): ?>
-			<div>
-				 <?= $bm['DETAIL_TEXT'] ?>
-			</div>
-			 <?php else: ?>
-			<p>
-				 <?= htmlspecialchars($bm['PREVIEW_TEXT']) ?>
-			</p>
-			 <?php endif; ?>
-		</div>
-	</div>
-</div>
-<?php endforeach; ?><?php require($_SERVER["DOCUMENT_ROOT"]."/bitrix/footer.php");?>
+</section>
+
+<!-- Рендерер: Модальные окна членов Совета (для fancybox) -->
+<?php po_render_board_modals(); ?>
+
+</main>
+
+<?php require($_SERVER["DOCUMENT_ROOT"]."/bitrix/footer.php");?>

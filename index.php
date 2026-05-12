@@ -124,160 +124,21 @@ $APPLICATION->SetPageProperty('description', 'Политехническое о�
 	</div>
 </div>
  <!-- /.container --> </section>
-<!-- /.opportunities --> <?php
-$_boardItems = [];
-if (defined('IBLOCK_BOARD_ID') && IBLOCK_BOARD_ID > 0 && \Bitrix\Main\Loader::includeModule('iblock')) {
-    $dbBoard = CIBlockElement::GetList(
-        ['SORT' => 'ASC'],
-        ['IBLOCK_ID' => IBLOCK_BOARD_ID, 'ACTIVE' => 'Y'],
-        false,
-        ['nTopCount' => 12],
-        ['ID', 'NAME', 'PREVIEW_PICTURE', 'PREVIEW_TEXT']
-    );
+<!-- /.opportunities -->
 
-    while ($board = $dbBoard->GetNext()) {
-        $_boardItems[] = [
-            'name' => (string)$board['NAME'],
-            'pos' => (string)$board['PREVIEW_TEXT'],
-            'photo' => !empty($board['PREVIEW_PICTURE']) ? CFile::GetPath($board['PREVIEW_PICTURE']) : '',
-        ];
-    }
-}
-?> <?php if (!empty($_boardItems)): ?> <section class="boards">
-<div class="container">
-	<div class="boards__wrapper">
-		<h2 class="main-title">
-		Члены Совета Политехнического общества </h2>
-		<div class="boards__list">
-			 <?php foreach ($_boardItems as $boardItem): ?>
-			<div class="boards__item">
-				 <?php if (!empty($boardItem['photo'])): ?> <img alt="<?= htmlspecialchars($boardItem['name']) ?>" src="<?= htmlspecialchars($boardItem['photo']) ?>
-				" class="boards__item-image"> <?php endif; ?>
-				<h3 class="boards__item-title">
-				<?= htmlspecialchars($boardItem['name']) ?> </h3>
-				<p class="boards__item-text">
-					 <?= htmlspecialchars($boardItem['pos']) ?>
-				</p>
-			</div>
-			 <?php endforeach; ?>
-		</div>
-	</div>
-</div>
- <!-- /.container --> </section>
-<?php endif; ?> <!-- /.boards --> <!-- initiative --> <section class="initiative">
-<div class="container">
-	<div class="initiative__wrapper">
-		<div class="initiative__info">
-			<h2 class="main-title">
-			Проекты общества </h2>
-			<p class="main-text">
-				 Члены общества запустили важные проекты Политеха. Станьте частью братства и используйте все возможности общества.
-			</p>
-		</div>
-		 <?php
-// Аварийный fallback — только если инфоблок проектов пуст/недоступен.
-$_fallbackProjects = [
-    ['name' => 'Конференция PolytechExpo',        'url' => '/projects/politech-expo/', 'img' => 'initiative-img-1.png', 'mob' => 'initiative-img-mob-1.png'],
-    ['name' => 'Конференция Встреча выпускников', 'url' => '/projects/conference/',    'img' => 'initiative-img-2.png', 'mob' => 'initiative-img-mob-2.png'],
-    ['name' => 'Попечительский совет',            'url' => '/projects/trustees/',      'img' => 'initiative-img-3.png', 'mob' => 'initiative-img-mob-3.png'],
-    ['name' => 'Реставрации Ротонды',             'url' => '/projects/restoration/',   'img' => 'initiative-img-4.png', 'mob' => 'initiative-img-mob-4.png'],
-];
+<!-- Рендерер: Члены Совета -->
+<?php po_render_board_section(); ?>
 
-$_projects = [];
-$_localDesktopFallback = ['initiative-img-1.png', 'initiative-img-2.png', 'initiative-img-3.png', 'initiative-img-4.png'];
-$_localMobileFallback  = ['initiative-img-mob-1.png', 'initiative-img-mob-2.png', 'initiative-img-mob-3.png', 'initiative-img-mob-4.png'];
+<!-- /.boards -->
 
-if (defined('IBLOCK_PROJECTS_ID') && IBLOCK_PROJECTS_ID > 0 && \Bitrix\Main\Loader::includeModule('iblock')) {
-    $dbProjects = CIBlockElement::GetList(
-        ['SORT' => 'ASC', 'ID' => 'ASC'],
-        ['IBLOCK_ID' => IBLOCK_PROJECTS_ID, 'ACTIVE' => 'Y'],
-        false,
-        false,
-        ['ID', 'NAME', 'DETAIL_PAGE_URL', 'PREVIEW_PICTURE', 'PROPERTY_HOME_IMAGE', 'PROPERTY_HOME_IMAGE_MOB', 'PROPERTY_DETAIL_URL']
-    );
-    $projectIndex = 0;
-    while ($proj = $dbProjects->GetNext()) {
-        $homeImageId    = (int)($proj['PROPERTY_HOME_IMAGE_VALUE'] ?? 0);
-        $homeImageMobId = (int)($proj['PROPERTY_HOME_IMAGE_MOB_VALUE'] ?? 0);
-        $previewId      = (int)($proj['PREVIEW_PICTURE'] ?? 0);
+<!-- initiative -->
 
-        $desktopImage = '';
-        foreach ([$homeImageId, $previewId] as $candidateId) {
-            if ($candidateId <= 0) {
-                continue;
-            }
-            $candidatePath = CFile::GetPath($candidateId);
-            if ($candidatePath) {
-                $desktopImage = $candidatePath;
-                break;
-            }
-        }
+<!-- Рендерер: Проекты общества -->
+<?php po_render_projects_section(); ?>
 
-        $mobileImage = '';
-        foreach ([$homeImageMobId, $homeImageId, $previewId] as $candidateId) {
-            if ($candidateId <= 0) {
-                continue;
-            }
-            $candidatePath = CFile::GetPath($candidateId);
-            if ($candidatePath) {
-                $mobileImage = $candidatePath;
-                break;
-            }
-        }
+<!-- /.initiative -->
 
-        if ($desktopImage === '') {
-            $desktopImage = SITE_TEMPLATE_PATH . '/assets/img/' . $_localDesktopFallback[$projectIndex % count($_localDesktopFallback)];
-        }
-        if ($mobileImage === '') {
-            $mobileImage = SITE_TEMPLATE_PATH . '/assets/img/' . $_localMobileFallback[$projectIndex % count($_localMobileFallback)];
-        }
-
-        $detailUrl = trim((string)($proj['PROPERTY_DETAIL_URL_VALUE'] ?? ''));
-        if ($detailUrl === '') {
-            $detailUrl = trim((string)($proj['DETAIL_PAGE_URL'] ?? ''));
-        }
-        if ($detailUrl === '') {
-            $detailUrl = '/projects/detail/?id=' . (int)$proj['ID'];
-        }
-
-        $_projects[] = [
-            'name' => (string)$proj['NAME'],
-            'url'  => $detailUrl,
-            'img'  => $desktopImage,
-            'mob'  => $mobileImage,
-        ];
-        $projectIndex++;
-    }
-}
-
-if (empty($_projects)) {
-    foreach ($_fallbackProjects as $fallbackProject) {
-        $_projects[] = [
-            'name' => $fallbackProject['name'],
-            'url'  => $fallbackProject['url'],
-            'img'  => SITE_TEMPLATE_PATH . '/assets/img/' . $fallbackProject['img'],
-            'mob'  => SITE_TEMPLATE_PATH . '/assets/img/' . $fallbackProject['mob'],
-        ];
-    }
-}
-
-// Рендерим карточки — структура точно как в верстке (h3 + img без обёрток)
-foreach ($_projects as $project):
-    $cardUrl = htmlspecialchars($project['url']);
-?>
-		<div class="initiative__card" style="cursor:pointer;position:relative;" onclick="window.location='&lt;span id=" bxid565939147"="" title="Код PHP: &lt;?= $cardUrl ?&gt;">
-			<?= $cardUrl ?><span class="bxhtmled-surrogate-inner"><span class="bxhtmled-right-side-item-icon"></span><span class="bxhtmled-comp-lable" unselectable="on" spellcheck="false">Код PHP</span></span>'"&gt;
-			<h3>
-			<?= htmlspecialchars($project['name']) ?> </h3>
- <img alt="<?= htmlspecialchars($project['name']) ?>" src="<?= htmlspecialchars($project['img']) ?>
-			" class="initiative__image desk-block"> <img alt="<?= htmlspecialchars($project['name']) ?>" src="<?= htmlspecialchars($project['mob']) ?>
-			" class="initiative__image desk-none">
-		</div>
-		 <?php endforeach; ?>
-	</div>
-</div>
- <!-- /.container --> </section>
-<!-- /.initiative --> <!-- history --> <section class="history">
+<!-- history -->
 <div class="container">
 	<h2 class="main-title history__title">
 	С 19 века создаем сеть поддержки и обеспечиваем стабильность и рост общества </h2>
@@ -543,53 +404,14 @@ foreach ($_projects as $project):
 	</div>
 </div>
  </section>
-<!-- /partner form on main --> <!-- news --> <section class="news">
-<div class="container">
-	<h2 class="main-title news__title">
-	Новости и события </h2>
-	<div class="news__wrapper">
-		 <?php
-if (\Bitrix\Main\Loader::includeModule('iblock')):
-    $newsIblockIds = [];
-    if (defined('IBLOCK_NEWS_ID')   && IBLOCK_NEWS_ID   > 0) $newsIblockIds[] = IBLOCK_NEWS_ID;
-    if (defined('IBLOCK_EVENTS_ID') && IBLOCK_EVENTS_ID > 0) $newsIblockIds[] = IBLOCK_EVENTS_ID;
-    if (!empty($newsIblockIds)):
-        $dbNews = CIBlockElement::GetList(
-            ['DATE_ACTIVE_FROM' => 'DESC', 'ID' => 'DESC'],
-            ['IBLOCK_ID' => $newsIblockIds, 'ACTIVE' => 'Y'],
-            false,
-            ['nTopCount' => 6],
-            ['ID', 'NAME', 'DATE_ACTIVE_FROM', 'PREVIEW_PICTURE', 'IBLOCK_ID']
-        );
-        while ($newsItem = $dbNews->GetNext()):
-            $newsImg = $newsItem['PREVIEW_PICTURE']
-                ? CFile::GetPath($newsItem['PREVIEW_PICTURE'])
-                : SITE_TEMPLATE_PATH . '/assets/img/news-img.png';
-            $newsDate = $newsItem['DATE_ACTIVE_FROM']
-                ? date('d.m.Y', strtotime($newsItem['DATE_ACTIVE_FROM']))
-                : '';
-?> <a href="/news/detail/?id=<?= (int)$newsItem['ID'] ?>" class="news__card"> <img alt="<?= htmlspecialchars($newsItem['NAME']) ?>" src="<?= htmlspecialchars($newsImg) ?>
-		">
-		<div class="news__content">
-			<h3 class="news__card-title">
-			<?= htmlspecialchars($newsItem['NAME']) ?> </h3>
-			<div class="news__row">
-				<p class="news__date">
-					 <?= $newsDate ?>
-				</p>
-			</div>
-		</div>
- </a>
-		<?php
-        endwhile;
-    endif;
-endif;
-?>
-	</div>
- <a href="/news/" class="btn news__btn btn-transparent">Все новости</a>
-</div>
- <!-- /.container --> </section>
-<!-- /.news --> </main>
+<!-- /partner form on main -->
+
+<!-- Рендерер: Новости и события -->
+<?php po_render_news_section(); ?>
+
+<!-- /.news -->
+
+</main>
 <script>
 function showPartnerFormMain() {
 	var block = document.getElementById('join-ur-block-main');
