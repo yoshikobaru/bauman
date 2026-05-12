@@ -126,8 +126,11 @@ $APPLICATION->SetPageProperty('description', 'Политехническое о�
  <!-- /.container --> </section>
 <!-- /.opportunities -->
 
-<!-- Рендерер: Члены Совета -->
-<?php po_render_board_section(); ?>
+<!-- Рендерер: Члены Совета (с fancybox для модальных окон) -->
+<?php po_render_board_section('Члены Совета Политехнического общества', 12, true); ?>
+
+<!-- Рендерер: Модальные окна членов Совета (для fancybox) -->
+<?php po_render_board_modals(); ?>
 
 <!-- /.boards -->
 

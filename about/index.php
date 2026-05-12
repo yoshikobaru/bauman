@@ -53,6 +53,11 @@ $APPLICATION->SetPageProperty('description', 'О Политехническом 
 
 <!-- /.boards -->
 
+<!-- Рендерер: Члены Политехнического общества -->
+<?php po_render_members_section('Члены Политехнического общества', 12, true); ?>
+
+<!-- /.members-section -->
+
 <!-- history -->
 <div class="container">
 	<h2 class="main-title history__title">
@@ -323,6 +328,9 @@ $APPLICATION->SetPageProperty('description', 'О Политехническом 
 
 <!-- Рендерер: Модальные окна членов Совета (для fancybox) -->
 <?php po_render_board_modals(); ?>
+
+<!-- Рендерер: Модальные окна членов Политехнического общества (для fancybox) -->
+<?php po_render_members_modals(); ?>
 
 </main>
 

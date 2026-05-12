@@ -44,6 +44,8 @@ if (is_dir($renderersDir)) {
         'projects_section.php', // Проекты общества
         'news_section.php',    // Новости и события
         'board_modals.php',    // Модальные окна членов Совета
+        'members_section.php', // Члены Политехнического общества
+        'members_modals.php',  // Модальные окна членов общества
     ];
     foreach ($renderers as $renderer) {
         $rendererPath = $renderersDir . $renderer;

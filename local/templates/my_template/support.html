@@ -252,7 +252,7 @@
 										<div class="account__personal-list account__grid--tripl">
 											<input type="text" placeholder="Фамилия">
 											<input type="text" placeholder="Имя">
-											<input type="text" placeholder="Дата Рождения">
+											<input type="text" class="field-required" placeholder="Дата Рождения">
 											<input type="email" placeholder="Електропочта">
 											<input type="tel" placeholder="Номер телефона">
 										</div>
@@ -278,7 +278,7 @@
 										</div>
 										<div class="join__politic-question">
 											<p class="join__politic-link">
-												Согласен с <a href="#">политикой обработки ПДн</a>
+												Согласен с <a href="#">политикой обработки ПДн</a> <span class="required-mark">*</span>
 											</p>
 											<div class="account__graduate-choice">
 												<label class="account__graduate-item">
@@ -429,6 +429,7 @@
 			</p> 
 		</div>
 		<form action="" class="form-membership__form">
+			<input type="hidden" id="support-project-name" name="project_name" value="">
 			<input type="text" placeholder="Фамилия" required>
 			<input type="text" placeholder="Имя" required>
 			<input type="text" placeholder="Отчество" required>
@@ -449,6 +450,19 @@
 	</div>
 
 
+	<script>
+	// Подстановка названия проекта из URL-параметра
+	(function(){
+		var projectInput = document.getElementById('support-project-name');
+		if (projectInput) {
+			var params = new URLSearchParams(window.location.search);
+			var projectName = params.get('project');
+			if (projectName) {
+				projectInput.value = decodeURIComponent(projectName);
+			}
+		}
+	})();
+	</script>
 	<script src="js/swiper-bundle.min.js"></script>
 	<script src="js/fancybox.umd.js"></script>
 	<script src="js/script.js"></script>

@@ -14,6 +14,109 @@
 }
 
 body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    margin: 0;
+    color: var(--color-text-main);
+    font-family: var(--text-georgia);
+}
+
+.site-wrapper {
+    flex: 1 1 auto;
+}
+
+[id] {
+    scroll-margin-top: 100px;
+}
+
+.banner-main {
+    min-height: 28vw;
+}
+
+.new-project__buttons {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    align-items: center;
+    margin-bottom: var(--section-margin);
+}
+
+.new-project__buttons .btn {
+    min-width: 180px;
+}
+
+.support-sum__desc,
+.support-sum__subtitle,
+.project-programm__donate {
+    text-align: justify;
+}
+
+.project-programm__item-price div.active,
+.project-programm__item-price input {
+    font-size: var(--text-32);
+    font-weight: 600;
+    font-family: var(--font-space);
+}
+
+.project-programm__item-price input {
+    border: none;
+    border-bottom: 2px solid var(--red-color);
+    background: transparent;
+    color: var(--red-color);
+    text-align: center;
+    outline: none;
+    width: 200px;
+}
+
+.form-reference-visits,
+.form-finance-help {
+    margin: 0 auto;
+}
+
+.fancybox__content > .fancybox-container .form-reference-visits,
+.fancybox__content > .fancybox-container .form-finance-help,
+.fancybox__content > .fancybox-container .form-competencies {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.form-boards__content {
+    align-self: flex-start;
+}
+
+.partner__wrapper {
+    margin-top: 0;
+}
+
+.field-required::after {
+    content: ' *';
+    color: var(--red-color);
+    font-weight: 700;
+}
+
+.join__politic-link .required-mark {
+    color: var(--red-color);
+    font-weight: 700;
+}
+
+.visits__card--completed .visits__register-btn {
+    display: none;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.site-wrapper {
+    flex: 1 1 auto;
+}
+
+body {
     margin: 0;
     color: var(--color-text-main);
     font-family: var(--text-georgia);
@@ -309,7 +412,6 @@ strong {
 /* banner-main */
 
 .banner-main {
-    margin-top: 130px;
     margin-bottom: var(--section-margin);
 }
 
@@ -852,8 +954,8 @@ strong {
 @media(max-width: 768px) {
     .boards__list {
         grid-template-columns: repeat(3, 1fr);
-        gap: 12px;              /* фикс: было 1.8vw — нестабильно на мобиле */
-        align-items: start;              /* ← ГЛАВНОЕ ИСПРАВЛЕНИЕ: карточки выравниваются по верхнему краю, не растягиваются */
+        gap: 12px;              /* С„РёРєСЃ: Р±С‹Р»Рѕ 1.8vw вЂ” РЅРµСЃС‚Р°Р±РёР»СЊРЅРѕ РЅР° РјРѕР±РёР»Рµ */
+        align-items: start;              /* в†ђ Р“Р›РђР’РќРћР• РРЎРџР РђР’Р›Р•РќРР•: РєР°СЂС‚РѕС‡РєРё РІС‹СЂР°РІРЅРёРІР°СЋС‚СЃСЏ РїРѕ РІРµСЂС…РЅРµРјСѓ РєСЂР°СЋ, РЅРµ СЂР°СЃС‚СЏРіРёРІР°СЋС‚СЃСЏ */
     }
 
     .boards__item {
@@ -863,9 +965,9 @@ strong {
 
     .boards__item-image {
         width: 100%;
-        height: 160px;          /* фикс: фиксированная высота изображения */
-        object-fit: cover;      /* обрезаем, а не растягиваем */
-        object-position: top;   /* показываем верхнюю часть (лицо) */
+        height: 160px;          /* С„РёРєСЃ: С„РёРєСЃРёСЂРѕРІР°РЅРЅР°СЏ РІС‹СЃРѕС‚Р° РёР·РѕР±СЂР°Р¶РµРЅРёСЏ */
+        object-fit: cover;      /* РѕР±СЂРµР·Р°РµРј, Р° РЅРµ СЂР°СЃС‚СЏРіРёРІР°РµРј */
+        object-position: top;   /* РїРѕРєР°Р·С‹РІР°РµРј РІРµСЂС…РЅСЋСЋ С‡Р°СЃС‚СЊ (Р»РёС†Рѕ) */
         margin-bottom: 8px;
     }
 
@@ -888,6 +990,168 @@ strong {
 
 @media(max-width: 576px) {
 
+}
+
+/* members-section */
+.members-section {
+    margin-bottom: var(--section-margin);
+}
+
+.members-section .main-title {
+    margin-bottom: 28px;
+}
+
+.members-section__list {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+}
+
+.members-section__item {
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+}
+
+.members-section__item:hover {
+    opacity: 0.8;
+}
+
+.members-section__item-image {
+    margin-bottom: 12px;
+    width: 100%;
+    height: 280px;
+    object-fit: cover;
+    object-position: top;
+}
+
+.members-section__item-placeholder {
+    width: 100%;
+    height: 280px;
+    background: #f5f5f5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 12px;
+}
+
+.members-section__item-placeholder svg {
+    width: 80px;
+    height: 80px;
+    fill: #ddd;
+}
+
+.members-section__item-title {
+    font-size: var(--text-32);
+    font-weight: 600;
+    margin-bottom: 8px;
+    line-height: 1.2;
+}
+
+.members-section__item-company {
+    font-size: 14px;
+    color: #555;
+    margin-bottom: 4px;
+    font-weight: 500;
+}
+
+.members-section__item-text {
+    font-size: 1vw;
+    color: #777;
+}
+
+/* Модальные окна для членов общества */
+.form-boards__company {
+    font-size: 16px;
+    color: #333;
+    font-weight: 500;
+    margin-bottom: 4px;
+}
+
+.form-boards__position {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 12px;
+}
+
+.form-boards__detail {
+    font-size: 15px;
+    line-height: 1.6;
+    color: #444;
+    margin-bottom: 16px;
+}
+
+.form-boards__email {
+    font-size: 14px;
+    margin-bottom: 0;
+}
+
+.form-boards__email a {
+    color: #0066cc;
+    text-decoration: none;
+}
+
+.form-boards__email a:hover {
+    text-decoration: underline;
+}
+
+.form-boards__placeholder {
+    width: 300px;
+    height: 400px;
+    background: #f5f5f5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.form-boards__placeholder svg {
+    width: 100px;
+    height: 100px;
+    fill: #ddd;
+}
+
+@media(max-width: 992px) {
+    .members-section__list {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media(max-width: 768px) {
+    .members-section__list {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+    }
+
+    .members-section__item {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .members-section__item-image {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+        object-position: top;
+        margin-bottom: 8px;
+    }
+
+    .members-section__item-title {
+        font-size: 16px;
+    }
+
+    .members-section__item-text {
+        font-size: 12px;
+    }
+
+    .form-boards__placeholder {
+        width: 200px;
+        height: 250px;
+    }
+
+    .form-boards__placeholder svg {
+        width: 60px;
+        height: 60px;
+    }
 }
 
 /* initiative */
@@ -1023,9 +1287,9 @@ strong {
 
 @media(min-width: 1800px) {
     .history__scroll {
-    overflow: auto; /* или scroll */
+    overflow: auto; /* РёР»Рё scroll */
     scrollbar-width: none; /* Firefox */
-    -ms-overflow-style: none; /* IE и Edge */
+    -ms-overflow-style: none; /* IE Рё Edge */
     }
 
     .history__scroll::-webkit-scrollbar {
@@ -2612,9 +2876,6 @@ strong {
 
 /* director */
 
-.director {
-
-}
 
 .director__wrapper {
     display: flex;
@@ -3246,9 +3507,6 @@ strong {
     padding-bottom: var(--section-margin);
 }
 
-.documents__title {
-
-}
 
 .documents__table {
     display: flex;
@@ -3506,7 +3764,7 @@ strong {
     margin-bottom: 24px;
 }
 
-/* Контейнер чекбокса */
+/* РљРѕРЅС‚РµР№РЅРµСЂ С‡РµРєР±РѕРєСЃР° */
   .checkbox-container {
     display: flex;
     align-items: center;
@@ -3518,7 +3776,7 @@ strong {
     color: #000;
   }
 
-  /* Скрываем стандартный чекбокс */
+  /* РЎРєСЂС‹РІР°РµРј СЃС‚Р°РЅРґР°СЂС‚РЅС‹Р№ С‡РµРєР±РѕРєСЃ */
   .checkbox-container input {
     position: absolute;
     opacity: 0;
@@ -3527,7 +3785,7 @@ strong {
     width: 0;
   }
 
-  /* Квадратик */
+  /* РљРІР°РґСЂР°С‚РёРє */
   .checkmark {
     position: absolute;
     left: 0;
@@ -3539,13 +3797,13 @@ strong {
     transition: background 0.3s, border-color 0.3s;
   }
 
-  /* Когда чекбокс выбран */
+  /* РљРѕРіРґР° С‡РµРєР±РѕРєСЃ РІС‹Р±СЂР°РЅ */
   .checkbox-container input:checked ~ .checkmark {
     background-color: var(--red-color);
     border-color: var(--red-color);
   }
 
-  /* Галочка */
+  /* Р“Р°Р»РѕС‡РєР° */
   .checkmark::after {
     content: "";
     position: absolute;
@@ -3909,7 +4167,7 @@ select,
     position: relative;
 }
 
-/* активное состояние */
+/* Р°РєС‚РёРІРЅРѕРµ СЃРѕСЃС‚РѕСЏРЅРёРµ */
 .account__graduate-input:checked + .account__graduate-box::after {
     content: "";
     position: absolute;
@@ -4397,11 +4655,11 @@ select,
 }
 
 .authorization__row--create input:nth-child(-n+3) {
-    grid-column: span 2; /* 3 элемента */
+    grid-column: span 2; /* 3 СЌР»РµРјРµРЅС‚Р° */
 }
 
 .authorization__row--create input:nth-child(n+4) {
-    grid-column: span 3; /* 2 элемента */
+    grid-column: span 3; /* 2 СЌР»РµРјРµРЅС‚Р° */
 }
 
 
@@ -4470,24 +4728,24 @@ select,
     margin-bottom: 24px;
 }
 
-/* 1 ряд — 3 поля */
+/* 1 СЂСЏРґ вЂ” 3 РїРѕР»СЏ */
 .join__grid input:nth-child(-n+3) {
     grid-column: span 2;
 }
 
-/* 2 ряд — 2 поля */
+/* 2 СЂСЏРґ вЂ” 2 РїРѕР»СЏ */
 .join__grid input:nth-child(4),
 .join__grid input:nth-child(5) {
     grid-column: span 3;
 }
 
-/* 3 ряд — textarea на всю ширину */
+/* 3 СЂСЏРґ вЂ” textarea РЅР° РІСЃСЋ С€РёСЂРёРЅСѓ */
 .join__grid textarea {
     grid-column: 1 / -1;
     min-height: 200px;
 }
 
-/* 4 ряд — 2 поля */
+/* 4 СЂСЏРґ вЂ” 2 РїРѕР»СЏ */
 .join__grid input:nth-child(7),
 .join__grid input:nth-child(8) {
     grid-column: span 3;
@@ -4909,9 +5167,6 @@ select,
     background-color: #f5f5f5;
 }
 
-.competencies__tabs {
-
-}
 
 .competencies__navs {
     display: flex;
@@ -5053,3 +5308,4 @@ select,
         left: 0;
     }
 }
+
