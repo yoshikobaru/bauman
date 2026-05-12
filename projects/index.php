@@ -45,8 +45,7 @@ if ($iblockOk && defined('IBLOCK_PROJECTS_ID') && IBLOCK_PROJECTS_ID > 0) {
 }
 
 $statusLabels = ['all' => 'Все', 'active' => 'Активные', 'completed' => 'Завершённые'];
-?>
-<main>
+?><main>
     <!-- banner-other -->
     <section class="banner-other banner-other-project">
         <div class="container">
@@ -54,12 +53,12 @@ $statusLabels = ['all' => 'Все', 'active' => 'Активные', 'completed' 
                 <div class="banner-other__content">
                     <div class="banner-other__info">
                         <h1 class="banner-other__title main-title">
-                            Инициативные резиденты сообщества запустили знаковые проекты Политеха
+                            Инициативные члены общества запустили знаковые проекты Политеха
                         </h1>
                     </div>
                     <img src="<?=SITE_TEMPLATE_PATH?>/assets/img/reference-page/banner-other-pattern.png" alt="" class="banner-other__pattern">
                 </div>
-                <img src="<?=SITE_TEMPLATE_PATH?>/assets/img/reference-page/banner-other-img.png" alt="" class="banner-other__image">
+                <img src="<?=SITE_TEMPLATE_PATH?>/assets/img/projects-page/project_page_hero.jpg" alt="" class="banner-other__image">
             </div>
         </div>
     </section>
@@ -67,7 +66,7 @@ $statusLabels = ['all' => 'Все', 'active' => 'Активные', 'completed' 
     <!-- visits / проекты из CMS -->
     <section class="visits">
         <div class="container">
-            <h2 class="main-title visits__title">Проекты сообщества</h2>
+            <h2 class="main-title visits__title">Проекты общества</h2>
 
             <!-- Фильтр по статусу -->
             <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:32px;">

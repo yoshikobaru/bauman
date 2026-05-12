@@ -46,7 +46,7 @@ if ($iblockOk && ($elementId > 0 || ($elementCode !== '' && defined('IBLOCK_PROJ
         }
     }
 } else {
-    $APPLICATION->SetTitle('Проект');
+    $APPLICATION->SetTitle("Проект");
 }
 
 $detailPicSrc = SITE_TEMPLATE_PATH . '/assets/img/reference-page/banner-other-img.png';
@@ -119,8 +119,8 @@ if (!empty($arElement['DETAIL_PICTURE'])) {
         <div class="container">
             <h2 class="main-title project-help__title">Проекту необходима финансовая поддержка</h2>
             <p class="project-help__text main-text">
-                Мы рады любой помощи вне зависимости от её размера. Для компаний желающими стать спонсорами данного мероприятия - готовы направить спонсорский пакет.
-            </p>
+                Мы рады любой помощи вне зависимости от её размера. ля компаний желающих стать спонсорами либо участниками данного проекта - просим связаться с нами.
+</p>
             <button class="btn project-help__btn" data-fancybox data-src="#form-finance-help">Связаться с организаторами</button>
         </div>
     </section>

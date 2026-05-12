@@ -120,9 +120,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['d5_action'])) {
         exit;
     }
 }
-?>
-
-<main>
+?><main>
         <!-- banner-other -->
 		<section class="banner-other">
             <div class="container">
@@ -158,7 +156,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['d5_action'])) {
                         </div>
                         <img src="<?=SITE_TEMPLATE_PATH?>/assets/img/reference-page/banner-other-pattern.png" alt="" class="banner-other__pattern">
                     </div>
-                    <img src="<?=SITE_TEMPLATE_PATH?>/assets/img/reference-page/banner-other-img.png" alt="" class="banner-other__image">
+                    <img src="<?=SITE_TEMPLATE_PATH?>/assets/img/reference_visits_hero.jpg" alt="" class="banner-other__image">
                 </div>
             </div>
             <!-- /.container -->

@@ -87,7 +87,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['d6_action'])) {
     exit;
 }
 ?>
-
 <main>
         <!-- banner-other -->
 		<section class="banner-other">
@@ -96,7 +95,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['d6_action'])) {
                     <div class="banner-other__content">
                         <div class="banner-other__info">
                             <h1 class="banner-other__title main-title">
-                               Витрина компетенций МВТУ (МГТУ) им. Н.Э. Баумана
+                               Витрина компетенций
                             </h1>
                             <a href="#" class="banner-other__btn btn" data-fancybox data-src="#form-finance-help">Стать партнёром</a>
                         </div>

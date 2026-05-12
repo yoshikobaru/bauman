@@ -852,7 +852,23 @@ strong {
 @media(max-width: 768px) {
     .boards__list {
         grid-template-columns: repeat(3, 1fr);
+        gap: 12px;              /* фикс: было 1.8vw — нестабильно на мобиле */
+        align-items: start;              /* ← ГЛАВНОЕ ИСПРАВЛЕНИЕ: карточки выравниваются по верхнему краю, не растягиваются */
     }
+
+    .boards__item {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .boards__item-image {
+        width: 100%;
+        height: 160px;          /* фикс: фиксированная высота изображения */
+        object-fit: cover;      /* обрезаем, а не растягиваем */
+        object-position: top;   /* показываем верхнюю часть (лицо) */
+        margin-bottom: 8px;
+    }
+
     .boards__item-title {
         font-size: 16px;
     }
@@ -868,6 +884,7 @@ strong {
         font-size: 12px;
     }
 }
+
 
 @media(max-width: 576px) {
 

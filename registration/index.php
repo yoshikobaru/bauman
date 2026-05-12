@@ -311,7 +311,6 @@ if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $fizDiplomaDateInputValue)) {
     $fizDiplomaDateInputValue = $d2 . '.' . $m2 . '.' . $y2;
 }
 ?>
-
 <main>
 <section class="join join--registration">
 <div class="container">
@@ -595,18 +594,17 @@ if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $fizDiplomaDateInputValue)) {
                     <div class="account__chapter"><h3 class="account__subtitle">Выбор тарифа</h3></div>
                 </div>
                 <div class="membership-slider swiper" style="margin-top:16px">
-                    <div class="swiper-wrapper" style="align-items:stretch">
+                    <div class="swiper-wrapper">
                         <!-- Базовое -->
                         <div class="swiper-slide membership-slider__card">
                             <h3 class="membership-slider__title">Базовое</h3>
                             <p class="membership-slider__name">1 000 Р</p>
                             <p class="membership-slider__time">ежегодно</p>
                             <ul class="membership-slider__list">
-                                <li class="membership-slider__item">Возможность размещения резюме на карьерной платформе Политехнического общества;</li>
-                                <li class="membership-slider__item">Доступ в закрытый карьерный канал с вакансиями от профильных компаний;</li>
-                                <li class="membership-slider__item">Участие в активностях, выставках и мероприятиях Политехнического общества;</li>
-                                <li class="membership-slider__item">Доступ в электронную библиотеку МГТУ (в разработке);</li>
-                                <li class="membership-slider__item">Доступ к витрине компетенций партнёров Политехнического общества, кафедр, студенческих конструкторских бюро и научно-образовательных центров МГТУ.</li>
+								<li class="membership-slider__item">Участие в активностях, выставках и мероприятиях Политехнического общества;</li>
+								<li class="membership-slider__item">Доступ в закрытый карьерный канал с вакансиями от профильных компаний;</li>
+								<li class="membership-slider__item">Возможность получить пластиковый пропуск члена Политехнического общества для посещения МГТУ им. Н.Э. Баумана;</li>
+								<li class="membership-slider__item">Доступ в электронную библиотеку МГТУ (в разработке).</li>
                             </ul>
                                 <button type="button" class="membership-slider__join btn btn-empty select-plan btn--active" data-plan="basic">Выбрать</button>
                         </div>
@@ -617,11 +615,11 @@ if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $fizDiplomaDateInputValue)) {
                             <p class="membership-slider__time">ежегодно</p>
                             <button class="membership-slider__advantages">+ Возможности Базового</button>
                             <ul class="membership-slider__list">
-                                <li class="membership-slider__item">Участие в закрытом чате членов общества уровня «Бизнес»;</li>
-                                <li class="membership-slider__item">Размещение информации и новостей о компании на площадках Политехнического общества;</li>
-                                <li class="membership-slider__item">Возможность предложить собственный проект для поиска спонсоров и поддержки Политехнического общества;</li>
-                                <li class="membership-slider__item">Участие в бизнес-мероприятиях Политехнического общества в онлайн и очном форматах;</li>
-                                <li class="membership-slider__item">Доступ к базе резюме выпускников на карьерной платформе Политехнического общества.</li>
+								<li class="membership-slider__item">Участие в бизнес-мероприятиях Политехнического общества в онлайн и очном форматах;</li>
+								<li class="membership-slider__item">Возможность предложить собственный проект для поиска спонсоров и поддержки Политехнического общества;</li>
+								<li class="membership-slider__item">Возможность участвовать в референс-визитах, организуемых Политехническим обществом;</li>
+								<li class="membership-slider__item">Доступ к базе резюме выпускников на карьерной платформе Политехнического общества;</li>
+								<li class="membership-slider__item">Участие в закрытом чате членов общества уровня «Бизнес».</li>
                             </ul>
                             <button type="button" class="membership-slider__join btn btn-empty select-plan" data-plan="premium">Выбрать</button>
                         </div>
@@ -682,10 +680,9 @@ if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $fizDiplomaDateInputValue)) {
                     </div>
                     <div class="partner__discription">
                         <ul class="partner__list">
-                            <li class="partner__item">Все преимущества базового и бизнес членства</li>
-                            <li class="partner__item">Возможность состоять в индустриальном клубе Политехнического общества</li>
-                            <li class="partner__item">Доступ к витрине компетенций, возможность разместить заказ/взять задачу</li>
-                            <li class="partner__item">Рекламные возможности площадок и мероприятий Политехнического общества</li>
+							<li class="partner__item">Все преимущества базового и бизнес членства;</li>
+							<li class="partner__item">Возможность разместить свою компанию на витрине компетенций Политехнического общества (в разработке);</li>
+							<li class="partner__item">Рекламные возможности площадок и мероприятий Политехнического общества.</li>
                         </ul>
                         <p class="partner__discription-text">Стоимость обсуждается индивидуально.</p>
                     </div>

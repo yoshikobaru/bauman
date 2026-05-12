@@ -201,9 +201,7 @@ $prefill = [
     'last_name'  => $USER->IsAuthorized() ? $USER->GetParam('LAST_NAME') : '',
     'email'      => $USER->IsAuthorized() ? $USER->GetParam('EMAIL')     : '',
 ];
-?>
-
-<main>
+?><main>
     <!-- D2: Форма поддержки проекта -->
     <section class="project-programm" style="padding-top:140px;">
         <div class="container">
@@ -364,7 +362,7 @@ $prefill = [
                                     </div>
                                     <div class="join__politic">
                                         <div class="join__politic-question">
-                                            <p class="join__politic-link">Ознакомлен с <a href="<?= defined('DOC_POLITIKA_URL') ? DOC_POLITIKA_URL : '#' ?>" target="_blank">политикой обработки ПДн</a></p>
+                                            <p class="join__politic-link">Ознакомлен с <a href="<?= defined('DOC_POLITIKA_URL') ? DOC_POLITIKA_URL : '#' ?>" target="_blank">политикой обработки ПДн *</a></p>
                                             <div class="account__graduate-choice">
                                                 <label class="account__graduate-item">
                                                     <input type="radio" name="agree_pd" value="yes" class="account__graduate-input">
@@ -396,7 +394,7 @@ $prefill = [
                                     </div>
                                     <div class="join__politic">
                                         <div class="join__politic-question">
-                                            <p class="join__politic-link">Ознакомлен с <a href="<?= defined('DOC_POLITIKA_URL') ? DOC_POLITIKA_URL : '#' ?>" target="_blank">политикой обработки ПДн</a></p>
+                                            <p class="join__politic-link">Ознакомлен с <a href="<?= defined('DOC_POLITIKA_URL') ? DOC_POLITIKA_URL : '#' ?>" target="_blank">политикой обработки ПДн *</a></p>
                                             <div class="account__graduate-choice">
                                                 <label class="account__graduate-item">
                                                     <input type="radio" name="agree_pd" value="yes" class="account__graduate-input">
@@ -439,6 +437,10 @@ $prefill = [
                                     <button type="button" class="btn project-programm__btn project-programm__btn--back" id="d2_back_pay">Назад</button>
                                     <button type="submit" class="btn project-programm__btn"<?= $paykeeperReady ? '' : ' disabled' ?>>Перейти к оплате</button>
                                 </div>
+				<br>
+				<p><span style="font-size:11px;color:#999;display:block;margin-top:4px">После нажатия кнопки «Перейти к оплате» Вы будете перенаправлены на защищенную платежную страницу "Газпромбанк" (Акционерное общество), где будет необходимо ввести данные Вашей пластиковой карты. В случае успешной авторизации Вы получите от сайта уведомление о том, что оплата проведена и/или описание порядка получения товара/услуги.</span></p>
+				<br>
+				<p><span style="font-size:11px;color:#999;display:block;margin-top:4px">Безопасность платежей обеспечивается с помощью Банка-эквайера (Газпромбанк (Акционерное Общество)), функционирующего на основе современных протоколов и технологий, разработанных платежными системами МИР, Visa International и Mastercard Worldwide (3D-Secure: Verified by VISA, Mastercard SecureCode, MirAccept). Обработка полученных конфиденциальных данных Держателя карты производится в процессинговом центре Банка, сертифицированного по стандарту PCI DSS. Безопасность передаваемой информации обеспечивается с помощью современных протоколов обеспечения безопасности в сети Интернет.</span></p>
                             </div>
                         </div>
                     </form>

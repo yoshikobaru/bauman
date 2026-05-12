@@ -159,157 +159,181 @@ if ($isAuthorized) {
     $dbU = CUser::GetByID($USER->GetID());
     $arCurUser = $dbU->Fetch() ?: [];
 }
-?>
-
-<main>
-    <!-- ── culture section ── -->
-    <section class="culture culture--subtitles">
-        <div class="container">
-            <h2 class="main-title culture__title">
-                Новые резиденты принимают эстафету лидерства и продолжают традиции успеха
-            </h2>
-            <div class="culture__wrapper">
-                <div class="culture__box">
-                    <div class="culture__card">
-                        <h3>Крупные предприятия и организации</h3>
-                        <p>Внесшие значительный вклад в развитие Общества.</p>
-                    </div>
-                    <div class="culture__card">
-                        <h3>Люди, оказавшие важные услуги</h3>
-                        <p>Развитию технического образования в России.</p>
-                    </div>
-                    <div class="culture__card">
-                        <h3>Учёные, прославившиеся трудами</h3>
-                        <p>В технической литературе.</p>
-                    </div>
-                    <div class="culture__card">
-                        <h3>Активные участники добровольческих проектов</h3>
-                        <p>Общества социальной направленности</p>
-                    </div>
-                </div>
-                <div class="culture__card culture__card--big culture__card--man">
-                    <img src="<?=SITE_TEMPLATE_PATH?>/assets/img/subscriptions-page/culture-bg-card.png" alt="" class="culture__card-image">
-                    <div class="culture__card-overlay">
-                        <h3>Выпускники МГТУ (МВТУ)</h3>
-                        <p>и его филиалов</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- ── membership slider section ── -->
-    <section class="membership">
-        <div class="container">
-            <h2 class="main-title membership__title">
-                Новые резиденты укрепляют связи внутри общества и способствуют его развитию
-            </h2>
-            <div class="membership-slider swiper">
-                <div class="swiper-wrapper">
-                    <!-- Базовое -->
-                    <div class="swiper-slide membership-slider__card">
-                        <h3 class="membership-slider__title">Базовое</h3>
-                        <p class="membership-slider__name">1 000 Р</p>
-                        <p class="membership-slider__time">ежегодно</p>
-                        <ul class="membership-slider__list">
-                            <li class="membership-slider__item">Возможность размещения резюме на карьерной платформе Политехнического общества;</li>
-                            <li class="membership-slider__item">Доступ в закрытый карьерный канал с вакансиями от профильных компаний;</li>
-                            <li class="membership-slider__item">Участие в активностях, выставках и мероприятиях Политехнического общества;</li>
-                            <li class="membership-slider__item">Доступ в электронную библиотеку МГТУ (в разработке);</li>
-                            <li class="membership-slider__item">Доступ к витрине компетенций партнёров Политехнического общества, кафедр, студенческих конструкторских бюро и научно-образовательных центров МГТУ.</li>
-                        </ul>
-                        <button class="membership-slider__join btn btn-empty" onclick="window.location='/registration/'">Вступить</button>
-                    </div>
-                    <!-- Профессиональное -->
-                    <div class="swiper-slide membership-slider__card membership-slider__card--proffesional">
-                        <h3 class="membership-slider__title">Профессиональное</h3>
-                        <p class="membership-slider__name">50 000 Р</p>
-                        <p class="membership-slider__time">ежегодно</p>
-                        <button class="membership-slider__advantages">+ Возможности Базового</button>
-                        <ul class="membership-slider__list">
-                            <li class="membership-slider__item">Участие в закрытом чате членов общества уровня «Бизнес»;</li>
-                            <li class="membership-slider__item">Размещение информации и новостей о компании на площадках Политехнического общества;</li>
-                            <li class="membership-slider__item">Возможность предложить собственный проект для поиска спонсоров и поддержки Политехнического общества;</li>
-                            <li class="membership-slider__item">Участие в бизнес-мероприятиях Политехнического общества в онлайн и очном форматах;</li>
-                            <li class="membership-slider__item">Доступ к базе резюме выпускников на карьерной платформе Политехнического общества.</li>
-                        </ul>
-                        <button class="membership-slider__join btn btn-empty" onclick="window.location='/registration/'">Вступить</button>
-                    </div>
-                    <!-- Партнёрское -->
-                    <div class="swiper-slide membership-slider__card membership-slider__card--honorary">
-                        <h3 class="membership-slider__title">Партнёрское</h3>
-                        <p class="membership-slider__name membership-slider__name--small">Персональные условия</p>
-                        <p class="membership-slider__time">обсуждается индивидуально</p>
-                        <button class="membership-slider__advantages">+ Возможности профессионального</button>
-                        <ul class="membership-slider__list">
-                            <li class="membership-slider__item">Участие в закрытых мероприятиях Политехнического общества;</li>
-                            <li class="membership-slider__item">Право стать членом Совета Политехнического общества выпускников МВТУ (МГТУ) им. Н.Э. Баумана;</li>
-                            <li class="membership-slider__item">Участие в закрытом чате партнёров Политехнического общества.</li>
-                        </ul>
-                        <button type="button" class="membership-slider__join btn btn-empty" onclick="showPartnerForm()">Стать партнером</button>
-                    </div>
-                    <!-- Почётное -->
-                    <div class="swiper-slide membership-slider__card membership-slider__card--gratuitous">
-                        <h3 class="membership-slider__title">Почётное</h3>
-                        <p class="membership-slider__name">Бесценно</p>
-                        <p class="membership-slider__time">по результатам заполненной анкеты</p>
-                        <button class="membership-slider__advantages">+ Возможности Базового</button>
-                        <ul class="membership-slider__list">
-                            <li class="membership-slider__item">Для тех, кто внёс значительный вклад в развитие технической науки, образования, технологий и деятельности Политехнического общества.</li>
-                        </ul>
-                        <button type="button" class="membership-slider__join btn btn-empty" onclick="window.location='/registration/'">Вступить</button>
-                    </div>
-                </div>
-                <div class="swiper-pagination"></div>
-            </div>
-        </div>
-    </section>
-
-    <!-- ── partner section ── -->
-    <section class="partner">
-        <div class="container">
-            <div class="partner__wrapper">
-                <div class="partner__info">
-                    <h2 class="main-title partner__title">Индустриальное партнерство</h2>
-                    <p class="main-text partner__text">Для юридических лиц</p>
-                    <button class="btn partner__btn desk-block" onclick="showPartnerForm()">Стать партнером</button>
-                </div>
-                <div class="partner__discription">
-                    <ul class="partner__list">
-                        <li class="partner__item">Все преимущества базового и бизнес членства</li>
-                        <li class="partner__item">Возможность состоять в индустриальном клубе Политехнического общества</li>
-                        <li class="partner__item">Доступ к витрине компетенций, возможность разместить заказ/взять задачу</li>
-                        <li class="partner__item">Рекламные возможности площадок и мероприятий Политехнического общества</li>
-                    </ul>
-                    <p class="partner__discription-text">Стоимость обсуждается индивидуально.</p>
-                </div>
-                <button class="btn partner__btn desk-none" onclick="showPartnerForm()">Стать партнером</button>
-            </div>
-        </div>
-    </section>
-
-    <!-- ── D7: форма партнёрства ── -->
-    <section id="join-ur-block" style="display:none">
-        <div class="container" style="padding-top:48px;padding-bottom:48px">
-            <div class="join__wrapper">
-                <?php if ($d7Done): ?>
-                <div style="text-align:center;padding:40px 0">
-                    <div style="font-size:48px;margin-bottom:12px">🤝</div>
-                    <h2 class="account__title main-title">Заявка на партнёрство отправлена!</h2>
-                    <p style="margin-top:12px;color:#666;max-width:480px;margin-left:auto;margin-right:auto">
-                        Мы свяжемся с вами в течение 5 рабочих дней для обсуждения условий партнёрства.
-                    </p>
-                    <a href="/" class="btn" style="margin-top:20px">На главную</a>
-                </div>
-                <?php else: ?>
-                <h2 class="account__title main-title">Индустриальное партнёрство</h2>
-                <p style="margin-bottom:24px;color:#666">Для компаний, НИИ и организаций. После отправки заявки мы свяжемся с вами в течение 5 рабочих дней.</p>
-                <?php if ($d7Error): ?>
-                <div class="authorization__alert authorization__alert--error" style="margin-bottom:16px">
-                    <p><?= htmlspecialchars($d7Error) ?></p>
-                </div>
-                <?php endif; ?>
-                <?php
+?><main>
+<!-- ── culture section ── --> <section class="culture culture--subtitles">
+<div class="container">
+	<h2 class="main-title culture__title">
+	Новые члены общества принимают эстафету лидерства и продолжают традиции успеха </h2>
+	<div class="culture__wrapper">
+		<div class="culture__box">
+			<div class="culture__card">
+				<h3>Крупные предприятия и организации</h3>
+				<p>
+					Внесшие значительный вклад в развитие Общества.
+				</p>
+			</div>
+			<div class="culture__card">
+				<h3>Люди, оказавшие важные услуги</h3>
+				<p>
+					Развитию технического образования в России.
+				</p>
+			</div>
+			<div class="culture__card">
+				<h3>Учёные, прославившиеся трудами</h3>
+				<p>
+					В технической литературе.
+				</p>
+			</div>
+			<div class="culture__card">
+				<h3>Активные участники добровольческих проектов</h3>
+				<p>
+					Общества социальной направленности
+				</p>
+			</div>
+		</div>
+		<div class="culture__card culture__card--big culture__card--man">
+ <img src="/local/templates/my_template/assets/img/subscriptions-page/culture-bg-card.png" alt="" class="culture__card-image">
+			<div class="culture__card-overlay">
+				<h3>Выпускники МВТУ (МГТУ)</h3>
+				<p>
+					и его филиалов
+				</p>
+			</div>
+		</div>
+	</div>
+</div>
+ </section>
+<!-- ── membership slider section ── --> <section class="membership">
+<div class="container">
+	<h2 class="main-title membership__title">
+	Новые члены общества укрепляют связи внутри общества и способствуют его развитию </h2>
+	<div class="membership-slider swiper">
+		<div class="swiper-wrapper">
+			 <!-- Базовое -->
+			<div class="swiper-slide membership-slider__card">
+				<h3 class="membership-slider__title">Базовое</h3>
+				<p class="membership-slider__name">
+					1 000 Р
+				</p>
+				<p class="membership-slider__time">
+					ежегодно
+				</p>
+				<ul class="membership-slider__list">
+					<li class="membership-slider__item">Участие в активностях, выставках и мероприятиях Политехнического общества;</li>
+					<li class="membership-slider__item">Доступ в закрытый карьерный канал с вакансиями от профильных компаний;</li>
+					<li class="membership-slider__item">Возможность получить пластиковый пропуск члена Политехнического общества для посещения МВТУ (МГТУ) им. Н.Э. Баумана;</li>
+					<li class="membership-slider__item">Доступ в электронную библиотеку МВТУ (МГТУ) (в разработке).</li>
+				</ul>
+ <button class="membership-slider__join btn btn-empty" onclick="window.location='/registration/'">Вступить</button>
+			</div>
+			 <!-- Профессиональное -->
+			<div class="swiper-slide membership-slider__card membership-slider__card--proffesional">
+				<h3 class="membership-slider__title">Профессиональное</h3>
+				<p class="membership-slider__name">
+					50 000 Р
+				</p>
+				<p class="membership-slider__time">
+					ежегодно
+				</p>
+ <button class="membership-slider__advantages">+ Возможности Базового</button>
+				<ul class="membership-slider__list">
+					<li class="membership-slider__item">Участие в бизнес-мероприятиях Политехнического общества в онлайн и очном форматах;</li>
+					<li class="membership-slider__item">Возможность предложить собственный проект для поиска спонсоров и поддержки Политехнического общества;</li>
+					<li class="membership-slider__item">Возможность участвовать в референс-визитах, организуемых Политехническим обществом;</li>
+					<li class="membership-slider__item">Доступ к базе резюме выпускников на карьерной платформе Политехнического общества;</li>
+					<li class="membership-slider__item">Участие в закрытом чате членов общества уровня «Бизнес».</li>
+				</ul>
+ <button class="membership-slider__join btn btn-empty" onclick="window.location='/registration/'">Вступить</button>
+			</div>
+			 <!-- Партнёрское -->
+			<div class="swiper-slide membership-slider__card membership-slider__card--honorary">
+				<h3 class="membership-slider__title">Партнёрское</h3>
+				<p class="membership-slider__name membership-slider__name--small">
+					Персональные условия
+				</p>
+				<p class="membership-slider__time">
+					обсуждается индивидуально
+				</p>
+ <button class="membership-slider__advantages">+ Возможности профессионального</button>
+				<ul class="membership-slider__list">
+					<li class="membership-slider__item">Участие в закрытых мероприятиях Политехнического общества;</li>
+					<li class="membership-slider__item">Право стать членом Совета Политехнического общества выпускников МВТУ (МГТУ) им. Н.Э. Баумана;</li>
+					<li class="membership-slider__item">Участие в закрытом чате партнёров Политехнического общества.</li>
+				</ul>
+ <button class="membership-slider__join btn btn-empty" onclick="window.location='/registration/'">Вступить</button>
+				<!-- <button type="button" class="membership-slider__join btn btn-empty" onclick="showPartnerForm()">Стать партнером</button> -->
+			</div>
+			 <!-- Почётное -->
+			<div class="swiper-slide membership-slider__card membership-slider__card--gratuitous">
+				<h3 class="membership-slider__title">Почётное</h3>
+				<p class="membership-slider__name">
+					Бесценно
+				</p>
+				<p class="membership-slider__time">
+					по результатам заполненной анкеты
+				</p>
+ <button class="membership-slider__advantages">+ Возможности Базового</button>
+				<ul class="membership-slider__list">
+					<li class="membership-slider__item">Для тех, кто внёс значительный вклад в развитие технической науки, образования, технологий и деятельности Политехнического общества.</li>
+				</ul>
+ <button type="button" class="membership-slider__join btn btn-empty" onclick="window.location='/registration/'">Вступить</button>
+			</div>
+		</div>
+		<div class="swiper-pagination">
+		</div>
+	</div>
+</div>
+ </section>
+<!-- ── partner section ── --> <section class="partner">
+<div class="container">
+	<div class="partner__wrapper">
+		<div class="partner__info">
+			<h2 class="main-title partner__title">Индустриальное партнерство</h2>
+			<p class="main-text partner__text">
+				Для юридических лиц
+			</p>
+ <button class="btn partner__btn desk-block" onclick="showPartnerForm()">Стать партнером</button>
+		</div>
+		<div class="partner__discription">
+			<ul class="partner__list">
+				<li class="partner__item">Все преимущества базового и бизнес членства;</li>
+				<li class="partner__item">Возможность разместить свою компанию на витрине компетенций Политехнического общества (в разработке);</li>
+				<li class="partner__item">Рекламные возможности площадок и мероприятий Политехнического общества.</li>
+			</ul>
+			<p class="partner__discription-text">
+				Стоимость обсуждается индивидуально.
+			</p>
+		</div>
+ <button class="btn partner__btn desk-none" onclick="showPartnerForm()">Стать партнером</button>
+	</div>
+</div>
+ </section>
+<!-- ── D7: форма партнёрства ── --> <section id="join-ur-block" style="display:none">
+<div class="container" style="padding-top:48px;padding-bottom:48px">
+	<div class="join__wrapper">
+		 <?php if ($d7Done): ?>
+		<div style="text-align:center;padding:40px 0">
+			<div style="font-size:48px;margin-bottom:12px">
+				🤝
+			</div>
+			<h2 class="account__title main-title">Заявка на партнёрство отправлена!</h2>
+			<p style="margin-top:12px;color:#666;max-width:480px;margin-left:auto;margin-right:auto">
+				 Мы свяжемся с вами в течение 5 рабочих дней для обсуждения условий партнёрства.
+			</p>
+ <a href="/" class="btn" style="margin-top:20px">На главную</a>
+		</div>
+		 <?php else: ?>
+		<h2 class="account__title main-title">Индустриальное партнёрство</h2>
+		<p style="margin-bottom:24px;color:#666">
+			Для компаний, НИИ и организаций. После отправки заявки мы свяжемся с вами в течение 5 рабочих дней.
+		</p>
+		 <?php if ($d7Error): ?>
+		<div class="authorization__alert authorization__alert--error" style="margin-bottom:16px">
+			<p>
+				<?= htmlspecialchars($d7Error) ?>
+			</p>
+		</div>
+		 <?php endif; ?> <?php
                 po_render_industrial_partnership_form([
                     'prefix'      => 'd7',
                     'action'      => '/join/#join-ur-block',
@@ -317,34 +341,33 @@ if ($isAuthorized) {
                     'post'        => $_POST,
                     'defaults'    => ['email' => $arCurUser['EMAIL'] ?? ''],
                 ]);
-                ?>
-                <?php endif; ?>
-            </div>
-        </div>
-    </section>
-</main>
-
+                ?> <?php endif; ?>
+	</div>
+</div>
+ </section> </main>
 <!-- ── Модаль: Почётный тариф ── -->
 <div id="form-honorary" style="display:none;max-width:480px;padding:32px 24px">
-    <h3 style="margin-bottom:12px;font-size:22px;font-weight:700">Почётное членство</h3>
-    <p style="color:#666;margin-bottom:24px;font-size:14px;line-height:1.6">
-        Почётное членство присваивается за особые заслуги перед Политехническим обществом. Оставьте заявку — мы свяжемся с вами.
-    </p>
-    <div id="honorary-fields">
-        <p id="honorary-error" style="display:none;color:#c0392b;margin-bottom:12px;font-size:13px"></p>
-        <input type="text"  id="honorary-fio"   placeholder="Фамилия Имя Отчество" style="display:block;width:100%;margin-bottom:12px;box-sizing:border-box">
-        <input type="email" id="honorary-email" placeholder="e-mail" style="display:block;width:100%;margin-bottom:12px;box-sizing:border-box">
-        <input type="tel"   id="honorary-phone" placeholder="Телефон" style="display:block;width:100%;margin-bottom:12px;box-sizing:border-box">
-        <textarea id="honorary-msg" placeholder="Дополнительно (по желанию)" style="display:block;width:100%;height:80px;margin-bottom:20px;resize:vertical;box-sizing:border-box"></textarea>
-        <button id="honorary-submit" class="btn" style="width:100%">Отправить заявку</button>
-    </div>
-    <div id="honorary-success" style="display:none;text-align:center;padding:24px 0">
-        <div style="font-size:48px;margin-bottom:12px">✅</div>
-        <p style="font-size:16px;font-weight:600">Заявка отправлена!</p>
-        <p style="font-size:14px;color:#666;margin-top:8px">Мы свяжемся с вами в ближайшее время.</p>
-    </div>
+	<h3 style="margin-bottom:12px;font-size:22px;font-weight:700">Почётное членство</h3>
+	<p style="color:#666;margin-bottom:24px;font-size:14px;line-height:1.6">
+		 Почётное членство присваивается за особые заслуги перед Политехническим обществом. Оставьте заявку — мы свяжемся с вами.
+	</p>
+	<div id="honorary-fields">
+		<p id="honorary-error" style="display:none;color:#c0392b;margin-bottom:12px;font-size:13px">
+		</p>
+ <input type="text" id="honorary-fio" placeholder="Фамилия Имя Отчество" style="display:block;width:100%;margin-bottom:12px;box-sizing:border-box"> <input type="email" id="honorary-email" placeholder="e-mail" style="display:block;width:100%;margin-bottom:12px;box-sizing:border-box"> <input type="tel" id="honorary-phone" placeholder="Телефон" style="display:block;width:100%;margin-bottom:12px;box-sizing:border-box"> <textarea id="honorary-msg" placeholder="Дополнительно (по желанию)" style="display:block;width:100%;height:80px;margin-bottom:20px;resize:vertical;box-sizing:border-box"></textarea> <button id="honorary-submit" class="btn" style="width:100%">Отправить заявку</button>
+	</div>
+	<div id="honorary-success" style="display:none;text-align:center;padding:24px 0">
+		<div style="font-size:48px;margin-bottom:12px">
+			✅
+		</div>
+		<p style="font-size:16px;font-weight:600">
+			Заявка отправлена!
+		</p>
+		<p style="font-size:14px;color:#666;margin-top:8px">
+			Мы свяжемся с вами в ближайшее время.
+		</p>
+	</div>
 </div>
-
 <script>
 // Показать форму партнёрства
 function showPartnerForm() {
@@ -462,6 +485,4 @@ document.querySelectorAll('[data-fancybox][data-src="#form-membership"][data-pla
 <?php if ($d7Done || $d7Error): ?>
 showPartnerForm();
 <?php endif; ?>
-</script>
-
-<?php require($_SERVER["DOCUMENT_ROOT"]."/bitrix/footer.php"); ?>
+</script><?php require($_SERVER["DOCUMENT_ROOT"]."/bitrix/footer.php"); ?>
