@@ -1171,38 +1171,79 @@ strong {
     display: flex;
     flex-wrap: wrap;
     align-items: stretch;
-    gap: 28px;
+    gap: 16px;
 }
 
 .initiative__info {
     flex: 0 0 21vw;
     min-width: 260px;
     margin-bottom: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+}
+
+.initiative__buttons {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-top: auto;
+    padding-top: 20px;
+}
+
+.initiative__buttons .btn {
+    min-width: 140px;
+    padding: 12px 20px;
+    font-size: 14px;
+    text-align: center;
+}
+
+.initiative__buttons .btn-empty {
+    background: transparent;
+    border: 2px solid var(--red-color);
+    color: var(--red-color);
+}
+
+.initiative__buttons .btn-empty:hover {
+    background: var(--red-color);
+    color: #fff;
+    border-color: var(--red-color);
+}
+
+.initiative__buttons .btn:not(.btn-empty):hover {
+    background: transparent;
+    color: var(--red-color);
+    border-color: var(--red-color);
 }
 
 .initiative__card {
     display: grid;
     align-items: flex-end;
     justify-content: flex-start;
-    flex: 1 1 calc(50% - 28px);
-    min-width: 280px;
+    flex: 0 1 calc(33.333% - 12px);
+    min-width: 200px;
     max-width: none;
+    max-height: 180px;
+    overflow: hidden;
 }
 
 .initiative__card h3 {
-    font-size: 1.7vw;
+    font-size: 1.2vw;
     color: #fff;
     position: relative;
     grid-column: 1 / -1;
     grid-row: 1 / -1;
-    margin: 1.7vw;
-    max-width: 16vw;
+    margin: 1vw;
+    max-width: 14vw;
+    line-height: 1.2;
 }
 
 .initiative__image {
     grid-column: -1 / 1;
     grid-row: -1 / 1;
     width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
 
 @media(max-width: 992px) {
@@ -1211,7 +1252,8 @@ strong {
         max-width: 343px;
     }
     .initiative__card {
-        flex: 1 1 calc(50% - 16px);
+        flex: 1 1 calc(50% - 8px);
+        max-height: 160px;
     }
     .initiative__wrapper {
         justify-content: space-between;
@@ -1220,16 +1262,17 @@ strong {
 
 @media(max-width: 1176px) {
     .initiative__wrapper {
-        gap: 16px;
+        gap: 12px;
     }
     .initiative__card {
-        flex-basis: 100%;
+        flex: 0 1 calc(33.333% - 8px);
         min-width: 0;
         align-items: center;
         justify-content: flex-start;
+        max-height: 150px;
     }
     .initiative__card h3 {
-        font-size: 20px;
+        font-size: 14px;
     }
     .initiative__image {
         width: 100%;

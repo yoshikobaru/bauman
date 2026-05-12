@@ -139,15 +139,19 @@ if (!function_exists('po_render_projects_section')) {
                 <div class="initiative__info">
                     <h2 class="main-title"><?= htmlspecialchars($title) ?></h2>
                     <p class="main-text"><?= htmlspecialchars($subtitle) ?></p>
+                    <div class="initiative__buttons">
+                        <a href="/projects/" class="btn btn-empty">Все проекты</a>
+                        <a href="/support/" class="btn">Поддержать</a>
+                    </div>
                 </div>
                 <?php foreach ($projects as $project): ?>
                 <a href="<?= htmlspecialchars($project['url']) ?>" class="initiative__card">
                     <h3><?= htmlspecialchars($project['name']) ?></h3>
-                    <img alt="<?= htmlspecialchars($project['name']) ?>" 
-                         src="<?= htmlspecialchars($project['img']) ?>" 
+                    <img alt="<?= htmlspecialchars($project['name']) ?>"
+                         src="<?= htmlspecialchars($project['img']) ?>"
                          class="initiative__image desk-block">
-                    <img alt="<?= htmlspecialchars($project['name']) ?>" 
-                         src="<?= htmlspecialchars($project['mob']) ?>" 
+                    <img alt="<?= htmlspecialchars($project['name']) ?>"
+                         src="<?= htmlspecialchars($project['mob']) ?>"
                          class="initiative__image desk-none">
                 </a>
                 <?php endforeach; ?>
