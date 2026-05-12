@@ -412,7 +412,7 @@ strong {
 /* banner-main */
 
 .banner-main {
-    margin-bottom: var(--section-margin);
+    margin-bottom: calc(var(--section-margin) + 24px);
 }
 
 .banner-main__wrapper {
@@ -1765,7 +1765,7 @@ strong {
 /* news */
 
 .news {
-    padding: var(--section-margin) 0;
+    padding: var(--section-margin) 0 calc(var(--section-margin) + 24px);
     background-color: #F5F5F6;
 }
 
@@ -1842,7 +1842,7 @@ strong {
 /* partner */
 
 .partner {
-    margin-bottom: var(--section-margin);
+    margin-bottom: calc(var(--section-margin) + 24px);
 }
 
 .partner__wrapper {
