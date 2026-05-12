@@ -412,7 +412,9 @@ strong {
 /* banner-main */
 
 .banner-main {
-    margin-bottom: calc(var(--section-margin) + 24px);
+    margin-bottom: calc(var(--section-margin) + 48px);
+    min-height: 32vw;
+    overflow: hidden;
 }
 
 .banner-main__wrapper {
@@ -459,6 +461,9 @@ strong {
 
 
 @media(max-width: 768px) {
+    .banner-main {
+        min-height: 52vw;
+    }
     .banner-main__content {
         padding: 24px 16px;
     }
