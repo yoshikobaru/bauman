@@ -258,10 +258,12 @@ $prefill = [
                             .d2-custom-row input {
                                 width: 100%;
                                 border: none;
-                                border-bottom: 1px solid currentColor;
+                                border-bottom: 1px solid #003039;
                                 background: transparent;
                                 font-size: 26px;
                                 font-weight: 600;
+                                font-family: 'Geologica', sans-serif;
+                                text-align: left;
                                 outline: none;
                                 padding: 2px 0;
                             }
@@ -307,7 +309,7 @@ $prefill = [
                                     <div data-val="30000">30 000 Р</div>
                                     <div data-val="custom" class="d2-custom-row">
                                         <span>Другая сумма</span>
-                                        <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="12" autocomplete="off" id="d2_custom_amount" placeholder="Введите сумму, руб." onclick="event.stopPropagation()">
+                                        <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="12" autocomplete="off" id="d2_custom_amount" placeholder="Введите сумму, руб. *" onclick="event.stopPropagation()">
                                     </div>
                                 </div>
                                 <div class="project-programm__buttons">

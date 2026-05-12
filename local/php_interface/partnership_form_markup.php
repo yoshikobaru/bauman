@@ -63,7 +63,7 @@ if (!function_exists('po_render_industrial_partnership_form')) {
                     . '" target="_blank">политикой обработки ПДн</a> *';
             } else {
                 $consentLabel = 'Согласен с <a href="' . $politikaEsc
-                    . '" target="_blank">политикой обработки ПДн</a>';
+                    . '" target="_blank">политикой обработки ПДн *</a>';
             }
         }
 

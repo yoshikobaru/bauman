@@ -1,0 +1,152 @@
+<?php
+/**
+ * Рендерит страницу "Проекты" со списком проектов
+ * 
+ * Использует инфоблок IBLOCK_PROJECTS_ID
+ * Поддерживает фильтрацию: ?status=active|completed|all
+ * 
+ * Подключение: подключается автоматически через init.php
+ */
+
+if (!defined('B_PROLOG_INCLUDED') || B_PROLOG_INCLUDED !== true) {
+    return;
+}
+
+if (!function_exists('po_render_projects_listing')) {
+    /**
+     * Форматирует дату проекта в русский формат
+     */
+    function po_format_project_date(?string $rawDate): string {
+        if (!$rawDate) return '';
+        $ts = strtotime($rawDate);
+        if (!$ts) return '';
+        $months = [
+            1 => 'января', 2 => 'февраля', 3 => 'марта', 4 => 'апреля',
+            5 => 'мая', 6 => 'июня', 7 => 'июля', 8 => 'августа',
+            9 => 'сентября', 10 => 'октября', 11 => 'ноября', 12 => 'декабря',
+        ];
+        return date('d', $ts) . ' ' . $months[(int)date('n', $ts)] . ' ' . date('Y', $ts);
+    }
+
+    /**
+     * Выводит HTML-разметку страницы "Проекты"
+     * 
+     * @param string $pageTitle Заголовок страницы
+     */
+    function po_render_projects_listing(
+        string $pageTitle = 'Проекты общества'
+    ): void 
+    {
+        // Параметр фильтрации
+        $statusFilter = $_GET['status'] ?? 'all';
+        if (!in_array($statusFilter, ['active', 'completed', 'all'])) {
+            $statusFilter = 'all';
+        }
+
+        $statusLabels = ['all' => 'Все', 'active' => 'Активные', 'completed' => 'Завершённые'];
+
+        // Fallback статичные проекты
+        $staticProjects = [
+            ['name' => 'PolytechExpo',             'text' => 'Ежегодная конференция выпускников и партнёров МГТУ им. Н.Э. Баумана', 'url' => '/projects/politech-expo/',  'img' => '/assets/img/projects-page/current-project-img-1.png'],
+            ['name' => 'Встреча выпускников',      'text' => 'Традиционная встреча выпускников всех поколений Бауманки',            'url' => '/projects/conference/',    'img' => '/assets/img/projects-page/current-project-img-1.png'],
+            ['name' => 'Попечительский совет МТ4', 'text' => 'Поддержка развития кафедры МТ4 МГТУ им. Н.Э. Баумана',              'url' => '/projects/trustees/',      'img' => '/assets/img/projects-page/current-project-img-1.png'],
+            ['name' => 'Реставрация ротонды',      'text' => 'Проект по восстановлению исторической ротонды МГТУ',                  'url' => '/projects/restoration/',   'img' => '/assets/img/projects-page/current-project-img-1.png'],
+        ];
+
+        $projects = [];
+        $hasItems = false;
+
+        // Получаем проекты из инфоблока
+        if (\Bitrix\Main\Loader::includeModule('iblock') && defined('IBLOCK_PROJECTS_ID') && IBLOCK_PROJECTS_ID > 0) {
+            $arFilter = ['IBLOCK_ID' => IBLOCK_PROJECTS_ID, 'ACTIVE' => 'Y'];
+            if ($statusFilter !== 'all') {
+                $arFilter['PROPERTY_PROJECT_STATUS'] = $statusFilter;
+            }
+            
+            $dbProjects = CIBlockElement::GetList(
+                ['SORT' => 'ASC'],
+                $arFilter,
+                false,
+                false,
+                ['ID', 'NAME', 'CODE', 'DATE_ACTIVE_FROM', 'PREVIEW_TEXT', 'PREVIEW_PICTURE', 'DETAIL_PAGE_URL', 'PROPERTY_DETAIL_URL']
+            );
+
+            while ($row = $dbProjects->GetNext()) {
+                $hasItems = true;
+                $imgSrc = SITE_TEMPLATE_PATH . '/assets/img/projects-page/current-project-img-1.png';
+                if (!empty($row['PREVIEW_PICTURE'])) {
+                    $img = CFile::GetPath($row['PREVIEW_PICTURE']);
+                    if ($img) $imgSrc = $img;
+                }
+                $link = !empty($row['PROPERTY_DETAIL_URL_VALUE'])
+                    ? $row['PROPERTY_DETAIL_URL_VALUE']
+                    : (!empty($row['CODE']) ? '/projects/' . rawurlencode($row['CODE']) . '/' : '/projects/detail/?id=' . (int)$row['ID']);
+                
+                $formattedDate = po_format_project_date($row['DATE_ACTIVE_FROM'] ?? '');
+
+                $projects[] = [
+                    'img' => $imgSrc,
+                    'date' => $formattedDate,
+                    'name' => $row['NAME'],
+                    'text' => $row['PREVIEW_TEXT'] ?? '',
+                    'link' => $link,
+                ];
+            }
+        }
+        ?>
+
+            <!-- visits / проекты из CMS -->
+            <section class="visits">
+                <div class="container">
+                    <h2 class="main-title visits__title"><?= htmlspecialchars($pageTitle) ?></h2>
+
+                    <!-- Фильтр по статусу -->
+                    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:32px;">
+                        <?php foreach ($statusLabels as $key => $label): ?>
+                        <a href="/projects/?status=<?= $key ?>"
+                           class="btn <?= $statusFilter === $key ? '' : 'btn-transparent' ?>"
+                           style="<?= $statusFilter === $key ? '' : 'opacity:0.7;' ?>">
+                            <?= $label ?>
+                        </a>
+                        <?php endforeach; ?>
+                    </div>
+
+                    <div class="visits__list visits__list--projects">
+                        <?php if ($hasItems): ?>
+                            <?php foreach ($projects as $proj): ?>
+                        <div class="visits__card visits__card--compact">
+                            <div class="visits__content">
+                                <h3 class="visits__subtitle"><?= htmlspecialchars($proj['name']) ?></h3>
+                                <?php if (!empty($proj['text'])): ?>
+                                <p class="visits__text"><?= htmlspecialchars($proj['text']) ?></p>
+                                <?php endif; ?>
+                                <div class="visits__buttons">
+                                    <a href="/projects/?status=<?= $statusFilter ?>" class="btn visits__btn btn-transparent visits__btn--outline">Все проекты</a>
+                                    <a href="/support/?project=<?= urlencode($proj['name']) ?>" class="btn visits__btn visits__btn--help">Поддержать</a>
+                                </div>
+                            </div>
+                        </div>
+                            <?php endforeach; ?>
+                        <?php elseif ($statusFilter !== 'completed'): ?>
+                            <?php foreach ($staticProjects as $sp): ?>
+                        <div class="visits__card visits__card--compact">
+                            <div class="visits__content">
+                                <h3 class="visits__subtitle"><?= htmlspecialchars($sp['name']) ?></h3>
+                                <p class="visits__text"><?= htmlspecialchars($sp['text']) ?></p>
+                                <div class="visits__buttons">
+                                    <a href="/projects/?status=<?= $statusFilter ?>" class="btn visits__btn btn-transparent visits__btn--outline">Все проекты</a>
+                                    <a href="/support/?project=<?= urlencode($sp['name']) ?>" class="btn visits__btn visits__btn--help">Поддержать</a>
+                                </div>
+                            </div>
+                        </div>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                    </div>
+                    <?php if ($statusFilter === 'completed' && !$hasItems): ?>
+                    <p style="color:#888;margin-top:12px">Завершённых проектов пока нет.</p>
+                    <?php endif; ?>
+                </div>
+            </section>
+        <?php
+    }
+}

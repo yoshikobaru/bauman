@@ -1120,6 +1120,22 @@ function po_paykeeper_build_callback_ack(string $id, string $secretWord): string
 
 require_once __DIR__ . '/partnership_form_markup.php';
 
+// Подключение рендереров страниц
+$renderersDir = __DIR__ . '/renderers/';
+if (is_dir($renderersDir)) {
+    $pageRenderers = [
+        'news_page.php',
+        'projects_listing.php',
+        'reference_visits.php',
+    ];
+    foreach ($pageRenderers as $renderer) {
+        $rendererPath = $renderersDir . $renderer;
+        if (file_exists($rendererPath)) {
+            require_once $rendererPath;
+        }
+    }
+}
+
 // Логирование входа пользователя
 AddEventHandler('main', 'OnAfterUserLogin', function (&$arFields) {
     $login = $arFields['LOGIN'] ?? '';

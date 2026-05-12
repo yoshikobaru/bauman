@@ -300,15 +300,15 @@ if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $resDobInputValue)) {
                     <div class="account__personal">
                         <div class="account__chapter"><h3 class="account__subtitle">Личные данные</h3></div>
                         <div class="account__personal-list account__grid">
-                            <input type="text" name="res_lname"  placeholder="Фамилия"
+                            <input type="text" name="res_lname"  placeholder="Фамилия *" required
                                    value="<?= htmlspecialchars($_POST['res_lname'] ?? ($USER->IsAuthorized() ? $USER->GetParam('LAST_NAME') : '')) ?>">
-                            <input type="text" name="res_fname"  placeholder="Имя"
+                            <input type="text" name="res_fname"  placeholder="Имя *" required
                                    value="<?= htmlspecialchars($_POST['res_fname'] ?? ($USER->IsAuthorized() ? $USER->GetParam('NAME') : '')) ?>">
-                            <input type="text" name="res_sname"  placeholder="Отчество"
+                            <input type="text" name="res_sname"  placeholder="Отчество *"
                                    value="<?= htmlspecialchars($_POST['res_sname'] ?? ($USER->IsAuthorized() ? $USER->GetParam('SECOND_NAME') : '')) ?>">
                             <div class="po-date-field">
                                 <input type="text" name="res_dob" id="res_dob"
-                                       placeholder="Дата рождения (ДД.ММ.ГГГГ)"
+                                       placeholder="Дата рождения * (ДД.ММ.ГГГГ)"
                                        required
                                        inputmode="numeric" maxlength="10"
                                        value="<?= htmlspecialchars($resDobInputValue) ?>">
@@ -361,7 +361,7 @@ if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $resDobInputValue)) {
                                         <path d="M11.2871 0.5L15.5 4.88281V19.5H0.5V0.5H11.2871Z" stroke="black"/>
                                     </svg>
                                     Перетащите или <span>загрузите файл</span> (PDF, DOC, DOCX) *
-                                    <input type="file" name="res_attachment" id="res_attachment" class="account__photo-input" accept=".pdf,.doc,.docx">
+                                    <input type="file" name="res_attachment" id="res_attachment" class="account__photo-input" accept=".pdf,.doc,.docx" required>
                                 </label>
                                 <span class="po-file-name" id="res-file-name">Файл не выбран</span>
                                 <span class="po-field-error" id="res-file-err">Прикрепите файл резюме (PDF, DOC, DOCX)</span>
@@ -373,7 +373,7 @@ if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $resDobInputValue)) {
                         <div class="join__politic-question">
                             <label style="display:flex;align-items:center;gap:10px;cursor:pointer">
                                 <input type="checkbox" name="res_agree_pd" id="res_agree_pd" required style="width:18px;height:18px;flex-shrink:0">
-                                <span class="join__politic-link">Согласен с <a href="<?= defined('DOC_POLITIKA_URL') ? DOC_POLITIKA_URL : '#' ?>" target="_blank">политикой обработки ПДн</a></span>
+                                <span class="join__politic-link">Согласен с <a href="<?= defined('DOC_POLITIKA_URL') ? DOC_POLITIKA_URL : '#' ?>" target="_blank">политикой обработки ПДн *</a></span>
                             </label>
                             <span class="po-field-error" id="res-agree-err">Необходимо согласие с политикой обработки ПДн</span>
                         </div>
@@ -473,7 +473,7 @@ if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $resDobInputValue)) {
                         <div class="join__politic-question">
                             <label style="display:flex;align-items:center;gap:10px;cursor:pointer">
                                 <input type="checkbox" name="vac_agree_pd" id="vac_agree_pd" required style="width:18px;height:18px;flex-shrink:0">
-                                <span class="join__politic-link">Согласен с <a href="<?= defined('DOC_POLITIKA_URL') ? DOC_POLITIKA_URL : '#' ?>" target="_blank">политикой обработки ПДн</a></span>
+                                <span class="join__politic-link">Согласен с <a href="<?= defined('DOC_POLITIKA_URL') ? DOC_POLITIKA_URL : '#' ?>" target="_blank">политикой обработки ПДн *</a></span>
                             </label>
                             <span class="po-field-error" id="vac-agree-err">Необходимо согласие с политикой обработки ПДн</span>
                         </div>

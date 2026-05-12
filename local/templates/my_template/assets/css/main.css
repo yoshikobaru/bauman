@@ -980,6 +980,7 @@ strong {
 .history {
     background-color: #F5F5F6;
     padding: var(--section-margin) 0 0;
+    scroll-margin-top: 80px;
 }
 
 .history__title {
@@ -1132,6 +1133,7 @@ strong {
 
 .culture-reference {
     padding: 0 0 var(--section-margin);
+    scroll-margin-top: 80px;
 }
 
 /* culture__card--red */
@@ -2348,6 +2350,7 @@ strong {
     font-size: var(--title-size);
     padding: 2vw 0;
     text-align: center;
+    font-family: 'Geologica', sans-serif;
 }
 
 .project-programm__item-selector div.active,
@@ -2709,6 +2712,59 @@ strong {
     margin-top: auto;
     display: flex;
     gap: 16px;
+}
+
+/* Compact project cards for projects listing page */
+.visits__list--projects {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+}
+
+.visits__card--compact {
+    background-color: #fff;
+    display: flex;
+    flex-direction: column;
+}
+
+.visits__card--compact .visits__content {
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.visits__card--compact .visits__subtitle {
+    font-size: 20px;
+    margin-bottom: 12px;
+}
+
+.visits__card--compact .visits__text {
+    flex-grow: 1;
+    margin-bottom: 16px;
+}
+
+.visits__card--compact .visits__buttons {
+    margin-top: auto;
+}
+
+/* Button outline style - white with red border, reverses on hover */
+.visits__btn--outline {
+    background-color: transparent;
+    border: 2px solid #CE2029;
+    color: #CE2029;
+    transition: all 0.3s ease;
+}
+
+.visits__btn--outline:hover {
+    background-color: #CE2029;
+    color: #fff;
+}
+
+@media (max-width: 992px) {
+    .visits__list--projects {
+        grid-template-columns: 1fr;
+    }
 }
 
 .visits__date {
