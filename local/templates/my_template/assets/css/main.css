@@ -413,7 +413,7 @@ strong {
 
 .banner-main {
     margin-bottom: calc(var(--section-margin) + 48px);
-    padding-top: 48px;
+    padding-top: 56px;
     min-height: 32vw;
     overflow: hidden;
 }
@@ -464,7 +464,7 @@ strong {
 @media(max-width: 768px) {
     .banner-main {
         min-height: 52vw;
-        padding-top: 40px;
+        padding-top: 56px;
     }
     .banner-main__content {
         padding: 24px 16px;
