@@ -221,9 +221,6 @@ $APPLICATION->SetTitle("Вступить");
         <div id="partner-popup-subscriptions" class="form-partnership-popup" style="display:none;">
             <div class="form-partnership-popup__inner">
                 <h2 class="account__title main-title">Индустриальное партнёрство</h2>
-                <p class="form-partnership-popup__subtitle">
-                    Для компаний, НИИ и организаций. После отправки заявки мы свяжемся с вами в течение 5 рабочих дней.
-                </p>
                 <?php
                     if (function_exists('po_render_industrial_partnership_form')) {
                         po_render_industrial_partnership_form([
@@ -231,6 +228,7 @@ $APPLICATION->SetTitle("Вступить");
                             'action'      => '/join/#join-ur-block',
                             'hidden_name' => 'd7_action',
                             'post'        => [],
+                            'subtitle'    => 'Заполните форму и мы свяжемся с вами',
                         ]);
                     }
                 ?>

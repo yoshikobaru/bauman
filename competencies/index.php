@@ -97,7 +97,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['d6_action'])) {
                             <h1 class="banner-other__title main-title">
                                Витрина компетенций
                             </h1>
-                            <a href="#" class="banner-other__btn btn" data-fancybox data-src="#form-finance-help">Стать партнёром</a>
+                            <a href="#" class="banner-other__btn btn" data-fancybox data-src="#form-partner-competencies">Стать партнёром</a>
                         </div>
                         <img src="<?=SITE_TEMPLATE_PATH?>/assets/img/reference-page/banner-other-pattern.png" alt="" class="banner-other__pattern">
                     </div>
@@ -256,5 +256,24 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 <?php endif; ?>
+
+<!-- form-partner-competencies: попап "Стать партнёром" для Витрины компетенций -->
+<div id="form-partner-competencies" class="form-partnership-popup" style="display:none;">
+    <div class="form-partnership-popup__inner">
+        <h2 class="account__title main-title">Витрина компетенций</h2>
+        <?php
+            if (function_exists('po_render_industrial_partnership_form')) {
+                po_render_industrial_partnership_form([
+                    'prefix'      => 'd7',
+                    'action'      => '/competencies/',
+                    'hidden_name' => 'partnership_action',
+                    'post'        => [],
+                    'subtitle'    => 'Заполните форму и мы свяжемся с вами для обсуждения деталей сотрудничества',
+                ]);
+            }
+        ?>
+    </div>
+</div>
+<!-- /form-partner-competencies -->
 
 <?php require($_SERVER["DOCUMENT_ROOT"]."/bitrix/footer.php");?>
