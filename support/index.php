@@ -258,9 +258,10 @@ $prefill = [
                             .d2-custom-row input {
                                 width: 100%;
                                 border: none;
-                                border-bottom: 1px solid currentColor;
+                                border-bottom: 1px solid #003039;
                                 background: transparent;
-                                font-size: var(--title-size);
+                                font-size: 26px;
+                                font-weight: 600;
                                 font-family: 'Geologica', sans-serif;
                                 text-align: left;
                                 outline: none;

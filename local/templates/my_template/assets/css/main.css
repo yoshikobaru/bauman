@@ -52,16 +52,11 @@ body {
     text-align: left;
 }
 
-.project-programm__item-price div.active,
 .project-programm__item-price input {
-    font-size: var(--text-32);
-    font-weight: 600;
+    font-size: var(--title-size);
     font-family: 'Geologica', sans-serif;
-}
-
-.project-programm__item-price input {
     border: none;
-    border-bottom: 2px solid currentColor;
+    border-bottom: 2px solid #003039;
     background: transparent;
     text-align: center;
     outline: none;
