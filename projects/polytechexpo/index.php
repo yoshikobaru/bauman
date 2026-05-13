@@ -252,30 +252,5 @@ $APPLICATION->SetTitle("PolytechExpo");
         </div>
                 
 	</main>
-<div class="form-finance-help" id="form-finance-help" style="display:none;max-width:1440px;">
-        <h2 class="main-title">Связаться с организаторами</h2>
-		<input type="email" placeholder="e-mail" required>
-		<input type="password" placeholder="Пароль" required>
-        <textarea name="" id="" placeholder="Письмо"></textarea>
-        <div class="join__politic-question">
-            <p class="join__politic-link">
-                Согласен с <a href="#">политикой обработки ПДн</a>
-            </p>
-            <div class="account__graduate-choice">
-                <label class="account__graduate-item">
-                    <input type="radio" name="subscribe" value="yes" class="account__graduate-input">
-                    <span class="account__graduate-box"></span>
-                    Да
-                </label>
-
-                <label class="account__graduate-item">
-                    <input type="radio" name="subscribe" value="no" class="account__graduate-input">
-                    <span class="account__graduate-box"></span>
-                    Нет
-                </label>
-            </div>
-        </div>   
-        <button class="btn form-finance-help__btn">Отправить</button>
-	</div>
 
 <?php require($_SERVER["DOCUMENT_ROOT"]."/bitrix/footer.php");?>

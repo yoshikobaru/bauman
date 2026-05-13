@@ -126,36 +126,34 @@
 
 	<!-- Форма: Связаться с организаторами / Стать партнёром -->
 	<div class="form-finance-help" id="form-finance-help" style="display:none;">
-		<div class="join__wrapper">
-			<h2 class="account__title main-title" id="ffh-title">Связаться с организаторами</h2>
-			<div id="ffh-form-block">
-				<p id="ffh-error" style="display:none;color:#c0392b;margin-bottom:12px;font-size:13px"></p>
-				<div style="display:flex;flex-direction:column;gap:12px;margin-top:16px">
-					<input type="text"  id="ffh-name"    placeholder="Имя *">
-					<input type="email" id="ffh-email"   placeholder="e-mail *">
-					<input type="tel"   id="ffh-phone"   placeholder="Телефон">
-					<textarea id="ffh-message" placeholder="Сообщение" style="min-height:100px;padding:12px;border:1px solid #ccc;border-radius:4px;resize:vertical"></textarea>
-					<div class="join__politic-question">
-						<p class="join__politic-link">Согласен с <a href="<?= defined('DOC_POLITIKA_URL') ? DOC_POLITIKA_URL : '#' ?>" target="_blank">политикой обработки ПДн</a></p>
-						<div class="account__graduate-choice">
-							<label class="account__graduate-item">
-								<input type="radio" name="ffh_consent" value="yes" id="ffh-consent-yes" class="account__graduate-input">
-								<span class="account__graduate-box"></span>Да
-							</label>
-							<label class="account__graduate-item">
-								<input type="radio" name="ffh_consent" value="no" class="account__graduate-input">
-								<span class="account__graduate-box"></span>Нет
-							</label>
-						</div>
+		<h2 class="account__title main-title" id="ffh-title">Связаться с организаторами</h2>
+		<div id="ffh-form-block">
+			<p id="ffh-error" style="display:none;color:#c0392b;margin-bottom:12px;font-size:13px"></p>
+			<div style="display:flex;flex-direction:column;gap:24px">
+				<input type="text"  id="ffh-name"    placeholder="Имя *" style="width:100%;padding:16px 20px;font-size:18px;background:rgba(0,0,0,.03);border:none;border-radius:4px;box-sizing:border-box">
+				<input type="email" id="ffh-email"   placeholder="e-mail *" style="width:100%;padding:16px 20px;font-size:18px;background:rgba(0,0,0,.03);border:none;border-radius:4px;box-sizing:border-box">
+				<input type="tel"   id="ffh-phone"   placeholder="Телефон" style="width:100%;padding:16px 20px;font-size:18px;background:rgba(0,0,0,.03);border:none;border-radius:4px;box-sizing:border-box">
+				<textarea id="ffh-message" placeholder="Сообщение" style="width:100%;min-height:120px;padding:16px 20px;font-size:18px;background:rgba(0,0,0,.03);border:none;border-radius:4px;resize:vertical;box-sizing:border-box"></textarea>
+				<div class="join__politic-question" style="gap:12px">
+					<p class="join__politic-link">Согласен с <a href="<?= defined('DOC_POLITIKA_URL') ? DOC_POLITIKA_URL : '#' ?>" target="_blank">политикой обработки ПДн</a></p>
+					<div class="account__graduate-choice" style="flex-direction:row;gap:24px">
+						<label class="account__graduate-item">
+							<input type="radio" name="ffh_consent" value="yes" id="ffh-consent-yes" class="account__graduate-input">
+							<span class="account__graduate-box"></span>Да
+						</label>
+						<label class="account__graduate-item">
+							<input type="radio" name="ffh_consent" value="no" class="account__graduate-input">
+							<span class="account__graduate-box"></span>Нет
+						</label>
 					</div>
-					<button class="btn authorization__btn" id="ffh-submit">Отправить</button>
 				</div>
+				<button class="btn authorization__btn" id="ffh-submit" style="margin-top:8px">Отправить</button>
 			</div>
-			<div id="ffh-ok" style="display:none;text-align:center;padding:32px 0">
-				<div style="font-size:48px;margin-bottom:12px">✅</div>
-				<h3 style="font-size:18px;margin-bottom:8px">Заявка отправлена!</h3>
-				<p style="color:#666;font-size:14px">Мы свяжемся с вами в ближайшее время.</p>
-			</div>
+		</div>
+		<div id="ffh-ok" style="display:none;text-align:center;padding:32px 0">
+			<div style="font-size:48px;margin-bottom:12px">✅</div>
+			<h3 style="font-size:18px;margin-bottom:8px">Заявка отправлена!</h3>
+			<p style="color:#666;font-size:14px">Мы свяжемся с вами в ближайшее время.</p>
 		</div>
 	</div>
 	<script>
