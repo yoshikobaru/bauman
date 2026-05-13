@@ -126,34 +126,23 @@
 
 	<!-- Форма: Связаться с организаторами / Стать партнёром -->
 	<div class="form-finance-help" id="form-finance-help" style="display:none;">
-		<h2 class="account__title main-title" id="ffh-title">Связаться с организаторами</h2>
+		<h2 class="form-finance-help__title" id="ffh-title">Связаться с организаторами</h2>
 		<div id="ffh-form-block">
-			<p id="ffh-error" style="display:none;color:#c0392b;margin-bottom:12px;font-size:13px"></p>
-			<div style="display:flex;flex-direction:column;gap:24px">
-				<input type="text"  id="ffh-name"    placeholder="Имя *" style="width:100%;padding:16px 20px;font-size:18px;background:rgba(0,0,0,.03);border:none;border-radius:4px;box-sizing:border-box">
-				<input type="email" id="ffh-email"   placeholder="e-mail *" style="width:100%;padding:16px 20px;font-size:18px;background:rgba(0,0,0,.03);border:none;border-radius:4px;box-sizing:border-box">
-				<input type="tel"   id="ffh-phone"   placeholder="Телефон" style="width:100%;padding:16px 20px;font-size:18px;background:rgba(0,0,0,.03);border:none;border-radius:4px;box-sizing:border-box">
-				<textarea id="ffh-message" placeholder="Сообщение" style="width:100%;min-height:120px;padding:16px 20px;font-size:18px;background:rgba(0,0,0,.03);border:none;border-radius:4px;resize:vertical;box-sizing:border-box"></textarea>
-				<div class="join__politic-question" style="flex-direction:column;gap:12px">
-					<p class="join__politic-link">Согласен с <a href="<?= defined('DOC_POLITIKA_URL') ? DOC_POLITIKA_URL : '#' ?>" target="_blank">политикой обработки ПДн</a></p>
-					<div class="account__graduate-choice" style="flex-direction:row;gap:24px">
-						<label class="account__graduate-item">
-							<input type="radio" name="ffh_consent" value="yes" id="ffh-consent-yes" class="account__graduate-input">
-							<span class="account__graduate-box"></span>Да
-						</label>
-						<label class="account__graduate-item">
-							<input type="radio" name="ffh_consent" value="no" class="account__graduate-input">
-							<span class="account__graduate-box"></span>Нет
-						</label>
-					</div>
-				</div>
-				<button class="btn authorization__btn" id="ffh-submit" style="margin-top:8px">Отправить</button>
+			<p id="ffh-error" class="form-finance-help__error"></p>
+			<div class="form-finance-help__fields">
+				<input type="text"  id="ffh-name"  placeholder="Имя *" class="form-finance-help__input">
+				<input type="email" id="ffh-email" placeholder="E-mail *" class="form-finance-help__input">
+				<input type="tel"   id="ffh-phone" placeholder="Номер телефона" class="form-finance-help__input">
 			</div>
+			<button class="btn form-finance-help__btn" id="ffh-submit">Отправить</button>
+			<p class="form-finance-help__consent">
+				Нажимая кнопку «Отправить» вы даете свое согласие на <a href="<?= defined('DOC_POLITIKA_URL') ? DOC_POLITIKA_URL : '#' ?>" target="_blank">обработку персональных данных</a>
+			</p>
 		</div>
-		<div id="ffh-ok" style="display:none;text-align:center;padding:32px 0">
-			<div style="font-size:48px;margin-bottom:12px">✅</div>
-			<h3 style="font-size:18px;margin-bottom:8px">Заявка отправлена!</h3>
-			<p style="color:#666;font-size:14px">Мы свяжемся с вами в ближайшее время.</p>
+		<div id="ffh-ok" class="form-finance-help__success" style="display:none;">
+			<div class="form-finance-help__success-icon">✓</div>
+			<h3 class="form-finance-help__success-title">Заявка отправлена!</h3>
+			<p class="form-finance-help__success-text">Мы свяжемся с вами в ближайшее время.</p>
 		</div>
 	</div>
 	<script>
@@ -161,20 +150,17 @@
 		var btn = document.getElementById('ffh-submit');
 		if (!btn) return;
 		btn.addEventListener('click', function(){
-			var name    = (document.getElementById('ffh-name')?.value    || '').trim();
-			var email   = (document.getElementById('ffh-email')?.value   || '').trim();
-			var phone   = (document.getElementById('ffh-phone')?.value   || '').trim();
-			var message = (document.getElementById('ffh-message')?.value || '').trim();
-			var consent = document.getElementById('ffh-consent-yes')?.checked;
-			var errEl   = document.getElementById('ffh-error');
+			var name  = (document.getElementById('ffh-name')?.value  || '').trim();
+			var email = (document.getElementById('ffh-email')?.value || '').trim();
+			var phone = (document.getElementById('ffh-phone')?.value || '').trim();
+			var errEl = document.getElementById('ffh-error');
 			errEl.style.display = 'none';
-			if (!name)    { errEl.textContent = 'Введите имя';      errEl.style.display = ''; return; }
-			if (!email)   { errEl.textContent = 'Введите email';    errEl.style.display = ''; return; }
-			if (!consent) { errEl.textContent = 'Необходимо согласие с политикой ПДн'; errEl.style.display = ''; return; }
+			if (!name)  { errEl.textContent = 'Введите имя';   errEl.style.display = ''; return; }
+			if (!email) { errEl.textContent = 'Введите e-mail'; errEl.style.display = ''; return; }
 			btn.disabled = true;
 			var fd = new FormData();
 			fd.append('name', name); fd.append('email', email);
-			fd.append('phone', phone); fd.append('message', message);
+			fd.append('phone', phone); fd.append('message', '');
 			fetch('/local/ajax/contact.php', { method: 'POST', body: fd })
 				.then(function(r){ return r.json(); })
 				.then(function(data){
