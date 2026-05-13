@@ -5404,7 +5404,7 @@ select,
     position: relative;
     width: 100%;
     background-color: #fff;
-    padding: 2vw;
+    padding: 32px;
 }
 
 .form-partnership-popup .account__personal {
