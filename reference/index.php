@@ -150,7 +150,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['d5_action'])) {
                                 </div>
                             </div>
 							<div class="banner-other__buttons">
-								<a href="#culture" class="banner-other__btn btn">Подробнее</a>
+								<a href="#что-дают-референс-визиты" class="banner-other__btn btn">Подробнее</a>
 								<a href="#" class="banner-other__btn btn resume-select__btn" data-fancybox data-src="#form-reference-visits">Стать принимающей стороной</a>
 							</div>
                         </div>
@@ -167,7 +167,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['d5_action'])) {
         <?php po_render_reference_visits('Визиты'); ?>
 
         <!-- culture -->
-		<section class="culture culture-reference" id="culture">
+		<section class="culture culture-reference" id="что-дают-референс-визиты">
 			<div class="container">
 				<h2 class="main-title culture__title">
 					Что дают референс-визиты 
@@ -510,7 +510,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['d5_action'])) {
 			</div>
 			<div class="join__politic">
 				<div class="join__politic-question">
-					<p class="join__politic-link">Согласен с <a href="<?= defined('DOC_POLITIKA_URL') ? DOC_POLITIKA_URL : '#' ?>" target="_blank">политикой обработки ПДн</a></p>
+					<p class="join__politic-link">Согласен с <a href="<?= defined('DOC_POLITIKA_URL') ? DOC_POLITIKA_URL : '#' ?>" target="_blank">политикой обработки ПДн</a> <span style="color:var(--red-color)">*</span></p>
 					<div class="account__graduate-choice">
 						<label class="account__graduate-item">
 							<input type="radio" name="d5_agree" value="yes" class="account__graduate-input" required <?= $d5Form['d5_agree'] === 'yes' ? 'checked' : '' ?>>
