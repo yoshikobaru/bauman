@@ -260,7 +260,7 @@ document.addEventListener('DOMContentLoaded', function() {
 <!-- form-partner-competencies: попап "Стать партнёром" для Витрины компетенций -->
 <div id="form-partner-competencies" class="form-partnership-popup" style="display:none;">
     <div class="form-partnership-popup__inner">
-        <h2 class="account__title main-title">Витрина компетенций</h2>
+        <h2 class="account__title main-title">Запрос в Витрине компетенций</h2>
         <?php
             if (function_exists('po_render_industrial_partnership_form')) {
                 po_render_industrial_partnership_form([

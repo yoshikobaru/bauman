@@ -80,18 +80,7 @@ if (!function_exists('po_render_industrial_partnership_form')) {
 <form method="POST" action="<?= $action ?>">
                     <input type="hidden" name="<?= $hiddenName ?>" value="<?= $hiddenValue ?>">
                     <div class="account__personal">
-                        <div class="account__chapter"><h3 class="account__subtitle">Данные компании<?= $companyExtra ?></h3></div>
-                        <div class="account__personal-list account__grid">
-                            <input type="text" name="<?= htmlspecialchars($companyKey, ENT_QUOTES, 'UTF-8') ?>"
-                                   placeholder="Название компании *" required
-                                   value="<?= $fv($post, $companyKey) ?>">
-                            <input type="text" name="<?= htmlspecialchars($siteKey, ENT_QUOTES, 'UTF-8') ?>"
-                                   placeholder="Сайт компании"
-                                   value="<?= $fv($post, $siteKey) ?>">
-                        </div>
-                    </div>
-                    <div class="account__personal" style="margin-top:24px">
-                        <div class="account__chapter"><h3 class="account__subtitle">Контакты представителя</h3></div>
+                        <div class="account__chapter"><h3 class="account__subtitle">Данные представителя</h3></div>
                         <div class="account__personal-list account__grid">
                             <input type="text" name="<?= htmlspecialchars($contactKey, ENT_QUOTES, 'UTF-8') ?>"
                                    placeholder="ФИО представителя *" required
@@ -110,6 +99,17 @@ if (!function_exists('po_render_industrial_partnership_form')) {
                                    value="<?= $fv($post, $phoneKey) ?>">
                         </div>
                     </div>
+                    <div class="account__personal" style="margin-top:24px">
+                        <div class="account__chapter"><h3 class="account__subtitle">Данные о компании<?= $companyExtra ?></h3></div>
+                        <div class="account__personal-list account__grid">
+                            <input type="text" name="<?= htmlspecialchars($companyKey, ENT_QUOTES, 'UTF-8') ?>"
+                                   placeholder="Название компании *" required
+                                   value="<?= $fv($post, $companyKey) ?>">
+                            <input type="text" name="<?= htmlspecialchars($siteKey, ENT_QUOTES, 'UTF-8') ?>"
+                                   placeholder="Сайт компании"
+                                   value="<?= $fv($post, $siteKey) ?>">
+                        </div>
+                    </div>
                     <div class="join__politic" style="margin-top:24px">
                         <div class="join__politic-question">
                             <label style="display:flex;align-items:center;gap:10px;cursor:pointer">
@@ -121,7 +121,7 @@ if (!function_exists('po_render_industrial_partnership_form')) {
                             <?= $extraAfter ?>
                         </div>
                     </div>
-                    <button type="submit" class="btn authorization__btn" style="margin-top:24px">Отправить заявку на партнёрство</button>
+                    <button type="submit" class="btn authorization__btn" style="margin-top:24px">Отправить</button>
                 </form>
 <script>
 (function () {
