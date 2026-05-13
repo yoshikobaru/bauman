@@ -5375,17 +5375,27 @@ select,
 
 .form-partnership-popup__inner {
     position: relative;
-}
-
-.form-partnership-popup__subtitle {
-    color: #666;
-    margin-bottom: 32px;
-    font-size: 18px;
-    line-height: 1.5;
+    width: 100%;
 }
 
 .form-partnership-popup .account__personal {
     margin-bottom: 0;
+}
+
+.form-partnership-popup .account__chapter {
+    margin-bottom: 16px;
+}
+
+.form-partnership-popup .account__chapter h3 {
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.form-partnership-popup .form-partnership-popup__subtitle {
+    color: #666;
+    margin-bottom: 32px;
+    font-size: 18px;
+    line-height: 1.5;
 }
 
 .form-partnership-popup .account__personal-list {
