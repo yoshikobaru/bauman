@@ -4004,6 +4004,8 @@ select,
     border: none;
     border-radius: 4px;
     transition: border-color 0.2s ease;
+    height: 70px;
+    box-sizing: border-box;
 }
 
 .form-finance-help input:focus,
@@ -4013,7 +4015,8 @@ select,
 }
 
 .form-finance-help textarea {
-    min-height: 120px;
+    min-height: 250px;
+    height: 250px;
 }
 
 .fancybox__dialog .account__graduate-item *:empty,
@@ -4780,6 +4783,8 @@ select,
 
 .join__politic-question {
     width: 100%;
+    display: flex;
+    align-items: center;
 }
 
 .join__politic-link {
@@ -5453,9 +5458,22 @@ select,
 
 .form-partnership-popup .authorization__btn {
     width: 100%;
-    padding: 16px;
+}
+
+.form-finance-help .authorization__btn {
+    width: 100%;
+    padding: 20px;
+    background: #CE2029;
+    color: #fff;
     font-size: 18px;
-    font-weight: 700;
+    font-family: var(--text-geologica);
+    border: none;
+    border-radius: 0;
+    cursor: pointer;
+}
+
+.form-finance-help .authorization__btn:hover {
+    opacity: 0.9;
 }
 
 .form-partnership-popup .join__politic {

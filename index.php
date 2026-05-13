@@ -393,7 +393,6 @@ $APPLICATION->SetPageProperty('description', 'Политехническое о�
 
 <!-- partner form popup on main -->
 <div id="join-ur-block-main" class="form-partnership-popup" style="display:none;">
-	<div class="join__wrapper">
 		<h2 class="account__title main-title">Индустриальное партнёрство</h2>
 		<p class="form-partnership-popup__subtitle">
 			Для компаний, НИИ и организаций. После отправки заявки мы свяжемся с вами в течение 5 рабочих дней.
@@ -407,7 +406,6 @@ $APPLICATION->SetPageProperty('description', 'Политехническое о�
 			]);
 		?>
 	</div>
-</div>
 <!-- /partner form popup on main -->
 
 <!-- Рендерер: Новости и события -->
