@@ -3818,13 +3818,14 @@ strong {
 /* РљРѕРЅС‚РµР№РЅРµСЂ С‡РµРєР±РѕРєСЃР° */
   .checkbox-container {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     position: relative;
     padding-left: 30px;
     cursor: pointer;
     font-size: var(--text-size);
     user-select: none;
     color: #000;
+    line-height: 1.4;
   }
 
   /* РЎРєСЂС‹РІР°РµРј СЃС‚Р°РЅРґР°СЂС‚РЅС‹Р№ С‡РµРєР±РѕРєСЃ */
@@ -5364,7 +5365,7 @@ select,
 /* form-partnership-popup */
 .form-partnership-popup {
     padding: 32px;
-    max-width: 600px;
+    max-width: 700px;
     width: 100%;
     margin: 0 auto;
     background: #fff;
@@ -5378,8 +5379,8 @@ select,
 
 .form-partnership-popup__subtitle {
     color: #666;
-    margin-bottom: 24px;
-    font-size: var(--text-size);
+    margin-bottom: 32px;
+    font-size: 18px;
     line-height: 1.5;
 }
 
@@ -5388,38 +5389,47 @@ select,
 }
 
 .form-partnership-popup .account__personal-list {
-    gap: 16px;
+    gap: 24px;
 }
 
-.form-partnership-popup .account__personal-list input {
+.form-partnership-popup .account__personal-list input,
+.form-partnership-popup .account__personal-list textarea,
+.form-partnership-popup .account__personal-list select {
     width: 100%;
-    padding: 12px 16px;
+    padding: 16px 20px;
     border: 1px solid #ddd;
     border-radius: 4px;
-    font-size: 15px;
+    font-size: 18px;
     font-family: var(--text-georgia);
     transition: border-color 0.2s ease;
+    background: rgba(0, 0, 0, 0.03);
+    border: none;
 }
 
-.form-partnership-popup .account__personal-list input:focus {
+.form-partnership-popup .account__personal-list input:focus,
+.form-partnership-popup .account__personal-list textarea:focus,
+.form-partnership-popup .account__personal-list select:focus {
     outline: none;
     border-color: #CE2029;
+    background: rgba(0, 0, 0, 0.03);
 }
 
 .form-partnership-popup .authorization__btn {
     width: 100%;
-    padding: 14px 24px;
-    font-size: 16px;
+    padding: 16px;
+    font-size: 18px;
+    font-weight: 700;
 }
 
 .form-partnership-popup .join__politic {
-    margin-top: 20px;
+    margin-top: 32px;
+    margin-bottom: 32px;
 }
 
 .form-partnership-popup .join__politic-link {
-    font-size: 14px;
+    font-size: 18px;
     color: #666;
-    line-height: 1.4;
+    line-height: 1.5;
 }
 
 .form-partnership-popup .join__politic-link a {
