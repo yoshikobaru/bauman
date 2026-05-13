@@ -70,17 +70,22 @@ body {
 }
 
 .form-reference-visits,
-.form-finance-help {
+.form-finance-help,
+.form-partnership-popup {
     margin: 0 auto;
+    max-width: 100%;
 }
 
 .fancybox__content > .fancybox-container .form-reference-visits,
 .fancybox__content > .fancybox-container .form-finance-help,
-.fancybox__content > .fancybox-container .form-competencies {
+.fancybox__content > .fancybox-container .form-competencies,
+.fancybox__content > .fancybox-container .form-partnership-popup {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    width: auto !important;
+    max-width: 700px !important;
 }
 
 .form-boards__content {
