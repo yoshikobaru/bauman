@@ -134,7 +134,7 @@
 				<input type="email" id="ffh-email"   placeholder="e-mail *" style="width:100%;padding:16px 20px;font-size:18px;background:rgba(0,0,0,.03);border:none;border-radius:4px;box-sizing:border-box">
 				<input type="tel"   id="ffh-phone"   placeholder="Телефон" style="width:100%;padding:16px 20px;font-size:18px;background:rgba(0,0,0,.03);border:none;border-radius:4px;box-sizing:border-box">
 				<textarea id="ffh-message" placeholder="Сообщение" style="width:100%;min-height:120px;padding:16px 20px;font-size:18px;background:rgba(0,0,0,.03);border:none;border-radius:4px;resize:vertical;box-sizing:border-box"></textarea>
-				<div class="join__politic-question" style="gap:12px">
+				<div class="join__politic-question" style="flex-direction:column;gap:12px">
 					<p class="join__politic-link">Согласен с <a href="<?= defined('DOC_POLITIKA_URL') ? DOC_POLITIKA_URL : '#' ?>" target="_blank">политикой обработки ПДн</a></p>
 					<div class="account__graduate-choice" style="flex-direction:row;gap:24px">
 						<label class="account__graduate-item">
