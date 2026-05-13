@@ -49,21 +49,20 @@ body {
 .support-sum__desc,
 .support-sum__subtitle,
 .project-programm__donate {
-    text-align: justify;
+    text-align: left;
 }
 
 .project-programm__item-price div.active,
 .project-programm__item-price input {
     font-size: var(--text-32);
     font-weight: 600;
-    font-family: var(--font-space);
+    font-family: 'Geologica', sans-serif;
 }
 
 .project-programm__item-price input {
     border: none;
-    border-bottom: 2px solid var(--red-color);
+    border-bottom: 2px solid currentColor;
     background: transparent;
-    color: var(--red-color);
     text-align: center;
     outline: none;
     width: 200px;
