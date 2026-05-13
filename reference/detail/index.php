@@ -106,10 +106,14 @@ if (defined('IBLOCK_REFERENCE_ID') && IBLOCK_REFERENCE_ID > 0) {
         IBLOCK_REFERENCE_ID, $arElement['ID'], 'sort', 'asc', []
     );
     $props = [];
+    $statusXmlId = '';
     $detailCodes = ['REF_STATUS', 'REF_DATE', 'REF_LOCATION', 'REF_DURATION', 'REF_SUBTITLE'];
     while ($p = $dbProps->Fetch()) {
         if (!in_array($p['CODE'], $detailCodes)) continue;
         $props[$p['CODE']] = $p['VALUE_ENUM'] ?: $p['VALUE'];
+        if ($p['CODE'] === 'REF_STATUS') {
+            $statusXmlId = $p['VALUE_XML_ID'] ?? '';
+        }
     }
 } else {
     LocalRedirect('/reference/');
@@ -170,10 +174,12 @@ $userPhone     = $USER->IsAuthorized() ? htmlspecialchars($USER->GetParam('PERSO
                             <?= nl2br(htmlspecialchars($arElement['PREVIEW_TEXT'])) ?>
                         </p>
                         <?php endif; ?>
-                        <?php if ($_isMember): ?>
-                        <a href="#" class="banner-other__btn btn" data-fancybox data-src="#form-d4-visit">Зарегистрироваться</a>
-                        <?php else: ?>
-                        <a href="/join/?back=<?= urlencode($_SERVER['REQUEST_URI']) ?>" class="banner-other__btn btn">Зарегистрироваться</a>
+                        <?php if ($statusXmlId !== 'completed'): ?>
+                            <?php if ($_isMember): ?>
+                            <a href="#" class="banner-other__btn btn" data-fancybox data-src="#form-d4-visit">Зарегистрироваться</a>
+                            <?php else: ?>
+                            <a href="/join/?back=<?= urlencode($_SERVER['REQUEST_URI']) ?>" class="banner-other__btn btn">Зарегистрироваться</a>
+                            <?php endif; ?>
                         <?php endif; ?>
                     </div>
                     <img src="<?= SITE_TEMPLATE_PATH ?>/assets/img/reference-page/banner-other-pattern.png" alt="" class="banner-other__pattern">
@@ -195,6 +201,7 @@ $userPhone     = $USER->IsAuthorized() ? htmlspecialchars($USER->GetParam('PERSO
 
 </main>
 
+<?php if ($statusXmlId !== 'completed'): ?>
 <!-- D4: Форма заявки на участие в референс-визите -->
 <div class="form-d4-visit" id="form-d4-visit" style="display:none;">
     <div class="join__wrapper">
@@ -242,8 +249,9 @@ $userPhone     = $USER->IsAuthorized() ? htmlspecialchars($USER->GetParam('PERSO
         <?php endif; ?>
     </div>
 </div>
+<?php endif; ?>
 
-<?php if ($d4Done): ?>
+<?php if ($d4Done && $statusXmlId !== 'completed'): ?>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     if (window.Fancybox) Fancybox.show([{src: '#form-d4-visit', type: 'inline'}]);
