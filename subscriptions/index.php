@@ -189,7 +189,7 @@ $APPLICATION->SetTitle("Вступить");
                         <p class="main-text partner__text">
                             Для юридических лиц
                         </p>
-                        <button class="btn partner__btn desk-block">Стать партнером</button>
+                        <button class="btn partner__btn desk-block" data-fancybox data-src="#partner-popup-subscriptions">Стать партнером</button>
                     </div>
                     <div class="partner__discription">
                         <ul class="partner__list">
@@ -210,12 +210,33 @@ $APPLICATION->SetTitle("Вступить");
                             Стоимость обсуждается индивидуально. 
                         </p>
                     </div>
-                    <button class="btn partner__btn desk-none">Стать партнером</button>
+                    <button class="btn partner__btn desk-none" data-fancybox data-src="#partner-popup-subscriptions">Стать партнером</button>
                 </div>
             </div>
             <!-- /.container -->
         </section>
         <!-- /.partner -->
-	</main>
+
+        <!-- partner form popup -->
+        <div id="partner-popup-subscriptions" class="form-partnership-popup" style="display:none;">
+            <div class="form-partnership-popup__inner">
+                <h2 class="account__title main-title">Индустриальное партнёрство</h2>
+                <p class="form-partnership-popup__subtitle">
+                    Для компаний, НИИ и организаций. После отправки заявки мы свяжемся с вами в течение 5 рабочих дней.
+                </p>
+                <?php
+                    if (function_exists('po_render_industrial_partnership_form')) {
+                        po_render_industrial_partnership_form([
+                            'prefix'      => 'd7',
+                            'action'      => '/join/#join-ur-block',
+                            'hidden_name' => 'd7_action',
+                            'post'        => [],
+                        ]);
+                    }
+                ?>
+            </div>
+        </div>
+        <!-- /partner form popup -->
+ </main>
 
 <?php require($_SERVER["DOCUMENT_ROOT"]."/bitrix/footer.php");?>

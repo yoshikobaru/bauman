@@ -373,7 +373,7 @@ $APPLICATION->SetPageProperty('description', 'Политехническое о�
 			<p class="main-text partner__text">
 				Для юридических лиц
 			</p>
- <button class="btn partner__btn desk-block" onclick="showPartnerFormMain()">Стать партнером</button>
+ <button class="btn partner__btn desk-block" data-fancybox data-src="#join-ur-block-main">Стать партнером</button>
 		</div>
 		<div class="partner__discription">
 			<ul class="partner__list">
@@ -385,29 +385,30 @@ $APPLICATION->SetPageProperty('description', 'Политехническое о�
 				Стоимость обсуждается индивидуально.
 			</p>
 		</div>
- <button class="btn partner__btn desk-none" onclick="showPartnerFormMain()">Стать партнером</button>
+ <button class="btn partner__btn desk-none" data-fancybox data-src="#join-ur-block-main">Стать партнером</button>
 	</div>
 </div>
  </section>
-<!-- /.partner --> <!-- partner form on main --> <section id="join-ur-block-main" style="display:none">
-<div class="container" style="padding-top:48px;padding-bottom:48px">
-	<div class="join__wrapper">
+<!-- /.partner -->
+
+<!-- partner form popup on main -->
+<div id="join-ur-block-main" class="form-partnership-popup" style="display:none;">
+	<div class="form-partnership-popup__inner">
 		<h2 class="account__title main-title">Индустриальное партнёрство</h2>
-		<p style="margin-bottom:24px;color:#666">
+		<p class="form-partnership-popup__subtitle">
 			Для компаний, НИИ и организаций. После отправки заявки мы свяжемся с вами в течение 5 рабочих дней.
 		</p>
-		 <?php
-				po_render_industrial_partnership_form([
-					'prefix'      => 'd7',
-					'action'      => '/join/#join-ur-block',
-					'hidden_name' => 'd7_action',
-					'post'        => [],
-				]);
-				?>
+		<?php
+			po_render_industrial_partnership_form([
+				'prefix'      => 'd7',
+				'action'      => '/join/#join-ur-block',
+				'hidden_name' => 'd7_action',
+				'post'        => [],
+			]);
+		?>
 	</div>
 </div>
- </section>
-<!-- /partner form on main -->
+<!-- /partner form popup on main -->
 
 <!-- Рендерер: Новости и события -->
 <?php po_render_news_section(); ?>
@@ -415,15 +416,6 @@ $APPLICATION->SetPageProperty('description', 'Политехническое о�
 <!-- /.news -->
 
 </main>
-<script>
-function showPartnerFormMain() {
-	var block = document.getElementById('join-ur-block-main');
-	if (block) {
-		block.style.display = '';
-		block.scrollIntoView({ behavior: 'smooth', block: 'start' });
-	}
-}
-</script>
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
