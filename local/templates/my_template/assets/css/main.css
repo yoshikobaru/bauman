@@ -3979,11 +3979,33 @@ select,
 
 .form-finance-help {
     width: 100%;
+    max-width: 700px;
+    padding: 32px;
+    background: #fff;
+    border-radius: 8px;
+    font-family: var(--text-georgia);
+}
+
+.form-finance-help .join__wrapper {
+    width: 100%;
 }
 
 .form-finance-help input,
 .form-finance-help textarea {
     margin-bottom: 24px;
+    padding: 16px 20px;
+    font-size: 18px;
+    font-family: var(--text-georgia);
+    background: rgba(0, 0, 0, 0.03);
+    border: none;
+    border-radius: 4px;
+    transition: border-color 0.2s ease;
+}
+
+.form-finance-help input:focus,
+.form-finance-help textarea:focus {
+    outline: none;
+    border-color: #CE2029;
 }
 
 .form-finance-help textarea {
