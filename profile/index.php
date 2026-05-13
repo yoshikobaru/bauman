@@ -345,7 +345,6 @@ if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $profileDiplomaDateInputValue)) {
                     <div class="account__block">
                         <h2 class="account__title">Мои активности</h2>
 
-                        <!-- Telegram-чаты по уровню членства -->
                         <?php
                         $_userGroupsProfile = $USER->GetUserGroupArray();
                         $tgChats = [
@@ -354,18 +353,21 @@ if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $profileDiplomaDateInputValue)) {
                                 'desc'  => 'Обсуждения, новости, анонсы для всех членов общества',
                                 'url'   => '#',
                                 'icon'  => '💬',
+                                'type'  => 'basic',
                             ],
                             PO_MEMBER_PREMIUM_ID => [
                                 'title' => 'VIP-канал для почётных членов',
                                 'desc'  => 'Закрытый канал с эксклюзивными материалами и нетворкингом',
                                 'url'   => '#',
                                 'icon'  => '⭐',
+                                'type'  => 'premium',
                             ],
                             PO_PARTNER_ID        => [
                                 'title' => 'Канал для партнёров',
                                 'desc'  => 'Совместные проекты, вакансии и партнёрские предложения',
                                 'url'   => '#',
                                 'icon'  => '🤝',
+                                'type'  => 'partner',
                             ],
                         ];
                         $myTgChats = [];
@@ -374,34 +376,8 @@ if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $profileDiplomaDateInputValue)) {
                                 $myTgChats[] = $chatInfo;
                             }
                         }
-                        ?>
-                        <?php if (!empty($myTgChats)): ?>
-                        <div style="margin-bottom:32px">
-                            <h3 class="account__subtitle" style="margin-bottom:16px">Мои Telegram-чаты</h3>
-                            <div style="display:grid;gap:12px">
-                                <?php foreach ($myTgChats as $chat): ?>
-                                <div style="display:flex;align-items:center;gap:16px;background:#f0f8ff;border-radius:10px;padding:16px 20px;border-left:3px solid #2980b9">
-                                    <span style="font-size:28px"><?= $chat['icon'] ?></span>
-                                    <div style="flex:1">
-                                        <div style="font-weight:600;font-size:15px;margin-bottom:2px"><?= htmlspecialchars($chat['title']) ?></div>
-                                        <div style="color:#666;font-size:13px"><?= htmlspecialchars($chat['desc']) ?></div>
-                                    </div>
-                                    <?php if ($chat['url'] !== '#'): ?>
-                                    <a href="<?= htmlspecialchars($chat['url']) ?>" target="_blank" rel="noopener"
-                                       class="btn" style="white-space:nowrap;font-size:13px;padding:8px 16px">
-                                        Открыть
-                                    </a>
-                                    <?php else: ?>
-                                    <span style="color:#aaa;font-size:12px;white-space:nowrap">Скоро</span>
-                                    <?php endif; ?>
-                                </div>
-                                <?php endforeach; ?>
-                            </div>
-                        </div>
-                        <?php endif; ?>
 
-                        <?php
-                        $arEvents   = [];
+                        $arEvents    = [];
                         $arDonations = [];
                         if ($hlOk && defined('HL_APPLICATIONS_ID') && HL_APPLICATIONS_ID > 0) {
                             $hlEntity = \Bitrix\Highloadblock\HighloadBlockTable::getById(HL_APPLICATIONS_ID)->fetch();
@@ -420,81 +396,165 @@ if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $profileDiplomaDateInputValue)) {
                                 }
                             }
                         }
-                        $actStatusLabels = [
-                            'new'       => ['label' => 'Новая',        'color' => '#888'],
-                            'in_review' => ['label' => 'На рассмотрении','color' => '#2980b9'],
-                            'approved'  => ['label' => 'Одобрено',     'color' => '#27ae60'],
-                            'rejected'  => ['label' => 'Отклонено',    'color' => '#e74c3c'],
-                        ];
+
+                        // маппинг статусов в бейджи по Figma
+                        $eventBadgeClass = function($status) {
+                            return match($status) {
+                                'approved'  => 'activities__badge--active',
+                                'in_review' => 'activities__badge--review',
+                                'rejected'  => 'activities__badge--rejected',
+                                default     => 'activities__badge--new',
+                            };
+                        };
+                        $eventBadgeLabel = function($status) {
+                            return match($status) {
+                                'approved'  => 'Активно',
+                                'in_review' => 'На рассмотрении',
+                                'rejected'  => 'Отклонено',
+                                default     => 'Новая',
+                            };
+                        };
+                        // completed = approved + прошло
+                        $isCompleted = function($status) {
+                            return $status === 'approved';
+                        };
                         ?>
-                        <!-- Секция событий -->
-                        <div class="account__chapter" style="margin-top:24px">
-                            <h3 class="account__subtitle">Мои события</h3>
+
+                        <?php if (!empty($myTgChats)): ?>
+                        <div class="activities__tg-section">
+                            <p class="activities__tg-title">Доступные Telegram-чаты</p>
+                            <div class="activities__tg-list">
+                                <?php foreach ($myTgChats as $chat):
+                                    $iconClass = 'activities__tg-icon--' . ($chat['type'] ?? 'basic');
+                                ?>
+                                <div class="activities__tg-card">
+                                    <div class="activities__tg-icon <?= $iconClass ?>">
+                                        <?= $chat['icon'] ?>
+                                    </div>
+                                    <div class="activities__tg-body">
+                                        <div class="activities__tg-name"><?= htmlspecialchars($chat['title']) ?></div>
+                                        <div class="activities__tg-desc"><?= htmlspecialchars($chat['desc']) ?></div>
+                                    </div>
+                                    <div class="activities__tg-action">
+                                        <?php if ($chat['url'] !== '#'): ?>
+                                        <a href="<?= htmlspecialchars($chat['url']) ?>" target="_blank" rel="noopener"
+                                           class="btn" style="white-space:nowrap;font-size:14px;padding:8px 18px">
+                                            Открыть
+                                        </a>
+                                        <?php else: ?>
+                                        <span style="color:#aaa;font-size:13px;white-space:nowrap">Скоро</span>
+                                        <?php endif; ?>
+                                    </div>
+                                </div>
+                                <?php endforeach; ?>
+                            </div>
                         </div>
-                        <?php if (empty($arEvents)): ?>
-                        <p style="color:#888;margin-top:12px">Вы пока не регистрировались на события.</p>
-                        <a href="/news/?type=events" style="display:inline-block;margin-top:8px;color:#1a73e8">Посмотреть ближайшие события →</a>
-                        <?php else: ?>
-                        <table style="width:100%;border-collapse:collapse;margin-top:12px;font-size:14px">
-                            <thead>
-                                <tr style="background:#f5f5f5">
-                                    <th style="padding:10px;text-align:left;border-bottom:1px solid #eee">Событие</th>
-                                    <th style="padding:10px;text-align:left;border-bottom:1px solid #eee">Дата заявки</th>
-                                    <th style="padding:10px;text-align:left;border-bottom:1px solid #eee">Статус</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                            <?php foreach ($arEvents as $ev):
-                                $evData   = json_decode($ev['UF_DATA'] ?? '{}', true) ?: [];
-                                $evTitle  = htmlspecialchars($evData['event_name'] ?? ('Событие #' . ($ev['UF_ELEMENT_ID'] ?? $ev['ID'])));
-                                $evDate   = !empty($ev['UF_DATE_CREATE']) ? $ev['UF_DATE_CREATE']->format('d.m.Y H:i') : '';
-                                $evSt     = $actStatusLabels[$ev['UF_STATUS'] ?? 'new'] ?? ['label' => $ev['UF_STATUS'], 'color' => '#888'];
-                            ?>
-                            <tr style="border-bottom:1px solid #f0f0f0">
-                                <td style="padding:10px"><?= $evTitle ?></td>
-                                <td style="padding:10px"><?= htmlspecialchars($evDate) ?></td>
-                                <td style="padding:10px;color:<?= $evSt['color'] ?>;font-weight:600"><?= htmlspecialchars($evSt['label']) ?></td>
-                            </tr>
-                            <?php endforeach; ?>
-                            </tbody>
-                        </table>
                         <?php endif; ?>
 
-                        <!-- Секция пожертвований/поддержки проектов -->
-                        <div class="account__chapter" style="margin-top:32px">
-                            <h3 class="account__subtitle">История поддержки проектов</h3>
+                        <!-- Мероприятия -->
+                        <div class="activities__section">
+                            <div class="activities__section-header">
+                                <span class="activities__section-title">Мероприятия</span>
+                                <a href="/news/?type=events" class="activities__section-link">
+                                    Показать все
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+                                        <path d="M12 5v14M5 12l7-7 7 7"/>
+                                    </svg>
+                                </a>
+                            </div>
+
+                            <?php if (empty($arEvents)): ?>
+                            <div class="activities__empty">
+                                Вы пока не регистрировались на мероприятия.
+                                <a href="/news/?type=events">Посмотреть ближайшие события →</a>
+                            </div>
+                            <?php else: ?>
+                            <div class="activities__events-grid">
+                                <?php foreach ($arEvents as $ev):
+                                    $evData      = json_decode($ev['UF_DATA'] ?? '{}', true) ?: [];
+                                    $evTitle     = htmlspecialchars($evData['event_name'] ?? ('Событие #' . ($ev['UF_ELEMENT_ID'] ?? $ev['ID'])));
+                                    $evDateRaw   = !empty($ev['UF_DATE_CREATE']) ? $ev['UF_DATE_CREATE']->format('d.m.Y') : '';
+                                    $evStatus    = $ev['UF_STATUS'] ?? 'new';
+                                    $evBadgeCls  = $eventBadgeClass($evStatus);
+                                    $evBadgeLbl  = $eventBadgeLabel($evStatus);
+                                    $evCompleted = $isCompleted($evStatus);
+                                    $evImg       = $evData['event_image'] ?? '';
+                                ?>
+                                <div class="activities__event-card">
+                                    <?php if ($evImg): ?>
+                                    <img src="<?= htmlspecialchars($evImg) ?>"
+                                         alt="<?= $evTitle ?>"
+                                         class="activities__event-img<?= $evCompleted ? ' activities__event-img--completed' : '' ?>">
+                                    <?php else: ?>
+                                    <div class="activities__event-img" style="display:flex;align-items:center;justify-content:center;background:#e8e8e8">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#c0c0c0" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+                                    </div>
+                                    <?php endif; ?>
+                                    <div class="activities__event-body">
+                                        <div class="activities__event-badge-row">
+                                            <span class="activities__badge <?= $evBadgeCls ?>"><?= $evBadgeLbl ?></span>
+                                        </div>
+                                        <div class="activities__event-title"><?= $evTitle ?></div>
+                                        <?php if ($evDateRaw): ?>
+                                        <div class="activities__event-date"><?= $evDateRaw ?></div>
+                                        <?php endif; ?>
+                                        <a href="/news/<?= (int)($ev['UF_ELEMENT_ID'] ?? 0) ?>/"
+                                           class="activities__event-btn<?= $evCompleted ? ' activities__event-btn--disabled' : '' ?>">
+                                            <?= $evCompleted ? 'Завершено' : 'Подробнее' ?>
+                                        </a>
+                                    </div>
+                                </div>
+                                <?php endforeach; ?>
+                            </div>
+                            <?php endif; ?>
                         </div>
-                        <?php if (empty($arDonations)): ?>
-                        <p style="color:#888;margin-top:12px">Вы пока не поддерживали проекты.</p>
-                        <a href="/projects/" style="display:inline-block;margin-top:8px;color:#1a73e8">Посмотреть проекты →</a>
-                        <?php else: ?>
-                        <table style="width:100%;border-collapse:collapse;margin-top:12px;font-size:14px">
-                            <thead>
-                                <tr style="background:#f5f5f5">
-                                    <th style="padding:10px;text-align:left;border-bottom:1px solid #eee">Проект</th>
-                                    <th style="padding:10px;text-align:left;border-bottom:1px solid #eee">Сумма</th>
-                                    <th style="padding:10px;text-align:left;border-bottom:1px solid #eee">Дата</th>
-                                    <th style="padding:10px;text-align:left;border-bottom:1px solid #eee">Статус</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                            <?php foreach ($arDonations as $don):
-                                $donData  = json_decode($don['UF_DATA'] ?? '{}', true) ?: [];
-                                $donTitle = htmlspecialchars($donData['project_name'] ?? ('Проект #' . ($don['UF_ELEMENT_ID'] ?? $don['ID'])));
-                                $donSum   = htmlspecialchars($donData['amount'] ?? '—');
-                                $donDate  = !empty($don['UF_DATE_CREATE']) ? $don['UF_DATE_CREATE']->format('d.m.Y H:i') : '';
-                                $donSt    = $actStatusLabels[$don['UF_STATUS'] ?? 'new'] ?? ['label' => $don['UF_STATUS'], 'color' => '#888'];
-                            ?>
-                            <tr style="border-bottom:1px solid #f0f0f0">
-                                <td style="padding:10px"><?= $donTitle ?></td>
-                                <td style="padding:10px"><?= $donSum ?></td>
-                                <td style="padding:10px"><?= htmlspecialchars($donDate) ?></td>
-                                <td style="padding:10px;color:<?= $donSt['color'] ?>;font-weight:600"><?= htmlspecialchars($donSt['label']) ?></td>
-                            </tr>
-                            <?php endforeach; ?>
-                            </tbody>
-                        </table>
-                        <?php endif; ?>
+
+                        <!-- История пожертвований -->
+                        <div class="activities__section">
+                            <div class="activities__section-header">
+                                <span class="activities__section-title">История пожертвований</span>
+                                <a href="/projects/" class="activities__section-link">
+                                    Показать все
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+                                        <path d="M12 5v14M5 12l7-7 7 7"/>
+                                    </svg>
+                                </a>
+                            </div>
+
+                            <?php if (empty($arDonations)): ?>
+                            <div class="activities__empty">
+                                Вы пока не поддерживали проекты.
+                                <a href="/projects/">Посмотреть проекты →</a>
+                            </div>
+                            <?php else: ?>
+                            <div class="activities__donations-grid">
+                                <?php foreach ($arDonations as $don):
+                                    $donData     = json_decode($don['UF_DATA'] ?? '{}', true) ?: [];
+                                    $donTitle    = htmlspecialchars($donData['project_name'] ?? ('Проект #' . ($don['UF_ELEMENT_ID'] ?? $don['ID'])));
+                                    $donAmount   = htmlspecialchars($donData['amount'] ?? '—');
+                                    $donDateRaw  = !empty($don['UF_DATE_CREATE']) ? $don['UF_DATE_CREATE']->format('d.m.Y') : '';
+                                    $donStatus   = $don['UF_STATUS'] ?? 'new';
+                                    $donBadgeCls = $eventBadgeClass($donStatus);
+                                    $donBadgeLbl = $eventBadgeLabel($donStatus);
+                                ?>
+                                <div class="activities__donation-card">
+                                    <div class="activities__donation-meta">
+                                        <span class="activities__badge <?= $donBadgeCls ?>"><?= $donBadgeLbl ?></span>
+                                        <?php if ($donDateRaw): ?>
+                                        <span class="activities__donation-date"><?= $donDateRaw ?></span>
+                                        <?php endif; ?>
+                                    </div>
+                                    <div class="activities__donation-title"><?= $donTitle ?></div>
+                                    <div class="activities__donation-amount">
+                                        <span class="activities__donation-amount-label">Сумма</span>
+                                        <span class="activities__donation-amount-value"><?= $donAmount ?></span>
+                                    </div>
+                                </div>
+                                <?php endforeach; ?>
+                            </div>
+                            <?php endif; ?>
+                        </div>
+
                     </div>
 
                     <?php elseif ($tab === 'applications'): ?>

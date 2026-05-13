@@ -5680,3 +5680,270 @@ select,
     }
 }
 
+/* ─── Мои активности: Telegram-чаты ─── */
+.activities__tg-section { margin-bottom: 40px; }
+.activities__tg-title {
+    font-size: 18px;
+    font-weight: 300;
+    color: #000;
+    margin-bottom: 16px;
+    font-family: var(--text-georgia);
+}
+.activities__tg-list { display: flex; flex-direction: column; gap: 12px; }
+.activities__tg-card {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 14px 20px;
+    background: #fff;
+    border: 1px solid rgba(0, 47, 73, 0.12);
+    border-radius: 0;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+.activities__tg-card:hover {
+    border-color: rgba(0, 47, 73, 0.3);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+}
+.activities__tg-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 20px;
+}
+.activities__tg-icon--basic   { background: rgba(0, 47, 73, 0.08); }
+.activities__tg-icon--premium { background: rgba(240, 165, 0, 0.12); }
+.activities__tg-icon--partner { background: rgba(41, 128, 185, 0.12); }
+.activities__tg-body { flex: 1; min-width: 0; }
+.activities__tg-name {
+    font-size: 18px;
+    font-weight: 500;
+    color: #002F49;
+    letter-spacing: -0.02em;
+    line-height: 130%;
+    margin-bottom: 2px;
+}
+.activities__tg-desc {
+    font-size: 14px;
+    font-weight: 300;
+    color: #000;
+    opacity: 0.5;
+    line-height: 150%;
+}
+.activities__tg-action { flex-shrink: 0; }
+
+/* ─── Мои активности: секции ─── */
+.activities__section { margin-bottom: 40px; }
+.activities__section:last-child { margin-bottom: 0; }
+.activities__section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+}
+.activities__section-title {
+    font-size: 18px;
+    font-weight: 300;
+    color: #000;
+    font-family: var(--text-georgia);
+}
+.activities__section-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 18px;
+    font-weight: 300;
+    color: #000;
+    text-decoration: none;
+    opacity: 0.6;
+    transition: opacity 0.2s;
+    font-family: var(--text-georgia);
+}
+.activities__section-link:hover { opacity: 1; text-decoration: none; }
+.activities__section-link svg { width: 20px; height: 20px; }
+
+/* ─── Мои активности: пустые состояния ─── */
+.activities__empty {
+    padding: 32px 24px;
+    text-align: center;
+    color: #888;
+    font-size: 16px;
+    background: #f8f8f8;
+    border-radius: 0;
+}
+.activities__empty a {
+    color: #004B7A;
+    text-decoration: none;
+    display: inline-block;
+    margin-top: 8px;
+}
+.activities__empty a:hover { text-decoration: underline; }
+
+/* ─── Мои активности: статусные бейджи ─── */
+.activities__badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 12px;
+    font-size: 18px;
+    font-weight: 300;
+    line-height: 150%;
+    border-radius: 0;
+    white-space: nowrap;
+    font-family: var(--text-georgia);
+}
+.activities__badge--active    { background: rgba(45, 129, 0, 0.03); color: #2D8100; }
+.activities__badge--completed,
+.activities__badge--finished  { background: rgba(206, 32, 41, 0.03); color: #CE2029; }
+.activities__badge--review    { background: rgba(41, 128, 185, 0.05); color: #2980b9; }
+.activities__badge--new       { background: rgba(0, 0, 0, 0.04); color: #666; }
+.activities__badge--rejected  { background: rgba(231, 76, 60, 0.05); color: #e74c3c; }
+
+/* ─── Мои активности: карточки мероприятий (3 колонки) ─── */
+.activities__events-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+}
+.activities__event-card {
+    background: #F5F5F6;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    transition: box-shadow 0.2s;
+}
+.activities__event-card:hover { box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); }
+.activities__event-img {
+    width: 100%;
+    height: 220px;
+    object-fit: cover;
+    display: block;
+    background: #e8e8e8;
+}
+.activities__event-img--completed { filter: grayscale(100%); opacity: 0.7; }
+.activities__event-body {
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    flex: 1;
+}
+.activities__event-badge-row { display: flex; align-items: center; justify-content: flex-start; }
+.activities__event-title {
+    font-size: 18px;
+    font-weight: 500;
+    color: #000;
+    letter-spacing: -0.02em;
+    line-height: 130%;
+    flex: 1;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+.activities__event-date {
+    font-size: 13px;
+    font-weight: 300;
+    color: #000;
+    opacity: 0.5;
+}
+.activities__event-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 14px 16px;
+    border: 2px solid rgba(206, 32, 41, 0.1);
+    border-radius: 0;
+    font-size: 18px;
+    font-weight: 700;
+    font-family: var(--font-space);
+    letter-spacing: -0.02em;
+    color: #CE2029;
+    text-decoration: none;
+    transition: background 0.2s, border-color 0.2s;
+    margin-top: auto;
+    cursor: pointer;
+    background: transparent;
+}
+.activities__event-btn:hover {
+    background: rgba(206, 32, 41, 0.04);
+    border-color: rgba(206, 32, 41, 0.25);
+    text-decoration: none;
+}
+.activities__event-btn--disabled {
+    opacity: 0.3;
+    cursor: default;
+    pointer-events: none;
+}
+
+/* ─── Мои активности: карточки пожертвований (2 колонки) ─── */
+.activities__donations-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+}
+.activities__donation-card {
+    background: rgba(0, 0, 0, 0.03);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    transition: background 0.2s, box-shadow 0.2s;
+}
+.activities__donation-card:hover {
+    background: rgba(0, 0, 0, 0.05);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+}
+.activities__donation-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
+.activities__donation-date {
+    font-size: 18px;
+    font-weight: 300;
+    color: #000;
+    opacity: 0.3;
+    white-space: nowrap;
+}
+.activities__donation-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #002F49;
+    letter-spacing: -0.02em;
+    line-height: 120%;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+.activities__donation-amount { display: flex; flex-direction: column; gap: 2px; }
+.activities__donation-amount-label {
+    font-size: 18px;
+    font-weight: 300;
+    color: #000;
+    opacity: 0.3;
+}
+.activities__donation-amount-value {
+    font-size: 24px;
+    font-weight: 600;
+    color: #002F49;
+    letter-spacing: -0.02em;
+}
+
+/* ─── Responsive ─── */
+@media (max-width: 1100px) {
+    .activities__events-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 768px) {
+    .activities__events-grid,
+    .activities__donations-grid { grid-template-columns: 1fr; }
+    .activities__tg-card { flex-wrap: wrap; }
+    .activities__tg-action { width: 100%; }
+    .activities__event-btn { font-size: 16px; }
+}
+
