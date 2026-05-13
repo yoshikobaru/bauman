@@ -125,7 +125,7 @@
 	</div>
 
 	<!-- Форма: Связаться с организаторами / Стать партнёром -->
-	<div class="form-finance-help" id="form-finance-help" style="display:none;max-width:600px;">
+	<div class="form-finance-help" id="form-finance-help" style="display:none;">
 		<div class="join__wrapper">
 			<h2 class="account__title main-title" id="ffh-title">Связаться с организаторами</h2>
 			<div id="ffh-form-block">

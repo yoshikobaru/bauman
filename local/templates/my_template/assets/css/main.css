@@ -3993,6 +3993,7 @@ select,
 
 .form-finance-help .join__wrapper {
     width: 100%;
+    padding: 2vw;
 }
 
 .form-finance-help input,
@@ -5402,6 +5403,8 @@ select,
 .form-partnership-popup__inner {
     position: relative;
     width: 100%;
+    background-color: #fff;
+    padding: 2vw;
 }
 
 .form-partnership-popup .account__personal {
