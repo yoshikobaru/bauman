@@ -126,45 +126,39 @@
 
 	<!-- Форма: Связаться с организаторами / Стать партнёром -->
 	<div class="form-finance-help" id="form-finance-help" style="display:none;">
-		<div class="form-finance-help__inner">
+		<div class="form-finance-help__header">
 			<h2 class="form-finance-help__title" id="ffh-title">Связаться с организаторами</h2>
 			<button class="form-finance-help__close" data-fancybox-close aria-label="Закрыть">
 				<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
 					<path d="M18 6L6 18M6 6L18 18" stroke="#000" stroke-width="2" stroke-linecap="round"/>
 				</svg>
 			</button>
-			<div id="ffh-form-block">
-				<p id="ffh-error" style="display:none;color:#c0392b;margin-bottom:12px;font-size:14px"></p>
-				<div class="form-finance-help__fields">
-					<div class="form-finance-help__input-wrapper">
-						<input type="email" id="ffh-email" class="form-finance-help__input" placeholder="E-mail" required>
-					</div>
-					<div class="form-finance-help__input-wrapper">
-						<input type="text" id="ffh-subject" class="form-finance-help__input" placeholder="Тема письма" required>
-					</div>
-					<div class="form-finance-help__textarea-wrapper">
-						<textarea id="ffh-message" class="form-finance-help__textarea" placeholder="Письмо" required></textarea>
-					</div>
-				</div>
-				<div class="form-finance-help__consent-row">
-					<div class="form-finance-help__consent-text">
-						Согласен с <a href="<?= defined('DOC_POLITIKA_URL') ? DOC_POLITIKA_URL : '#' ?>" target="_blank">политикой обработки ПДн</a>
-					</div>
-					<div class="form-finance-help__radio-group">
-						<label class="form-finance-help__radio">
-							<input type="radio" name="ffh_consent" value="yes" id="ffh-consent-yes" class="form-finance-help__radio-input" checked>
-							<span class="form-finance-help__radio-custom"></span>
-							<span class="form-finance-help__radio-label">Да</span>
-						</label>
-						<label class="form-finance-help__radio">
-							<input type="radio" name="ffh_consent" value="no" class="form-finance-help__radio-input">
-							<span class="form-finance-help__radio-custom"></span>
-							<span class="form-finance-help__radio-label">Нет</span>
-						</label>
-					</div>
-				</div>
-				<button class="form-finance-help__submit" id="ffh-submit">Отправить</button>
+		</div>
+		<div id="ffh-form-block">
+			<p id="ffh-error" style="display:none;color:#c0392b;margin-bottom:12px;font-size:14px"></p>
+			<div class="form-finance-help__fields">
+				<input type="email" id="ffh-email" class="form-finance-help__input" placeholder="E-mail" required>
+				<input type="text" id="ffh-subject" class="form-finance-help__input" placeholder="Тема письма" required>
+				<textarea id="ffh-message" class="form-finance-help__textarea" placeholder="Письмо" required></textarea>
 			</div>
+			<div class="form-finance-help__consent-section">
+				<p class="form-finance-help__consent-text">
+					Согласен с <a href="<?= defined('DOC_POLITIKA_URL') ? DOC_POLITIKA_URL : '#' ?>" target="_blank">политикой обработки ПДн</a>
+				</p>
+				<div class="form-finance-help__radio-group">
+					<label class="form-finance-help__radio">
+						<input type="radio" name="ffh_consent" value="yes" id="ffh-consent-yes" class="form-finance-help__radio-input" checked>
+						<span class="form-finance-help__radio-custom"></span>
+						<span class="form-finance-help__radio-label">Да</span>
+					</label>
+					<label class="form-finance-help__radio">
+						<input type="radio" name="ffh_consent" value="no" class="form-finance-help__radio-input">
+						<span class="form-finance-help__radio-custom"></span>
+						<span class="form-finance-help__radio-label">Нет</span>
+					</label>
+				</div>
+			</div>
+			<button class="form-finance-help__submit" id="ffh-submit">Отправить</button>
 		</div>
 		<div id="ffh-ok" style="display:none;text-align:center;padding:32px 0">
 			<div style="font-size:48px;margin-bottom:12px">✅</div>

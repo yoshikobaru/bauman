@@ -3987,14 +3987,14 @@ select,
     border-radius: 0;
     font-family: var(--text-geologica);
     box-sizing: border-box;
+    position: relative;
 }
 
-.form-finance-help__inner {
+.form-finance-help__header {
     display: flex;
-    flex-direction: column;
+    justify-content: space-between;
     align-items: flex-start;
-    gap: 12px;
-    position: relative;
+    width: 100%;
 }
 
 .form-finance-help__title {
@@ -4009,8 +4009,8 @@ select,
 
 .form-finance-help__close {
     position: absolute;
-    top: 0;
-    right: 0;
+    top: 40px;
+    right: 80px;
     width: 32px;
     height: 32px;
     display: flex;
@@ -4036,16 +4036,7 @@ select,
     flex-direction: column;
     gap: 24px;
     width: 100%;
-    margin-top: 28px;
-}
-
-.form-finance-help__input-wrapper,
-.form-finance-help__textarea-wrapper {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: flex-start;
-    width: 100%;
+    margin-top: 40px;
 }
 
 .form-finance-help__input {
@@ -4076,7 +4067,6 @@ select,
 .form-finance-help__textarea {
     width: 100%;
     height: 250px;
-    min-height: 250px;
     padding: 18px 20px;
     font-size: 22px;
     font-family: 'Geologica', var(--text-geologica);
@@ -4100,14 +4090,13 @@ select,
     background: rgba(0, 0, 0, 0.05);
 }
 
-.form-finance-help__consent-row {
+.form-finance-help__consent-section {
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     align-items: flex-start;
-    justify-content: space-between;
+    gap: 16px;
     width: 100%;
-    margin-top: 16px;
-    gap: 24px;
+    margin-top: 40px;
 }
 
 .form-finance-help__consent-text {
@@ -4228,6 +4217,11 @@ select,
         padding: 32px 48px;
     }
     
+    .form-finance-help__close {
+        top: 32px;
+        right: 48px;
+    }
+    
     .form-finance-help__title {
         font-size: 36px;
     }
@@ -4248,11 +4242,9 @@ select,
         padding: 24px 20px;
     }
     
-    .form-finance-help__title {
-        font-size: 28px;
-    }
-    
     .form-finance-help__close {
+        top: 24px;
+        right: 20px;
         width: 24px;
         height: 24px;
     }
@@ -4262,9 +4254,8 @@ select,
         height: 24px;
     }
     
-    .form-finance-help__consent-row {
-        flex-direction: column;
-        gap: 16px;
+    .form-finance-help__title {
+        font-size: 28px;
     }
     
     .form-finance-help__submit {
