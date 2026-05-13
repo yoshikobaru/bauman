@@ -82,6 +82,7 @@ body {
     max-width: 700px !important;
     max-height: 90vh !important;
     overflow-y: auto;
+    padding: 0 !important;
 }
 
 .form-boards__content {
@@ -5388,7 +5389,7 @@ select,
 
 /* form-partnership-popup */
 .form-partnership-popup {
-    padding: 32px;
+    padding: 40px 80px;
     max-width: 700px;
     width: 100%;
     margin: 0 auto;
@@ -5401,7 +5402,7 @@ select,
     position: relative;
     width: 100%;
     background-color: #fff;
-    padding: 32px;
+    padding: 0;
 }
 
 .form-partnership-popup .account__personal {
@@ -5477,16 +5478,11 @@ select,
     text-decoration: underline;
 }
 
-/* Fancybox popup customization */
-.fancybox__dialog .form-partnership-popup {
-    padding: 32px;
-}
-
 @media (max-width: 576px) {
     .form-partnership-popup {
         padding: 20px 16px;
     }
-    
+
     .form-partnership-popup .account__personal-list.account__grid {
         grid-template-columns: 1fr;
     }
