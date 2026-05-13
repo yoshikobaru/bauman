@@ -33,7 +33,7 @@ if (!function_exists('po_render_industrial_partnership_form')) {
         $defaults     = $cfg['defaults'] ?? [];
         $politika     = defined('DOC_POLITIKA_URL') ? DOC_POLITIKA_URL : '#';
         $politikaEsc  = htmlspecialchars($politika, ENT_QUOTES, 'UTF-8');
-        $subtitle     = $cfg['subtitle'] ?? 'Заполните форму и мы свяжемся с вами';
+        $subtitle     = $cfg['subtitle'] ?? '';
 
         $emailPh = $cfg['email_placeholder']
             ?? ($prefix === 'ur' ? 'e-mail *' : 'Email *');
@@ -76,7 +76,9 @@ if (!function_exists('po_render_industrial_partnership_form')) {
         $phoneTitle   = 'Допустимы только цифры, пробел, символы + и −';
         $phonePattern = '[0-9 \+\-]*';
         ?>
+<?php if ($subtitle): ?>
 <p class="form-partnership-popup__subtitle"><?= htmlspecialchars($subtitle, ENT_QUOTES, 'UTF-8') ?></p>
+<?php endif; ?>
 <form method="POST" action="<?= $action ?>">
                     <input type="hidden" name="<?= $hiddenName ?>" value="<?= $hiddenValue ?>">
                     <div class="account__personal">

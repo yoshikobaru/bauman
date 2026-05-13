@@ -2054,6 +2054,7 @@ strong {
 
 .banner-other--about {
     margin-top: calc(var(--section-margin) + 48px);
+    background-color: transparent;
     position: relative;
     z-index: 1;
 }
@@ -3987,14 +3988,6 @@ select,
     border-radius: 0;
     font-family: var(--text-geologica);
     box-sizing: border-box;
-    position: relative;
-}
-
-.form-finance-help__header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    width: 100%;
 }
 
 .form-finance-help__title {
@@ -4005,30 +3998,6 @@ select,
     margin: 0;
     line-height: 120%;
     letter-spacing: -0.02em;
-}
-
-.form-finance-help__close {
-    position: absolute;
-    top: 40px;
-    right: 80px;
-    width: 32px;
-    height: 32px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: transparent;
-    border: 2px solid #000000;
-    cursor: pointer;
-    padding: 0;
-    transition: opacity 0.2s ease;
-}
-
-.form-finance-help__close:hover {
-    opacity: 0.6;
-}
-
-.form-finance-help__close svg path {
-    stroke: #000000;
 }
 
 .form-finance-help__fields {
@@ -4217,11 +4186,6 @@ select,
         padding: 32px 48px;
     }
     
-    .form-finance-help__close {
-        top: 32px;
-        right: 48px;
-    }
-    
     .form-finance-help__title {
         font-size: 36px;
     }
@@ -4240,18 +4204,6 @@ select,
 @media (max-width: 768px) {
     .form-finance-help {
         padding: 24px 20px;
-    }
-    
-    .form-finance-help__close {
-        top: 24px;
-        right: 20px;
-        width: 24px;
-        height: 24px;
-    }
-    
-    .form-finance-help__close svg {
-        width: 24px;
-        height: 24px;
     }
     
     .form-finance-help__title {
@@ -5021,7 +4973,7 @@ select,
 .join__politic-link {
     font-size: 18px;
     margin-bottom: 16px;
-
+    padding-top: 2px;
 }
 
 .join__politic-link a {

@@ -126,14 +126,7 @@
 
 	<!-- Форма: Связаться с организаторами / Стать партнёром -->
 	<div class="form-finance-help" id="form-finance-help" style="display:none;">
-		<div class="form-finance-help__header">
-			<h2 class="form-finance-help__title" id="ffh-title">Связаться с организаторами</h2>
-			<button class="form-finance-help__close" data-fancybox-close aria-label="Закрыть">
-				<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-					<path d="M18 6L6 18M6 6L18 18" stroke="#000" stroke-width="2" stroke-linecap="round"/>
-				</svg>
-			</button>
-		</div>
+		<h2 class="form-finance-help__title" id="ffh-title">Связаться с организаторами</h2>
 		<div id="ffh-form-block">
 			<p id="ffh-error" style="display:none;color:#c0392b;margin-bottom:12px;font-size:14px"></p>
 			<div class="form-finance-help__fields">
