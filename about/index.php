@@ -53,12 +53,8 @@ $APPLICATION->SetPageProperty('description', 'О Политехническом 
 
 <!-- /.boards -->
 
-<!-- Рендерер: Члены Политехнического общества -->
-<?php po_render_members_section('Члены Политехнического общества', 12, true); ?>
-
-<!-- /.members-section -->
-
 <!-- history -->
+<section class="history bg-white" id="history">
 <div class="container">
 	<h2 class="main-title history__title">
 	С 19 века создаем сеть поддержки и обеспечиваем стабильность и рост общества </h2>
@@ -108,8 +104,11 @@ $APPLICATION->SetPageProperty('description', 'О Политехническом 
 		</div>
 	</div>
 </div>
- <!-- /.container --> </section>
-<!-- /.history --> <section class="charter">
+ <!-- /.container -->
+</section>
+<!-- /.history -->
+
+<section class="charter">
 <div class="container">
 	<div class="charter__wrapper">
  <img src="/local/templates/my_template/assets/img/about/charter-img-1.png" alt="" class="charter__image-main">
@@ -328,9 +327,6 @@ $APPLICATION->SetPageProperty('description', 'О Политехническом 
 
 <!-- Рендерер: Модальные окна членов Совета (для fancybox) -->
 <?php po_render_board_modals(); ?>
-
-<!-- Рендерер: Модальные окна членов Политехнического общества (для fancybox) -->
-<?php po_render_members_modals(); ?>
 
 </main>
 

@@ -48,9 +48,9 @@ if (!function_exists('po_render_projects_listing')) {
         // Fallback статичные проекты
         $staticProjects = [
             ['name' => 'PolytechExpo',             'text' => 'Ежегодная конференция выпускников и партнёров МГТУ им. Н.Э. Баумана', 'url' => '/projects/politech-expo/',  'img' => '/assets/img/projects-page/current-project-img-1.png'],
-            ['name' => 'Встреча выпускников',      'text' => 'Традиционная встреча выпускников всех поколений Бауманки',            'url' => '/projects/conference/',    'img' => '/assets/img/projects-page/current-project-img-1.png'],
-            ['name' => 'Попечительский совет МТ4', 'text' => 'Поддержка развития кафедры МТ4 МГТУ им. Н.Э. Баумана',              'url' => '/projects/trustees/',      'img' => '/assets/img/projects-page/current-project-img-1.png'],
-            ['name' => 'Реставрация ротонды',      'text' => 'Проект по восстановлению исторической ротонды МГТУ',                  'url' => '/projects/restoration/',   'img' => '/assets/img/projects-page/current-project-img-1.png'],
+            ['name' => 'Встреча выпускников',      'text' => 'Традиционная встреча выпускников всех поколений Бауманки',            'url' => '/projects/conference/',    'img' => '/assets/img/projects-page/current-project-img-2.png'],
+            ['name' => 'Попечительский совет МТ4', 'text' => 'Поддержка развития кафедры МТ4 МГТУ им. Н.Э. Баумана',              'url' => '/projects/trustees/',      'img' => '/assets/img/projects-page/current-project-img-3.png'],
+            ['name' => 'Реставрация ротонды',      'text' => 'Проект по восстановлению исторической ротонды МГТУ',                  'url' => '/projects/restoration/',   'img' => '/assets/img/projects-page/current-project-img-4.png'],
         ];
 
         $projects = [];
@@ -111,17 +111,21 @@ if (!function_exists('po_render_projects_listing')) {
                         <?php endforeach; ?>
                     </div>
 
-                    <div class="visits__list visits__list--projects">
+                    <div class="visits__list">
                         <?php if ($hasItems): ?>
                             <?php foreach ($projects as $proj): ?>
-                        <div class="visits__card visits__card--compact">
+                        <div class="visits__card">
+                            <img src="<?= htmlspecialchars($proj['img']) ?>" alt="<?= htmlspecialchars($proj['name']) ?>" class="visits__image">
                             <div class="visits__content">
+                                <?php if (!empty($proj['date'])): ?>
+                                <p class="visits__text" style="opacity: 0.5; margin-bottom: 8px;"><?= htmlspecialchars($proj['date']) ?></p>
+                                <?php endif; ?>
                                 <h3 class="visits__subtitle"><?= htmlspecialchars($proj['name']) ?></h3>
                                 <?php if (!empty($proj['text'])): ?>
                                 <p class="visits__text"><?= htmlspecialchars($proj['text']) ?></p>
                                 <?php endif; ?>
                                 <div class="visits__buttons">
-                                    <a href="/projects/?status=<?= $statusFilter ?>" class="btn visits__btn btn-transparent visits__btn--outline">Все проекты</a>
+                                    <a href="<?= htmlspecialchars($proj['link']) ?>" class="btn visits__btn btn-transparent">Подробнее</a>
                                     <a href="/support/?project=<?= urlencode($proj['name']) ?>" class="btn visits__btn visits__btn--help">Поддержать</a>
                                 </div>
                             </div>
@@ -129,12 +133,13 @@ if (!function_exists('po_render_projects_listing')) {
                             <?php endforeach; ?>
                         <?php elseif ($statusFilter !== 'completed'): ?>
                             <?php foreach ($staticProjects as $sp): ?>
-                        <div class="visits__card visits__card--compact">
+                        <div class="visits__card">
+                            <img src="<?= htmlspecialchars($sp['img']) ?>" alt="<?= htmlspecialchars($sp['name']) ?>" class="visits__image">
                             <div class="visits__content">
                                 <h3 class="visits__subtitle"><?= htmlspecialchars($sp['name']) ?></h3>
                                 <p class="visits__text"><?= htmlspecialchars($sp['text']) ?></p>
                                 <div class="visits__buttons">
-                                    <a href="/projects/?status=<?= $statusFilter ?>" class="btn visits__btn btn-transparent visits__btn--outline">Все проекты</a>
+                                    <a href="<?= htmlspecialchars($sp['url']) ?>" class="btn visits__btn btn-transparent">Подробнее</a>
                                     <a href="/support/?project=<?= urlencode($sp['name']) ?>" class="btn visits__btn visits__btn--help">Поддержать</a>
                                 </div>
                             </div>

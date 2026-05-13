@@ -276,7 +276,7 @@ $APPLICATION->SetPageProperty('description', 'Политехническое о�
 				<p>
 					 Практика на основе исследований
 				</p>
- </a> <a href="/about/#history-section" class="new-project__card new-project__card--different" style="text-decoration:none;color:#fff;display:block;"> <img src="/local/templates/my_template/assets/img/new-project-bg.png" alt="">
+ </a> <a href="/about/#history" class="new-project__card new-project__card--different" style="text-decoration:none;color:#fff;display:block;"> <img src="/local/templates/my_template/assets/img/new-project-bg.png" alt="">
 				<h3>
 				История и крепкое сообщество </h3>
  </a>
