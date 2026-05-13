@@ -463,11 +463,11 @@ if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $fizDiplomaDateInputValue)) {
                         </button>
                         <input type="date" id="fiz-dob-picker" class="po-date-field__native" tabindex="-1" aria-hidden="true">
                     </div>
+                    <input type="text" name="fiz_second_name" placeholder="Отчество"
+                           value="<?= htmlspecialchars($_POST['fiz_second_name'] ?? '') ?>">
                     <input type="tel" name="fiz_phone" placeholder="Телефон *"
                            autocomplete="tel"
                            value="<?= htmlspecialchars($_POST['fiz_phone'] ?? '') ?>">
-                    <input type="text" name="fiz_second_name" placeholder="Отчество"
-                           value="<?= htmlspecialchars($_POST['fiz_second_name'] ?? '') ?>">
                     <input type="hidden" name="fiz_dob_hidden" id="fiz-dob-hidden">
                 </div>
             </div>
