@@ -3837,12 +3837,11 @@ strong {
     width: 0;
   }
 
-  /* РљРІР°РґСЂР°С‚РёРє */
+  /* РљРІР°РґС€Р°С‚РёРє */
   .checkmark {
     position: absolute;
     left: 0;
-    top: 50%;
-    transform: translateY(-50%);
+    top: 0;
     height: 20px;
     width: 20px;
     background-color: #EFEFF0;
@@ -3862,12 +3861,12 @@ strong {
     position: absolute;
     display: none;
     left: 6px;
-    top: 50%;
-    transform: translateY(-50%) rotate(45deg);
+    top: 4px;
     width: 6px;
     height: 12px;
     border: solid white;
     border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
   }
 
   .checkbox-container input:checked ~ .checkmark::after {
