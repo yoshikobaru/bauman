@@ -5935,6 +5935,425 @@ select,
     letter-spacing: -0.02em;
 }
 
+/* ─── Activities: toggle button reset ─── */
+.activities__section-link {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+}
+
+/* ================================================================
+   SECURITY TAB — /profile/security/
+   ================================================================ */
+
+/* Блок */
+.account__block--security {
+    padding: 40px;
+    background: #fff;
+}
+
+.security-title {
+    font-family: 'Geologica', sans-serif;
+    font-weight: 600;
+    font-size: 50px;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+    color: #000;
+    margin: 0 0 40px;
+}
+
+/* Секция (группа блоков) */
+.security-section {
+    margin-bottom: 40px;
+}
+
+.security-section__subtitle {
+    font-family: 'Geologica', sans-serif;
+    font-weight: 300;
+    font-size: 18px;
+    line-height: 1.5;
+    color: #000;
+    margin: 0 0 24px;
+}
+
+/* ── Смена пароля ── */
+.security-form {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+.security-password-fields {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 24px;
+    flex-wrap: wrap;
+}
+
+.security-field {
+    position: relative;
+    display: flex;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.03);
+    height: 70px;
+    width: 679px;
+}
+
+.security-field input {
+    flex: 1;
+    border: none;
+    background: transparent;
+    padding: 16px 20px;
+    padding-right: 52px;
+    font-family: 'Geologica', sans-serif;
+    font-weight: 300;
+    font-size: 22px;
+    line-height: 1.5;
+    color: #000;
+    outline: none;
+    width: 100%;
+    height: 100%;
+}
+
+.security-field input::placeholder {
+    color: #000;
+    opacity: 0.3;
+}
+
+.security-field__eye {
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 24px;
+    height: 24px;
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #000;
+    opacity: 0.3;
+}
+
+.security-field__eye:hover {
+    opacity: 0.7;
+}
+
+.security-field__eye svg {
+    width: 24px;
+    height: 24px;
+}
+
+.security-save-btn {
+    background: var(--red-color);
+    color: #fff;
+    border: none;
+    padding: 20px;
+    width: 138px;
+    height: 58px;
+    font-family: 'Geologica', sans-serif;
+    font-weight: 400;
+    font-size: 18px;
+    line-height: 1;
+    cursor: pointer;
+    transition: opacity 0.2s;
+    opacity: 0.3;
+    pointer-events: none;
+    flex-shrink: 0;
+}
+
+.security-save-btn:hover {
+    opacity: 0.85;
+}
+
+.security-password-error {
+    color: var(--red-color);
+    font-size: 14px;
+    font-family: 'Geologica', sans-serif;
+    margin-top: 8px;
+}
+
+/* ── Двухфакторная аутентификация ── */
+.security-2fa-list {
+    display: flex;
+    flex-direction: row;
+    gap: 24px;
+}
+
+.security-2fa-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.03);
+    padding: 16px 20px;
+    width: 679px;
+    height: 70px;
+    box-sizing: border-box;
+}
+
+.security-2fa-value {
+    font-family: 'Geologica', sans-serif;
+    font-weight: 300;
+    font-size: 22px;
+    line-height: 1.5;
+    color: #000;
+}
+
+.security-2fa-status {
+    font-family: 'Geologica', sans-serif;
+    font-weight: 300;
+    font-size: 18px;
+    line-height: 1.5;
+    color: #999;
+}
+
+.security-2fa-status--on {
+    color: #2D8100;
+}
+
+/* ── Социальные входы ── */
+.security-social-list {
+    display: flex;
+    flex-direction: row;
+    gap: 24px;
+}
+
+.security-social-btn {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: rgba(0, 0, 0, 0.03);
+    border: none;
+    padding: 16px 20px;
+    width: 444.67px;
+    height: 70px;
+    font-family: 'Geologica', sans-serif;
+    font-weight: 300;
+    font-size: 22px;
+    line-height: 1.5;
+    color: #000;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.security-social-btn:hover:not(:disabled) {
+    background: rgba(0, 0, 0, 0.07);
+}
+
+.security-social-btn img {
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
+}
+
+.security-social-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* ── Активные сессии ── */
+.security-sessions-list {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.security-sessions-loading {
+    padding: 24px 20px;
+    background: rgba(0, 0, 0, 0.03);
+    font-family: 'Geologica', sans-serif;
+    font-weight: 300;
+    font-size: 18px;
+    color: #888;
+}
+
+.session-item {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-start;
+    background: rgba(0, 0, 0, 0.03);
+    padding: 16px 20px;
+    width: 679px;
+    min-height: 127px;
+    box-sizing: border-box;
+    transition: opacity 0.3s;
+}
+
+.session-info {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+}
+
+.session-icon {
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
+    margin-top: 4px;
+}
+
+.session-details {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.session-device-name {
+    font-family: 'Geologica', sans-serif;
+    font-weight: 300;
+    font-size: 22px;
+    line-height: 1.5;
+    color: #000;
+}
+
+.session-meta {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.session-city,
+.session-time,
+.session-current-label {
+    font-family: 'Geologica', sans-serif;
+    font-weight: 300;
+    font-size: 18px;
+    line-height: 1.5;
+    color: #000;
+}
+
+.session-city,
+.session-time {
+    opacity: 0.3;
+}
+
+.session-current-label {
+    opacity: 1;
+    color: #000;
+}
+
+.session-actions {
+    position: relative;
+}
+
+.session-menu-btn {
+    width: 24px;
+    height: 24px;
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.3;
+}
+
+.session-menu-btn:hover {
+    opacity: 0.7;
+}
+
+.session-menu-btn svg {
+    width: 24px;
+    height: 24px;
+}
+
+.session-dropdown {
+    position: absolute;
+    right: 0;
+    top: calc(100% + 4px);
+    background: #fff;
+    border: 1px solid #eee;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+    z-index: 100;
+    min-width: 160px;
+}
+
+.session-dropdown-info {
+    display: block;
+    padding: 10px 16px;
+    font-family: 'Geologica', sans-serif;
+    font-weight: 300;
+    font-size: 14px;
+    color: #888;
+}
+
+.session-terminate-btn {
+    display: block;
+    width: 100%;
+    padding: 10px 16px;
+    background: none;
+    border: none;
+    text-align: left;
+    font-family: 'Geologica', sans-serif;
+    font-weight: 300;
+    font-size: 14px;
+    color: var(--red-color);
+    cursor: pointer;
+}
+
+.session-terminate-btn:hover {
+    background: rgba(206, 32, 41, 0.05);
+}
+
+/* ── Responsive ── */
+@media (max-width: 1400px) {
+    .account__block--security {
+        padding: 24px;
+    }
+    .security-title {
+        font-size: 36px;
+    }
+    .security-field,
+    .security-2fa-item,
+    .session-item {
+        width: 100%;
+        max-width: 600px;
+    }
+    .security-social-btn {
+        width: auto;
+        min-width: 200px;
+    }
+}
+
+@media (max-width: 768px) {
+    .security-password-fields {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .security-field {
+        width: 100%;
+    }
+    .security-save-btn {
+        width: 100%;
+    }
+    .security-2fa-list {
+        flex-direction: column;
+    }
+    .security-2fa-item {
+        width: 100%;
+    }
+    .security-social-list {
+        flex-direction: column;
+    }
+    .security-social-btn {
+        width: 100%;
+    }
+    .session-item {
+        width: 100%;
+    }
+}
+
 /* ─── Responsive ─── */
 @media (max-width: 1100px) {
     .activities__events-grid { grid-template-columns: repeat(2, 1fr); }

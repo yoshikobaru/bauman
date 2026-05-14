@@ -510,15 +510,17 @@ if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $profileDiplomaDateInputValue)) {
                         </div>
 
                         <!-- История пожертвований -->
-                        <div class="activities__section">
+                        <div class="activities__section" id="activities-donations">
                             <div class="activities__section-header">
                                 <span class="activities__section-title">История пожертвований</span>
-                                <a href="/projects/" class="activities__section-link">
+                                <?php if (count($arDonations) > 4): ?>
+                                <button class="activities__section-link" id="activities-donations-toggle" type="button" data-count="<?= count($arDonations) ?>">
                                     Показать все
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
                                         <path d="M12 5v14M5 12l7-7 7 7"/>
                                     </svg>
-                                </a>
+                                </button>
+                                <?php endif; ?>
                             </div>
 
                             <?php if (empty($arDonations)): ?>
@@ -527,8 +529,8 @@ if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $profileDiplomaDateInputValue)) {
                                 <a href="/projects/">Посмотреть проекты →</a>
                             </div>
                             <?php else: ?>
-                            <div class="activities__donations-grid">
-                                <?php foreach ($arDonations as $don):
+                            <div class="activities__donations-grid" id="activities-donations-grid">
+                                <?php foreach ($arDonations as $i => $don):
                                     $donData     = json_decode($don['UF_DATA'] ?? '{}', true) ?: [];
                                     $donTitle    = htmlspecialchars($donData['project_name'] ?? ('Проект #' . ($don['UF_ELEMENT_ID'] ?? $don['ID'])));
                                     $donAmount   = htmlspecialchars($donData['amount'] ?? '—');
@@ -536,8 +538,9 @@ if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $profileDiplomaDateInputValue)) {
                                     $donStatus   = $don['UF_STATUS'] ?? 'new';
                                     $donBadgeCls = $eventBadgeClass($donStatus);
                                     $donBadgeLbl = $eventBadgeLabel($donStatus);
+                                    $hiddenClass = $i >= 4 ? ' activities__donation-card--hidden' : '';
                                 ?>
-                                <div class="activities__donation-card">
+                                <div class="activities__donation-card<?= $hiddenClass ?>"<?= $i >= 4 ? ' style="display:none"' : '' ?>>
                                     <div class="activities__donation-meta">
                                         <span class="activities__badge <?= $donBadgeCls ?>"><?= $donBadgeLbl ?></span>
                                         <?php if ($donDateRaw): ?>
@@ -1053,6 +1056,29 @@ if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $profileDiplomaDateInputValue)) {
             }
         });
     });
+
+    // Activities: "Показать все" для пожертвований
+    var donationsToggle = document.getElementById('activities-donations-toggle');
+    if (donationsToggle) {
+        donationsToggle.addEventListener('click', function() {
+            var grid = document.getElementById('activities-donations-grid');
+            if (!grid) return;
+            var hidden = grid.querySelectorAll('.activities__donation-card[style="display:none"], .activities__donation-card--hidden');
+            var anyHidden = Array.from(hidden).some(function(el) { return el.style.display === 'none'; });
+            if (anyHidden) {
+                // раскрыть все скрытые
+                hidden.forEach(function(el) { el.style.display = ''; });
+                this.innerHTML = 'Свернуть <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 19V5M5 12l7 7 7-7"/></svg>';
+            } else {
+                // скрыть все кроме первых 4
+                var allCards = grid.querySelectorAll('.activities__donation-card');
+                allCards.forEach(function(el, idx) {
+                    el.style.display = idx < 4 ? '' : 'none';
+                });
+                this.innerHTML = 'Показать все <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 5v14M5 12l7-7 7 7"/></svg>';
+            }
+        });
+    }
 })();
 </script>
 

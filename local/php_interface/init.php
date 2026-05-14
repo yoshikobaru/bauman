@@ -1120,6 +1120,281 @@ function po_paykeeper_build_callback_ack(string $id, string $secretWord): string
     return 'OK ' . md5($id . $secretWord);
 }
 
+/**
+ * Проверяет, начинается ли строка с префикса (PHP 7-совместимый).
+ */
+if (!function_exists('str_starts_with')) {
+    function str_starts_with(string $haystack, string $needle): bool {
+        return $needle === '' || mb_strpos($haystack, $needle) === 0;
+    }
+}
+
+/**
+ * Проверяет, начинается ли строка с префикса.
+ */
+function po_starts_with(string $haystack, string $needle): bool
+{
+    return $needle === '' || mb_strpos($haystack, $needle) === 0;
+}
+
+/**
+ * Получить город по IP-адресу через ip-api.com (бесплатный тариф, без API-ключа).
+ * Возвращает строку или пустую строку при ошибке.
+ */
+function po_ip_to_city(string $ip): string
+{
+    // Пропускаем локальные и тестовые адреса
+    if ($ip === '127.0.0.1' || $ip === '::1'
+        || po_starts_with($ip, '192.168.') || po_starts_with($ip, '10.')
+        || po_starts_with($ip, '172.16.') || po_starts_with($ip, '172.31.')) {
+        return '';
+    }
+
+    $cacheKey = 'po_city_' . md5($ip);
+    $cached = \Bitrix\Main\Data\Cache::createInstance();
+    if ($cached->initCache(86400, $cacheKey, 'po_ip_geodata')) {
+        return $cached->getVars() ?: '';
+    }
+
+    $url = 'http://ip-api.com/json/' . rawurlencode($ip) . '?fields=status,country,city';
+    $response = @file_get_contents($url);
+    if ($response === false) {
+        return '';
+    }
+
+    $data = json_decode($response, true);
+    if (!is_array($data) || ($data['status'] ?? '') !== 'success') {
+        return '';
+    }
+
+    $city = trim($data['city'] ?? '');
+    if ($city !== '') {
+        $cached->startDataCache();
+        $cached->endDataCache($city);
+    }
+
+    return $city;
+}
+
+/**
+ * Определить тип устройства и браузер по User-Agent.
+ *
+ * @return array{device_type: string, device_name: string, icon_type: string}
+ */
+function po_parse_user_agent(string $ua): array
+{
+    $ua = mb_strtolower($ua);
+
+    // Мобильные устройства
+    $mobilePatterns = [
+        'iphone'  => ['device_type' => 'mobile',  'device_name' => 'iPhone',       'icon_type' => 'smartphone'],
+        'ipad'    => ['device_type' => 'tablet',  'device_name' => 'iPad',          'icon_type' => 'tablet'],
+        'android' => ['device_type' => 'mobile',  'device_name' => 'Android',       'icon_type' => 'smartphone'],
+    ];
+
+    foreach ($mobilePatterns as $pattern => $info) {
+        if (str_contains($ua, $pattern)) {
+            // Пытаемся уточнить модель по косвенным признакам
+            if ($pattern === 'iphone' || $pattern === 'ipad') {
+                if (preg_match('/iphone\s*os\s*(\d+)/', $ua, $m)) {
+                    $info['device_name'] = 'iPhone ' . (int)$m[1]; // "iPhone 17"
+                } elseif (preg_match('/version\/[\d.]+.*mobile\/[^\s]+.*safari/i', $ua)) {
+                    $info['device_name'] = 'iPhone';
+                }
+            } elseif ($pattern === 'android') {
+                if (preg_match('/android\s*([\d.]+)/', $ua, $m)) {
+                    $info['device_name'] = 'Android ' . (int)$m[1];
+                }
+            }
+            return $info;
+        }
+    }
+
+    // Определяем браузер
+    $browser = 'Браузер';
+    if      (str_contains($ua, 'edg/'))       $browser = 'Edge';
+    elseif (str_contains($ua, 'opr/'))         $browser = 'Opera';
+    elseif (str_contains($ua, 'yabrowser'))    $browser = 'Яндекс.Браузер';
+    elseif (str_contains($ua, 'chrome/') && !str_contains($ua, 'chromium/')) $browser = 'Chrome';
+    elseif (str_contains($ua, 'firefox/'))     $browser = 'Firefox';
+    elseif (str_contains($ua, 'safari/') && !str_contains($ua, 'chrome/'))   $browser = 'Safari';
+
+    // Определяем ОС для уточнения
+    $osName = 'ПК';
+    if      (str_contains($ua, 'windows'))      $osName = 'Windows';
+    elseif  (str_contains($ua, 'mac os x') || str_contains($ua, 'macintosh')) $osName = 'Mac';
+    elseif  (str_contains($ua, 'linux') && !str_contains($ua, 'android'))      $osName = 'Linux';
+
+    return [
+        'device_type' => 'desktop',
+        'device_name' => $browser . ' (' . $osName . ')',
+        'icon_type'   => 'desktop',
+    ];
+}
+
+/**
+ * Форматировать дату последней активности сессии в понятный русский формат.
+ * "Сегодня в 17:00", "Вчера в 14:30", "15 января в 10:00" и т.д.
+ */
+function po_format_session_time(string $timestamp): string
+{
+    if ($timestamp === '' || $timestamp === '0') {
+        return 'Неизвестно';
+    }
+
+    $tz = new DateTimeZone('Europe/Moscow');
+
+    try {
+        $lastActivity = new DateTime($timestamp, $tz);
+    } catch (Exception $e) {
+        return 'Неизвестно';
+    }
+
+    $now = new DateTime('now', $tz);
+    $todayStart = (clone $now)->setTime(0, 0, 0);
+    $yesterdayStart = (clone $todayStart)->modify('-1 day');
+
+    $dayNames = ['Воскресенье', 'Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота'];
+    $monthNames = [1 => 'января', 2 => 'февраля', 3 => 'марта', 4 => 'апреля', 5 => 'мая', 6 => 'июня',
+                   7 => 'июля', 8 => 'августа', 9 => 'сентября', 10 => 'октября', 11 => 'ноября', 12 => 'декабря'];
+
+    $time = $lastActivity->format('H:i');
+    $dayOfWeek = (int)$lastActivity->format('w');
+    $dayOfMonth = (int)$lastActivity->format('j');
+    $month = (int)$lastActivity->format('n');
+
+    if ($lastActivity >= $todayStart) {
+        return 'Сегодня в ' . $time;
+    }
+    if ($lastActivity >= $yesterdayStart) {
+        return 'Вчера в ' . $time;
+    }
+
+    // Более недели назад — просто дата
+    return $dayOfMonth . ' ' . $monthNames[$month] . ' в ' . $time;
+}
+
+/**
+ * Получить список активных сессий пользователя.
+ *
+ * @param int $userId
+ * @return array
+ */
+function po_get_user_sessions(int $userId): array
+{
+    $sessions = [];
+
+    // Определяем имя таблицы сессий
+    $tableName = defined('BX_SESS_SID') ? BX_SESS_SID : 'b_sessions';
+
+    $connection = \Bitrix\Main\Application::getConnection();
+    $sqlHelper = $connection->getSqlHelper();
+
+    $userIdEscaped = $sqlHelper->forSql($userId);
+    $tableNameEscaped = $sqlHelper->forSql($tableName);
+
+    $query = "SELECT ID, SESS_DATA FROM {$tableNameEscaped} WHERE SESS_DATA LIKE '%s:8:\"USER_ID\";s:" . strlen((string)$userId) . ":\"{$userIdEscaped}\";%' LIMIT 100";
+    $res = $connection->query($query);
+
+    while ($row = $res->fetch()) {
+        $sessData = @unserialize($row['SESS_DATA'], ['allowed_classes' => false]);
+        if (!is_array($sessData)) continue;
+        if ((int)($sessData['USER_ID'] ?? 0) !== $userId) continue;
+
+        $sessId = (string)($row['ID'] ?? '');
+        if ($sessId === '') continue;
+
+        $hash = md5($sessId);
+        $ip = (string)($sessData['IP'] ?? '');
+        $lastActivity = (string)($sessData['last_activity'] ?? '');
+        $ua = (string)($sessData['UA'] ?? '');
+
+        $isCurrent = (md5(session_id()) === $hash) || ($sessData['SESSION_ID'] ?? '') === session_id();
+
+        if ($ua === '') {
+            $ua = $_SERVER['HTTP_USER_AGENT'] ?? '';
+        }
+
+        $geo = po_ip_to_city($ip);
+        $device = po_parse_user_agent($ua);
+
+        $sessions[] = [
+            'hash'          => $hash,
+            'device_type'   => $device['device_type'],
+            'device_name'   => $device['device_name'],
+            'icon_type'     => $device['icon_type'],
+            'city'          => $geo,
+            'last_activity' => po_format_session_time($lastActivity),
+            'is_current'    => $isCurrent,
+            'ip'            => $ip,
+        ];
+    }
+
+    // Если сессий в базе нет (например, файловый storage), fallback
+    if (empty($sessions)) {
+        $geo = po_ip_to_city($_SERVER['REMOTE_ADDR'] ?? '');
+        $device = po_parse_user_agent($_SERVER['HTTP_USER_AGENT'] ?? '');
+        $sessions[] = [
+            'hash'          => md5(session_id()),
+            'device_type'   => $device['device_type'],
+            'device_name'   => $device['device_name'],
+            'icon_type'     => $device['icon_type'],
+            'city'          => $geo,
+            'last_activity' => 'Сегодня',
+            'is_current'    => true,
+            'ip'            => $_SERVER['REMOTE_ADDR'] ?? '',
+        ];
+    }
+
+    return $sessions;
+}
+
+/**
+ * Завершить указанную сессию пользователя.
+ *
+ * @param int    $userId
+ * @param string $sessionHash MD5-хеш ID сессии
+ * @return bool
+ */
+function po_terminate_session(int $userId, string $sessionHash): bool
+{
+    $tableName = defined('BX_SESS_SID') ? BX_SESS_SID : 'b_sessions';
+
+    $connection = \Bitrix\Main\Application::getConnection();
+    $sqlHelper = $connection->getSqlHelper();
+    $tableNameEscaped = $sqlHelper->forSql($tableName);
+
+    // Находим сессию по MD5-хешу
+    $res = $connection->query("SELECT ID, SESS_DATA FROM {$tableNameEscaped} WHERE SESS_DATA LIKE '%USER_ID%' LIMIT 200");
+    while ($row = $res->fetch()) {
+        $sessId = (string)($row['ID'] ?? '');
+        if ($sessId === '') continue;
+        if (md5($sessId) !== $sessionHash) continue;
+
+        $sessDataRaw = $row['SESS_DATA'] ?? '';
+        $sessData = @unserialize($sessDataRaw, ['allowed_classes' => false]);
+        if (!is_array($sessData)) return false;
+        if ((int)($sessData['USER_ID'] ?? 0) !== $userId) return false;
+
+        // Удаляем сессию
+        $sessIdEscaped = $sqlHelper->forSql($sessId);
+        $connection->query("DELETE FROM {$tableNameEscaped} WHERE ID = '{$sessIdEscaped}'");
+
+        // Удаляем данные сессии из файлового storage, если есть
+        if (defined('BX_SESS_SAVE_PATH') && BX_SESS_SAVE_PATH !== 'files') {
+            $sessFile = rtrim(BX_SESS_SAVE_PATH, '/\\') . '/sess_' . $sessId;
+            if (file_exists($sessFile)) {
+                @unlink($sessFile);
+            }
+        }
+
+        po_logAction('session_terminate', 'user', $userId, 'Завершена сессия ' . $sessId . ' (' . $sessData['IP'] . ')');
+        return true;
+    }
+
+    return false;
+}
+
 require_once __DIR__ . '/partnership_form_markup.php';
 
 // Подключение рендереров страниц
