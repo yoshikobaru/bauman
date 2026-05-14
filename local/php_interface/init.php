@@ -1283,67 +1283,89 @@ function po_format_session_time(string $timestamp): string
 function po_get_user_sessions(int $userId): array
 {
     $sessions = [];
+    $currentSessionId = session_id();
 
-    // Определяем имя таблицы сессий
-    $tableName = defined('BX_SESS_SID') ? BX_SESS_SID : 'b_sessions';
+    // Всегда создаём хотя бы текущую сессию (fallback)
+    $createFallbackSession = function() use ($currentSessionId) {
+        $ua = $_SERVER['HTTP_USER_AGENT'] ?? '';
+        $ip = $_SERVER['REMOTE_ADDR'] ?? '';
 
-    $connection = \Bitrix\Main\Application::getConnection();
-    $sqlHelper = $connection->getSqlHelper();
+        $geo = '';
+        try { $geo = po_ip_to_city($ip); } catch (Throwable $e) {}
 
-    $userIdEscaped = $sqlHelper->forSql($userId);
-    $tableNameEscaped = $sqlHelper->forSql($tableName);
+        $device = ['device_type' => 'desktop', 'device_name' => 'Браузер', 'icon_type' => 'desktop'];
+        try { $device = po_parse_user_agent($ua); } catch (Throwable $e) {}
 
-    $query = "SELECT ID, SESS_DATA FROM {$tableNameEscaped} WHERE SESS_DATA LIKE '%s:8:\"USER_ID\";s:" . strlen((string)$userId) . ":\"{$userIdEscaped}\";%' LIMIT 100";
-    $res = $connection->query($query);
-
-    while ($row = $res->fetch()) {
-        $sessData = @unserialize($row['SESS_DATA'], ['allowed_classes' => false]);
-        if (!is_array($sessData)) continue;
-        if ((int)($sessData['USER_ID'] ?? 0) !== $userId) continue;
-
-        $sessId = (string)($row['ID'] ?? '');
-        if ($sessId === '') continue;
-
-        $hash = md5($sessId);
-        $ip = (string)($sessData['IP'] ?? '');
-        $lastActivity = (string)($sessData['last_activity'] ?? '');
-        $ua = (string)($sessData['UA'] ?? '');
-
-        $isCurrent = (md5(session_id()) === $hash) || ($sessData['SESSION_ID'] ?? '') === session_id();
-
-        if ($ua === '') {
-            $ua = $_SERVER['HTTP_USER_AGENT'] ?? '';
-        }
-
-        $geo = po_ip_to_city($ip);
-        $device = po_parse_user_agent($ua);
-
-        $sessions[] = [
-            'hash'          => $hash,
-            'device_type'   => $device['device_type'],
-            'device_name'   => $device['device_name'],
-            'icon_type'     => $device['icon_type'],
-            'city'          => $geo,
-            'last_activity' => po_format_session_time($lastActivity),
-            'is_current'    => $isCurrent,
-            'ip'            => $ip,
-        ];
-    }
-
-    // Если сессий в базе нет (например, файловый storage), fallback
-    if (empty($sessions)) {
-        $geo = po_ip_to_city($_SERVER['REMOTE_ADDR'] ?? '');
-        $device = po_parse_user_agent($_SERVER['HTTP_USER_AGENT'] ?? '');
-        $sessions[] = [
-            'hash'          => md5(session_id()),
+        return [
+            'hash'          => md5($currentSessionId ?: 'current'),
             'device_type'   => $device['device_type'],
             'device_name'   => $device['device_name'],
             'icon_type'     => $device['icon_type'],
             'city'          => $geo,
             'last_activity' => 'Сегодня',
             'is_current'    => true,
-            'ip'            => $_SERVER['REMOTE_ADDR'] ?? '',
+            'ip'            => $ip,
         ];
+    };
+
+    try {
+        $tableName = defined('BX_SESS_SID') ? BX_SESS_SID : 'b_sessions';
+
+        $connection = \Bitrix\Main\Application::getConnection();
+        $sqlHelper = $connection->getSqlHelper();
+        $userIdEscaped = $sqlHelper->forSql((string)$userId);
+        $tableNameEscaped = $sqlHelper->forSql($tableName);
+
+        $query = "SELECT ID, SESS_DATA FROM {$tableNameEscaped} WHERE SESS_DATA LIKE '%s:8:\"USER_ID\";s:" . strlen((string)$userId) . ":\"{$userIdEscaped}\";%' LIMIT 100";
+        $res = $connection->query($query);
+
+        while ($row = $res->fetch()) {
+            $sessId = (string)($row['ID'] ?? '');
+            if ($sessId === '') continue;
+
+            $sessDataRaw = $row['SESS_DATA'] ?? '';
+            $sessData = @unserialize($sessDataRaw, ['allowed_classes' => false]);
+            if (!is_array($sessData)) continue;
+            if ((int)($sessData['USER_ID'] ?? 0) !== $userId) continue;
+
+            $hash = md5($sessId);
+            $ip = (string)($sessData['IP'] ?? '');
+            $lastActivity = (string)($sessData['last_activity'] ?? '');
+            $ua = (string)($sessData['UA'] ?? '');
+
+            $isCurrent = ($currentSessionId !== '' && md5($sessId) === md5($currentSessionId))
+                         || ($sessData['SESSION_ID'] ?? '') === $currentSessionId;
+
+            if ($ua === '') {
+                $ua = $_SERVER['HTTP_USER_AGENT'] ?? '';
+            }
+
+            $geo = '';
+            $device = ['device_type' => 'desktop', 'device_name' => 'Браузер', 'icon_type' => 'desktop'];
+            try { $geo = po_ip_to_city($ip); } catch (Throwable $e) {}
+            try { $device = po_parse_user_agent($ua); } catch (Throwable $e) {}
+
+            $activityFormatted = 'Сегодня';
+            try { $activityFormatted = po_format_session_time($lastActivity); } catch (Throwable $e) {}
+
+            $sessions[] = [
+                'hash'          => $hash,
+                'device_type'   => $device['device_type'],
+                'device_name'   => $device['device_name'],
+                'icon_type'     => $device['icon_type'],
+                'city'          => $geo,
+                'last_activity' => $activityFormatted,
+                'is_current'    => $isCurrent,
+                'ip'            => $ip,
+            ];
+        }
+    } catch (Throwable $e) {
+        // Ошибка БД — просто используем fallback
+    }
+
+    // Если сессий в базе нет — fallback (файловый storage или пустая таблица)
+    if (empty($sessions)) {
+        $sessions[] = $createFallbackSession();
     }
 
     return $sessions;

@@ -407,17 +407,20 @@ $sessid = bitrix_sessid();
         var container = document.getElementById('security-sessions-list');
         if (!container) return;
 
-        fetch('/local/ajax/sessions.php?sessid=<?= $sessid ?>')
+        fetch('/local/ajax/sessions.php')
             .then(function(r) { return r.json(); })
             .then(function(data) {
                 if (data.success) {
                     renderSessions(data.sessions);
                 } else {
-                    container.innerHTML = '<p style="color:#888;font-size:14px">Не удалось загрузить сессии.</p>';
+                    // Показываем сообщение от сервера для отладки
+                    var msg = data.message || 'Не удалось загрузить сессии.';
+                    var debug = data.debug ? ' [' + data.debug + ']' : '';
+                    container.innerHTML = '<p style="color:#888;font-size:14px">' + escHtml(msg) + debug + '</p>';
                 }
             })
-            .catch(function() {
-                container.innerHTML = '<p style="color:#888;font-size:14px">Ошибка загрузки сессий.</p>';
+            .catch(function(err) {
+                container.innerHTML = '<p style="color:#888;font-size:14px">Ошибка сети: ' + escHtml(err.message) + '</p>';
             });
     }
 
