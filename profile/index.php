@@ -944,21 +944,21 @@ if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $profileDiplomaDateInputValue)) {
     // Activities: "Показать все" для пожертвований
     var donationsToggle = document.getElementById('activities-donations-toggle');
     if (donationsToggle) {
+        var donationsExpanded = false;
         donationsToggle.addEventListener('click', function() {
             var grid = document.getElementById('activities-donations-grid');
             if (!grid) return;
-            var hidden = grid.querySelectorAll('.activities__donation-card[style="display:none"], .activities__donation-card--hidden');
-            var anyHidden = Array.from(hidden).some(function(el) { return el.style.display === 'none'; });
-            if (anyHidden) {
-                // раскрыть все скрытые
-                hidden.forEach(function(el) { el.style.display = ''; });
+
+            donationsExpanded = !donationsExpanded;
+
+            var allCards = grid.querySelectorAll('.activities__donation-card');
+            allCards.forEach(function(el, idx) {
+                el.style.display = (donationsExpanded || idx < 4) ? '' : 'none';
+            });
+
+            if (donationsExpanded) {
                 this.innerHTML = 'Свернуть <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 19V5M5 12l7 7 7-7"/></svg>';
             } else {
-                // скрыть все кроме первых 4
-                var allCards = grid.querySelectorAll('.activities__donation-card');
-                allCards.forEach(function(el, idx) {
-                    el.style.display = idx < 4 ? '' : 'none';
-                });
                 this.innerHTML = 'Показать все <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 5v14M5 12l7-7 7 7"/></svg>';
             }
         });
