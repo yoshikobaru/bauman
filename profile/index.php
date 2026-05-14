@@ -234,7 +234,6 @@ if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $profileDiplomaDateInputValue)) {
                         <?php $tab = $_GET['tab'] ?? 'profile'; ?>
                         <a href="/profile/" class="account__menu-item <?= $tab === 'profile' ? 'account__menu-item--active' : '' ?>">Мой профиль</a>
                         <a href="/profile/security/" class="account__menu-item">Безопасность</a>
-                        <a href="/profile/?tab=membership" class="account__menu-item <?= $tab === 'membership' ? 'account__menu-item--active' : '' ?>">Моё членство</a>
                         <a href="/profile/?tab=activities" class="account__menu-item <?= $tab === 'activities' ? 'account__menu-item--active' : '' ?>">Мои активности</a>
                         <a href="/profile/?tab=applications" class="account__menu-item <?= $tab === 'applications' ? 'account__menu-item--active' : '' ?>">Мои заявки</a>
                         <?php if (defined('PO_PARTNER_ID') && in_array(PO_PARTNER_ID, $USER->GetUserGroupArray())): ?>
@@ -245,102 +244,7 @@ if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $profileDiplomaDateInputValue)) {
 
                 <div class="account__main">
 
-                    <?php if ($tab === 'membership'): ?>
-                    <!-- Моё членство -->
-                    <div class="account__block">
-                        <h2 class="account__title">Моё членство</h2>
-                        <?php if ($currentType && $membershipStatus): ?>
-                        <div class="account__rate <?= $currentType['class'] ?>" style="margin-top:24px">
-                            <img src="<?=SITE_TEMPLATE_PATH?>/assets/img/my_profile/rate-conus.png" alt="" class="account__rate-conus">
-                            <div class="account__rate-info">
-                                <span class="account__rate-status <?= $currentStatus['class'] ?? '' ?>">
-                                    <?= htmlspecialchars($currentStatus['label'] ?? $membershipStatus) ?>
-                                </span>
-                                <?php if ($membershipExpires && $membershipStatus === 'active'): ?>
-                                <div class="account__rate-date">
-                                    <span>Срок действия</span> до <?= htmlspecialchars($membershipExpires) ?>
-                                </div>
-                                <?php endif; ?>
-                            </div>
-                            <h4 class="account__rate-plan">
-                                <?= htmlspecialchars($currentType['label']) ?>
-                                <?php if ($showVerificationBadge): ?>
-                                <span class="profile-verification-badge" style="background:<?= htmlspecialchars($verificationBadgeColor) ?>">✓</span>
-                                <?php endif; ?>
-                            </h4>
-                            <p class="account__rate-price"><?= htmlspecialchars($currentType['price']) ?></p>
-                            <p class="account__rate-when">ежегодно</p>
-                            <?php if ($membershipStatus === 'active'): ?>
-                            <div class="account__rate-buttons account__grid">
-                                <?php if ($membershipType === 'basic'): ?>
-                                <a href="/join/" class="account__rate-btn btn">Продлить или изменить тип членства</a>
-                                <?php else: ?>
-                                <a href="/join/" class="account__rate-btn account__rate-btn--changes btn">Изменить тариф</a>
-                                <?php endif; ?>
-                            </div>
-                            <?php elseif ($membershipStatus === 'pending'): ?>
-                            <div style="margin-top:16px;padding:12px 16px;background:#fff9e6;border-radius:8px;border-left:3px solid #f0a500">
-                                <strong>Заявка принята.</strong> После проверки модератором и подтверждения оплаты членство будет активировано.
-                            </div>
-                            <?php elseif ($membershipStatus === 'in_review'): ?>
-                            <div style="margin-top:16px;padding:12px 16px;background:#e8f4fd;border-radius:8px;border-left:3px solid #2980b9">
-                                <strong>На рассмотрении.</strong> Ваша заявка передана модератору. Ожидайте ответа по email.
-                            </div>
-                            <?php elseif ($membershipStatus === 'rejected'): ?>
-                            <div style="margin-top:16px;padding:12px 16px;background:#fdecea;border-radius:8px;border-left:3px solid #e74c3c">
-                                <strong>Заявка отклонена.</strong> Обратитесь к администратору или подайте новую заявку.
-                                <br><a href="/join/" class="btn" style="margin-top:10px;display:inline-block">Подать новую заявку</a>
-                            </div>
-                            <?php endif; ?>
-                        </div>
-                        <?php else: ?>
-                        <div style="margin-top:24px;padding:32px;text-align:center;background:#f8f8f8;border-radius:12px">
-                            <p style="font-size:16px;color:#555;margin-bottom:16px">У вас пока нет активного членства в обществе.</p>
-                            <a href="/join/" class="btn">Вступить в общество</a>
-                        </div>
-                        <?php endif; ?>
-                        <!-- Привилегии текущего тарифа -->
-                        <?php if ($isMember && $membershipType): ?>
-                        <div class="account__chapter" style="margin-top:32px">
-                            <h3 class="account__subtitle">Привилегии вашего тарифа</h3>
-                        </div>
-                        <?php
-                        $privileges = [
-                            'basic' => [
-                                'Размещение резюме на карьерной платформе',
-                                'Доступ в закрытый карьерный канал с вакансиями',
-                                'Участие в активностях и мероприятиях общества',
-                                'Доступ к витрине компетенций партнёров',
-                            ],
-                            'premium' => [
-                                'Все привилегии Базового тарифа',
-                                'Участие в закрытом чате членов уровня «Бизнес»',
-                                'Размещение информации о компании на площадках общества',
-                                'Доступ к базе резюме выпускников',
-                            ],
-                            'partner' => [
-                                'Все привилегии Профессионального тарифа',
-                                'Участие в закрытых мероприятиях',
-                                'Право стать членом правления',
-                                'Индивидуальное сопровождение',
-                            ],
-                            'honorary' => [
-                                'Все привилегии',
-                                'Почётный статус',
-                                'Особые условия взаимодействия',
-                            ],
-                        ];
-                        $privList = $privileges[$membershipType] ?? [];
-                        ?>
-                        <ul style="margin-top:12px;padding-left:20px">
-                            <?php foreach ($privList as $priv): ?>
-                            <li style="margin-bottom:8px;color:#444"><?= htmlspecialchars($priv) ?></li>
-                            <?php endforeach; ?>
-                        </ul>
-                        <?php endif; ?>
-                    </div>
-
-                    <?php elseif ($tab === 'activities'): ?>
+                    <?php if ($tab === 'activities'): ?>
                     <!-- Мои активности -->
                     <div class="account__block">
                         <h2 class="account__title">Мои активности</h2>
@@ -907,26 +811,6 @@ if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $profileDiplomaDateInputValue)) {
                                 </div>
                         <?php endif; ?>
 
-                        <!-- Привязка соцсетей (статичная заготовка) -->
-                        <div class="account__log" style="margin-top:40px">
-                                <div class="account__chapter">
-                                <h3 class="account__subtitle">Привязка аккаунта для быстрого входа</h3>
-                                </div>
-                                <div class="account__log-wrapper">
-                                <button class="account__log-btn" disabled>
-                                        <img src="<?=SITE_TEMPLATE_PATH?>/assets/img/my_profile/yandex-icon.png" alt="">
-                                        Войти через Яндекс
-                                    </button>
-                                <button class="account__log-btn" disabled>
-                                        <img src="<?=SITE_TEMPLATE_PATH?>/assets/img/my_profile/gos-icon.png" alt="">
-                                        Войти через Госуслуги
-                                    </button>
-                                <button class="account__log-btn" disabled>
-                                        <img src="<?=SITE_TEMPLATE_PATH?>/assets/img/my_profile/vk-icon.png" alt="">
-                                        Войти через Вконтакте
-                                    </button>
-                            </div>
-                       </div>
                     </div>
                     <?php endif; ?>
 
