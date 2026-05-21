@@ -39,7 +39,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['reg_fiz_action'])) {
     $lastName        = trim($_POST['fiz_last_name']      ?? '');
     $firstName       = trim($_POST['fiz_first_name']     ?? '');
     $secondName      = trim($_POST['fiz_second_name']    ?? '');
-    $phone           = trim($_POST['fiz_phone']        ?? '');
     $dobRaw          = trim($_POST['fiz_dob']            ?? '');
     $isGraduate      = ($_POST['fiz_is_graduate']        ?? '') === 'yes';
     $gradYear        = trim($_POST['fiz_grad_year']      ?? '');
@@ -92,7 +91,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['reg_fiz_action'])) {
     if ($password !== $passwordConfirm) $errors[] = 'Пароли не совпадают';
     if (!$lastName)                  $errors[] = 'Введите фамилию';
     if (!$firstName)                 $errors[] = 'Введите имя';
-    if (!$phone)                     $errors[] = 'Введите номер телефона';
     if (!$dob)                       $errors[] = 'Укажите дату рождения';
     // Avatar extension check
     if (!empty($_FILES['fiz_avatar']['name']) && !po_regFileExt($_FILES['fiz_avatar'], $allowedAvatar)) {
@@ -142,7 +140,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['reg_fiz_action'])) {
             'UF_GRADUATE_YEAR'     => $isGraduate ? $gradYear : '',
             'UF_GRADUATE_DEPT'     => $isGraduate ? $gradDept : '',
             'UF_TELEGRAM'          => $telegram,
-            'UF_PERSONAL_PHONE'    => $phone,
             'UF_DIPLOMA_SERIES'    => $diplomaSer,
             'UF_DIPLOMA_NUMBER'    => $diplomaNum,
             'UF_DIPLOMA_DATE'      => $diplomaDate,
@@ -212,7 +209,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['reg_fiz_action'])) {
                 'год_окончания'            => $gradYear,
                 'выпускающая_кафедра'      => $gradDept,
                 'telegram'                 => $telegram,
-                'телефон'                  => $phone,
                 'вступал_ранее'            => $wasMember ? 'да' : 'нет',
                 'серия_диплома'            => $diplomaSer,
                 'номер_диплома'            => $diplomaNum,
@@ -449,7 +445,7 @@ if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $fizDiplomaDateInputValue)) {
                            value="<?= htmlspecialchars($_POST['fiz_first_name'] ?? '') ?>">
                     <div class="po-date-field">
                         <input type="text" name="fiz_dob" id="fiz-dob"
-                               placeholder="Дата рождения (ДД.ММ.ГГГГ) *"
+                               placeholder="Дата рождения (ДД.ММ.ГГГГ)"
                                title="Дата рождения (ДД.ММ.ГГГГ)"
                                autocomplete="bday" required
                                inputmode="numeric" maxlength="10"
@@ -465,9 +461,6 @@ if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $fizDiplomaDateInputValue)) {
                     </div>
                     <input type="text" name="fiz_second_name" placeholder="Отчество"
                            value="<?= htmlspecialchars($_POST['fiz_second_name'] ?? '') ?>">
-                    <input type="tel" name="fiz_phone" placeholder="Телефон *"
-                           autocomplete="tel"
-                           value="<?= htmlspecialchars($_POST['fiz_phone'] ?? '') ?>">
                     <input type="hidden" name="fiz_dob_hidden" id="fiz-dob-hidden">
                 </div>
             </div>
@@ -562,7 +555,7 @@ if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $fizDiplomaDateInputValue)) {
                                value="<?= htmlspecialchars($_POST['fiz_diploma_num'] ?? '') ?>">
                         <div class="po-date-field">
                             <input type="text" name="fiz_diploma_date" id="fiz-dip-date"
-                                   placeholder="Дата выдачи (ДД.ММ.ГГГГ) *"
+                                   placeholder="Дата выдачи (ДД.ММ.ГГГГ)"
                                    title="Дата выдачи (ДД.ММ.ГГГГ)"
                                    inputmode="numeric" maxlength="10"
                                    value="<?= htmlspecialchars($fizDiplomaDateInputValue) ?>"
@@ -666,7 +659,7 @@ if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $fizDiplomaDateInputValue)) {
                                    style="width:18px;height:18px;flex-shrink:0;margin-top:2px"
                                    <?= !empty($_POST['fiz_agree_charter']) ? 'checked' : '' ?>>
                             <span class="join__politic-link">
-                                Ознакомлен(а) и согласен(а) с <a href="<?= htmlspecialchars(defined('DOC_USTAV_URL') ? DOC_USTAV_URL : '#', ENT_QUOTES, 'UTF-8') ?>"<?= function_exists('po_document_link_attrs') ? po_document_link_attrs() : ' target="_blank"' ?> onclick="event.stopPropagation()">Уставом</a> и <a href="<?= htmlspecialchars(defined('DOC_POLITIKA_URL') ? DOC_POLITIKA_URL : '#', ENT_QUOTES, 'UTF-8') ?>"<?= function_exists('po_document_link_attrs') ? po_document_link_attrs() : ' target="_blank"' ?> onclick="event.stopPropagation()">политикой обработки ПДн</a> *
+                                Ознакомлен(а) и согласен(а) с <a href="<?= htmlspecialchars(defined('DOC_USTAV_URL') ? DOC_USTAV_URL : '#', ENT_QUOTES, 'UTF-8') ?>"<?= function_exists('po_document_link_attrs') ? po_document_link_attrs() : ' target="_blank"' ?> onclick="event.stopPropagation()">Уставом</a> и <a href="<?= htmlspecialchars(defined('DOC_POLITIKA_URL') ? DOC_POLITIKA_URL : '#', ENT_QUOTES, 'UTF-8') ?>"<?= function_exists('po_document_link_attrs') ? po_document_link_attrs() : ' target="_blank"' ?> onclick="event.stopPropagation()">политикой обработки ПДн</a> <span class="required-mark">*</span>
                             </span>
                         </label>
                         <span id="fiz-agree-err" style="display:none;color:#e74c3c;font-size:13px;margin-top:4px">Необходимо согласие с Уставом и политикой ПДн</span>
@@ -732,6 +725,7 @@ if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $fizDiplomaDateInputValue)) {
             'action'                 => '/registration/?type=ur',
             'hidden_name'            => 'reg_ur_action',
             'post'                   => $_POST,
+            'company_subtitle_extra' => ' <span style="color:#e31e24;font-size:13px;font-weight:400;margin-left:8px">* — обязательные поля</span>',
             'extra_after_consent'    => '<span id="ur-agree-err" style="display:none;color:#e74c3c;font-size:13px;margin-top:4px">Необходимо согласие с политикой обработки ПДн</span>',
         ]);
         ?>
@@ -996,8 +990,6 @@ document.addEventListener('click', function(e) {
 
         if (!fname || !fname.value.trim()) errors.push('Имя');
         if (!lname || !lname.value.trim()) errors.push('Фамилия');
-        var phoneInp = document.getElementById('fiz-phone');
-        if (!phoneInp || !phoneInp.value.trim()) errors.push('Телефон');
         if (!dobInp || !dobInp.value) errors.push('Дата рождения');
 
         if (!pass || !confirm) { /* skip if not visible */ }
