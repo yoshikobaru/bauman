@@ -343,26 +343,24 @@ if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $fizDiplomaDateInputValue)) {
     cursor: pointer;
 }
 .po-date-field__native {
-    position: absolute;
-    right: 8px;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 24px;
-    height: 24px;
+    position: fixed;
+    left: -9999px;
+    width: 1px;
+    height: 1px;
     opacity: 0;
     border: none;
     padding: 0;
     margin: 0;
-    cursor: pointer;
+    pointer-events: none;
 }
 </style>
 
     <!-- Вкладки физ/юр лицо -->
     <div style="display:flex;gap:12px;margin-bottom:32px;padding-top:8px">
-        <button id="tab-fiz" onclick="switchRegType('fiz')"
+        <button type="button" id="tab-fiz" onclick="switchRegType('fiz')"
                 class="btn <?= $regType !== 'ur' ? '' : 'btn-empty' ?>"
                 style="padding:10px 28px">Физическое лицо</button>
-        <button id="tab-ur"  onclick="switchRegType('ur')"
+        <button type="button" id="tab-ur"  onclick="switchRegType('ur')"
                 class="btn <?= $regType === 'ur' ? '' : 'btn-empty' ?>"
                 style="padding:10px 28px">Юридическое лицо</button>
     </div>
@@ -447,7 +445,7 @@ if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $fizDiplomaDateInputValue)) {
                         <input type="text" name="fiz_dob" id="fiz-dob"
                                placeholder="Дата рождения (ДД.ММ.ГГГГ)"
                                title="Дата рождения (ДД.ММ.ГГГГ)"
-                               autocomplete="bday" required
+                               autocomplete="off" required
                                inputmode="numeric" maxlength="10"
                                value="<?= htmlspecialchars($fizDobInputValue) ?>"
                                class="po-date-input">
@@ -457,7 +455,6 @@ if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $fizDiplomaDateInputValue)) {
                                 <path d="M8 3v4M16 3v4M3 10h18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
                             </svg>
                         </button>
-                        <input type="date" id="fiz-dob-picker" class="po-date-field__native" tabindex="-1" aria-hidden="true">
                     </div>
                     <input type="text" name="fiz_second_name" placeholder="Отчество"
                            value="<?= htmlspecialchars($_POST['fiz_second_name'] ?? '') ?>">
@@ -566,7 +563,6 @@ if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $fizDiplomaDateInputValue)) {
                                     <path d="M8 3v4M16 3v4M3 10h18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
                                 </svg>
                             </button>
-                            <input type="date" id="fiz-dip-date-picker" class="po-date-field__native" tabindex="-1" aria-hidden="true">
                         </div>
                         <input type="hidden" name="fiz_diploma_date_hidden" id="fiz-dip-date-hidden">
                     </div>
@@ -613,7 +609,7 @@ if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $fizDiplomaDateInputValue)) {
                             <h3 class="membership-slider__title">Профессиональное</h3>
                             <p class="membership-slider__name">50 000 Р</p>
                             <p class="membership-slider__time">ежегодно</p>
-                            <button class="membership-slider__advantages">+ Возможности Базового</button>
+                            <button type="button" class="membership-slider__advantages">+ Возможности Базового</button>
                             <ul class="membership-slider__list">
 								<li class="membership-slider__item">Участие в бизнес-мероприятиях Политехнического общества в онлайн и очном форматах;</li>
 								<li class="membership-slider__item">Возможность предложить собственный проект для поиска спонсоров и поддержки Политехнического общества;</li>
@@ -628,7 +624,7 @@ if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $fizDiplomaDateInputValue)) {
                             <h3 class="membership-slider__title">Партнёрское</h3>
                             <p class="membership-slider__name membership-slider__name--small">Персональные условия</p>
                             <p class="membership-slider__time">обсуждается индивидуально</p>
-                            <button class="membership-slider__advantages">+ Возможности профессионального</button>
+                            <button type="button" class="membership-slider__advantages">+ Возможности профессионального</button>
                             <ul class="membership-slider__list">
                                 <li class="membership-slider__item">Участие в закрытых мероприятиях Политехнического общества;</li>
                                 <li class="membership-slider__item">Право стать членом Совета Политехнического общества выпускников МВТУ (МГТУ) им. Н.Э. Баумана;</li>
@@ -641,7 +637,7 @@ if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $fizDiplomaDateInputValue)) {
                             <h3 class="membership-slider__title">Почётное</h3>
                             <p class="membership-slider__name">Бесценно</p>
                             <p class="membership-slider__time">по результатам заполненной анкеты</p>
-                            <button class="membership-slider__advantages">+ Возможности Базового</button>
+                            <button type="button" class="membership-slider__advantages">+ Возможности Базового</button>
                             <ul class="membership-slider__list">
                                 <li class="membership-slider__item">Для тех, кто внёс значительный вклад в развитие технической науки, образования, технологий и деятельности Политехнического общества.</li>
                             </ul>
@@ -655,7 +651,7 @@ if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $fizDiplomaDateInputValue)) {
                 <div class="join__politic" style="margin-top:24px">
                     <div class="join__politic-question">
                         <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer">
-                            <input type="checkbox" name="fiz_agree_charter" id="fiz_agree_charter" required
+                            <input type="checkbox" name="fiz_agree_charter" id="fiz_agree_charter"
                                    style="width:18px;height:18px;flex-shrink:0;margin-top:2px"
                                    <?= !empty($_POST['fiz_agree_charter']) ? 'checked' : '' ?>>
                             <span class="join__politic-link">
@@ -691,6 +687,11 @@ if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $fizDiplomaDateInputValue)) {
             </section>
 
         </form>
+        <!-- Календари вне формы: в Safari скрытый type=date внутри form может вызывать ложную отправку -->
+        <div id="po-registration-date-pickers" hidden aria-hidden="true">
+            <input type="date" id="fiz-dob-picker" class="po-date-field__native" tabindex="-1">
+            <input type="date" id="fiz-dip-date-picker" class="po-date-field__native" tabindex="-1">
+        </div>
     </div><!-- /join__wrapper -->
     <?php endif; ?>
     </div><!-- /block-fiz -->
@@ -811,19 +812,34 @@ function setupDateField(textInputId, pickerInputId) {
     if (isoInitial) pickerInput.value = isoInitial;
 }
 
+function syncRegistrationDateFields() {
+    var dobInp = document.getElementById('fiz-dob');
+    var dobHidden = document.getElementById('fiz-dob-hidden');
+    if (dobHidden && dobInp) dobHidden.value = normalizeRuDate(dobInp.value);
+    var dipDateInp = document.getElementById('fiz-dip-date');
+    var dipDateHidden = document.getElementById('fiz-dip-date-hidden');
+    if (dipDateHidden && dipDateInp) dipDateHidden.value = normalizeRuDate(dipDateInp.value);
+}
+
 setupDateField('fiz-dob', 'fiz-dob-picker');
 setupDateField('fiz-dip-date', 'fiz-dip-date-picker');
 
-document.querySelectorAll('[data-picker-target]').forEach(function(btn) {
-    btn.addEventListener('click', function() {
+document.querySelectorAll('#form-fiz [data-picker-target]').forEach(function(btn) {
+    btn.addEventListener('click', function(e) {
+        e.preventDefault();
         var picker = document.getElementById(this.getAttribute('data-picker-target'));
         if (!picker) return;
-        if (typeof picker.showPicker === 'function') {
-            picker.showPicker();
-        } else {
-            picker.focus();
-            picker.click();
-        }
+        var textId = this.getAttribute('data-picker-target') === 'fiz-dob-picker' ? 'fiz-dob' : 'fiz-dip-date';
+        var textInput = document.getElementById(textId);
+        var iso = textInput ? ruToIsoDate(textInput.value) : '';
+        if (iso) picker.value = iso;
+        try {
+            if (typeof picker.showPicker === 'function') {
+                picker.showPicker();
+                return;
+            }
+        } catch (err) { /* Safari может бросать, если showPicker недоступен */ }
+        picker.focus({ preventScroll: true });
     });
 });
 
@@ -974,19 +990,13 @@ document.addEventListener('click', function(e) {
     var form = document.getElementById('form-fiz');
     if (!form) return;
     form.addEventListener('submit', function(e) {
+        syncRegistrationDateFields();
         var errors = [];
         var pass    = document.getElementById('fiz-pass');
         var confirm = document.getElementById('fiz-pass-confirm');
         var dobInp  = document.getElementById('fiz-dob');
         var lname   = form.querySelector('[name="fiz_last_name"]');
         var fname   = form.querySelector('[name="fiz_first_name"]');
-
-        // Заполнить скрытые поля с датами в RU формате
-        var dobHidden = document.getElementById('fiz-dob-hidden');
-        if (dobHidden && dobInp) dobHidden.value = normalizeRuDate(dobInp.value);
-        var dipDateInp = document.getElementById('fiz-dip-date');
-        var dipDateHidden = document.getElementById('fiz-dip-date-hidden');
-        if (dipDateHidden && dipDateInp) dipDateHidden.value = normalizeRuDate(dipDateInp.value);
 
         if (!fname || !fname.value.trim()) errors.push('Имя');
         if (!lname || !lname.value.trim()) errors.push('Фамилия');
@@ -1026,16 +1036,28 @@ document.addEventListener('click', function(e) {
 
         if (errors.length > 0) {
             e.preventDefault();
-            var box = form.querySelector('.authorization__alert') || document.createElement('div');
-            box.className = 'authorization__alert authorization__alert--error';
-            box.style.marginBottom = '16px';
-            box.innerHTML = errors.map(function(err) { return '<p>' + err + '</p>'; }).join('');
-            var firstField = form.querySelector('input[name="fiz_email"]');
-            if (firstField && !form.querySelector('.authorization__alert')) {
-                firstField.parentNode.insertBefore(box, firstField);
+            var box = form.querySelector('.authorization__alert--client');
+            if (!box) {
+                box = document.createElement('div');
+                box.className = 'authorization__alert authorization__alert--error authorization__alert--client';
+                box.style.marginBottom = '16px';
+                var firstField = form.querySelector('input[name="fiz_email"]');
+                if (firstField && firstField.parentNode) {
+                    firstField.parentNode.parentNode.insertBefore(box, firstField.parentNode);
+                }
             }
+            box.innerHTML = errors.map(function(err) { return '<p>' + err + '</p>'; }).join('');
             box.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }
+    });
+
+    // Safari: Enter в поле не должен отправлять форму, пока пользователь не нажал «Вступить»
+    form.addEventListener('keydown', function(e) {
+        if (e.key !== 'Enter') return;
+        var tag = (e.target && e.target.tagName) ? e.target.tagName.toLowerCase() : '';
+        if (tag === 'textarea') return;
+        if (e.target && e.target.id === 'fiz-submit-btn') return;
+        e.preventDefault();
     });
 })();
 
