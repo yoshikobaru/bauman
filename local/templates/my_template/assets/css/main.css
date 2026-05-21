@@ -4986,6 +4986,26 @@ select,
     color: #CE2029;
 }
 
+/* Подпись с чекбоксом (popup-формы и др.): отступы .join__politic-link только для <p> */
+.join__politic-question label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+}
+
+.join__politic-question label input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+    margin: 0;
+}
+
+.join__politic-question label .join__politic-link {
+    margin-bottom: 0;
+    padding-top: 0;
+}
+
 .form-required-note {
     margin: 0 0 10px;
     font-size: 14px;
