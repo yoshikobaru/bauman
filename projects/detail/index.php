@@ -119,15 +119,15 @@ if (!empty($arElement['DETAIL_PICTURE'])) {
     </section>
 
     <?php if ($arElement): ?>
-    <section class="project-help">
-        <div class="container">
-            <h2 class="main-title project-help__title">Проекту необходима финансовая поддержка</h2>
-            <p class="project-help__text main-text">
-                Мы рады любой помощи вне зависимости от её размера. Для компаний желающих стать спонсорами либо участниками данного проекта - просим связаться с нами.
-</p>
-            <button class="btn project-help__btn" data-fancybox data-src="#form-finance-help">Связаться с организаторами</button>
-        </div>
-    </section>
+    <?php
+        $projectDetailUrl = trim((string)($arProps['DETAIL_URL']['VALUE'] ?? $arProps['PROJECT_DETAIL_URL']['VALUE'] ?? ''));
+        if ($projectDetailUrl === '' && !empty($arElement['CODE'])) {
+            $projectDetailUrl = '/projects/' . rawurlencode((string)$arElement['CODE']) . '/';
+        }
+        if (function_exists('po_render_project_help_section')) {
+            po_render_project_help_section((string)($arElement['CODE'] ?? ''), $projectDetailUrl, (string)$arElement['NAME']);
+        }
+    ?>
 
     <!-- Детальный текст -->
     <?php if (!empty($arProps['PROJECT_AMOUNT']['VALUE'])): ?>
@@ -142,6 +142,9 @@ if (!empty($arElement['DETAIL_PICTURE'])) {
 
     <?php
     $detailHtml = (string)($arElement['DETAIL_TEXT'] ?? '');
+    if ($detailHtml !== '' && function_exists('po_replace_legacy_project_help_html')) {
+        $detailHtml = po_replace_legacy_project_help_html($detailHtml);
+    }
     if ($detailHtml !== '') {
         $projectSupportRow = [
             'id' => $elementId,

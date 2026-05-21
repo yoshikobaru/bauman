@@ -38,7 +38,7 @@ $APPLICATION->SetTitle("PolytechExpo");
             <div class="container">
                 <h2 class="main-title project-help__title">Проекту необходима финансовая поддержка</h2>
                 <p class="project-help__text main-text">
-                    Мы рады любой помощи вне зависимости от её размера. Для компаний желающих стать спонсорами попечительских советов кафедр или факультетов - просим связаться с нами.
+                    Мы рады любой помощи вне зависимости от её размера. Для компаний желающих стать спонсорами либо участниками данного проекта - просим связаться с нами.
                 </p>
                 <button class="btn project-help__btn" data-fancybox data-src="#form-finance-help">Связаться с организаторами</button>
             </div>

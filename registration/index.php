@@ -666,7 +666,7 @@ if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $fizDiplomaDateInputValue)) {
                                    style="width:18px;height:18px;flex-shrink:0;margin-top:2px"
                                    <?= !empty($_POST['fiz_agree_charter']) ? 'checked' : '' ?>>
                             <span class="join__politic-link">
-                                Ознакомлен(а) и согласен(а) с <a href="<?= defined('DOC_USTAV_URL') ? DOC_USTAV_URL : '#' ?>" target="_blank">Уставом</a> и <a href="<?= defined('DOC_POLITIKA_URL') ? DOC_POLITIKA_URL : '#' ?>" target="_blank">политикой обработки ПДн</a> *
+                                Ознакомлен(а) и согласен(а) с <a href="<?= htmlspecialchars(defined('DOC_USTAV_URL') ? DOC_USTAV_URL : '#', ENT_QUOTES, 'UTF-8') ?>"<?= function_exists('po_document_link_attrs') ? po_document_link_attrs() : ' target="_blank"' ?> onclick="event.stopPropagation()">Уставом</a> и <a href="<?= htmlspecialchars(defined('DOC_POLITIKA_URL') ? DOC_POLITIKA_URL : '#', ENT_QUOTES, 'UTF-8') ?>"<?= function_exists('po_document_link_attrs') ? po_document_link_attrs() : ' target="_blank"' ?> onclick="event.stopPropagation()">политикой обработки ПДн</a> *
                             </span>
                         </label>
                         <span id="fiz-agree-err" style="display:none;color:#e74c3c;font-size:13px;margin-top:4px">Необходимо согласие с Уставом и политикой ПДн</span>

@@ -180,6 +180,14 @@ tabsProject.forEach(tab => {
 });
 
 
+// Ссылки на устав / политику ПДн внутри label — не переключать чекбокс
+document.addEventListener('click', function (e) {
+    var link = e.target.closest('a[href*="document.php?doc="]');
+    if (link) {
+        e.stopPropagation();
+    }
+}, true);
+
 // gallery
 
 var swiper = new Swiper(".project-gallery__swiper", {

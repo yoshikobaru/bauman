@@ -85,6 +85,41 @@ body {
     padding: 0 !important;
 }
 
+/* Попап «Стать принимающей стороной» на /reference/ */
+.form-reference-visits .join__wrapper {
+    margin-bottom: 0;
+    padding: 28px 32px 24px;
+}
+
+.form-reference-visits .account__personal-list {
+    margin-bottom: 20px;
+}
+
+.form-reference-visits .join__politic.form-reference-visits__consent {
+    display: block;
+    margin: 8px 0 12px;
+    gap: 0;
+}
+
+.form-reference-visits .form-required-note {
+    margin: 0 0 12px;
+}
+
+.form-reference-visits .form-reference-visits__submit {
+    margin-bottom: 0;
+}
+
+/* Высота попапа по содержимому, без пустого поля снизу */
+.fancybox__content > .fancybox-container .form-reference-visits {
+    height: auto !important;
+    min-height: 0 !important;
+}
+
+.fancybox__content:has(.form-reference-visits) {
+    height: auto !important;
+    padding-bottom: 0 !important;
+}
+
 .form-boards__content {
     align-self: flex-start;
 }
@@ -1450,7 +1485,12 @@ strong {
 
 .culture-reference {
     padding: 0 0 var(--section-margin);
-    scroll-margin-top: 80px;
+}
+
+/* Якорь «Подробнее» на /reference/ — заголовок, не секция; чуть выше дефолтного [id] */
+#что-дают-референс-визиты {
+    scroll-margin-top: calc(100px + 12px);
+    padding-top: 4px;
 }
 
 /* culture__card--red */

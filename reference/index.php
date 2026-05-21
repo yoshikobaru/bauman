@@ -75,7 +75,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['d5_action'])) {
     $em = $d5Form['d5_email'];
     $phone = $d5Form['d5_phone'];
     $site = $d5Form['d5_site'];
-    $agreePd = $d5Form['d5_agree'] === 'yes';
+    $agreePd = !empty($d5Form['d5_agree']) && $d5Form['d5_agree'] !== 'no';
     if (!$company || !$fn || !$em) {
         $d5Error = 'Заполните обязательные поля: Компания, Имя, Email.';
     } elseif ($phone !== '' && !po_is_valid_phone_chars($phone)) {
@@ -167,10 +167,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['d5_action'])) {
         <?php po_render_reference_visits('Визиты'); ?>
 
         <!-- culture -->
-		<section class="culture culture-reference" id="что-дают-референс-визиты">
+		<section class="culture culture-reference">
 			<div class="container">
-				<h2 class="main-title culture__title">
-					Что дают референс-визиты 
+				<h2 class="main-title culture__title" id="что-дают-референс-визиты">
+					Что дают референс-визиты
 				</h2>
 				<div class="culture__wrapper">
 					
@@ -508,23 +508,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['d5_action'])) {
 					<input type="text"  name="d5_site"       placeholder="Сайт" value="<?= htmlspecialchars($d5Form['d5_site']) ?>">
 				</div>
 			</div>
-			<div class="join__politic">
+			<div class="join__politic form-reference-visits__consent">
 				<div class="join__politic-question">
-					<p class="join__politic-link">Согласен с <a href="<?= defined('DOC_POLITIKA_URL') ? DOC_POLITIKA_URL : '#' ?>" target="_blank">политикой обработки ПДн</a> <span style="color:var(--red-color)">*</span></p>
-					<div class="account__graduate-choice">
-						<label class="account__graduate-item">
-							<input type="radio" name="d5_agree" value="yes" class="account__graduate-input" required <?= $d5Form['d5_agree'] === 'yes' ? 'checked' : '' ?>>
-							<span class="account__graduate-box"></span>Да
-						</label>
-						<label class="account__graduate-item">
-							<input type="radio" name="d5_agree" value="no" class="account__graduate-input" <?= $d5Form['d5_agree'] === 'no' ? 'checked' : '' ?>>
-							<span class="account__graduate-box"></span>Нет
-						</label>
-					</div>
+					<label>
+						<input type="checkbox" name="d5_agree" value="yes" id="d5_agree_pd" required
+							<?= ($d5Form['d5_agree'] === 'yes' || $d5Form['d5_agree'] === '1') ? ' checked' : '' ?>>
+						<span class="join__politic-link">Согласен с <a href="<?= htmlspecialchars(defined('DOC_POLITIKA_URL') ? DOC_POLITIKA_URL : '#', ENT_QUOTES, 'UTF-8') ?>"<?= function_exists('po_document_link_attrs') ? po_document_link_attrs() : ' target="_blank"' ?> onclick="event.stopPropagation()">политикой обработки ПДн</a> <span class="required-mark">*</span></span>
+					</label>
 				</div>
 			</div>
 			<p class="form-required-note">* Обязательные поля</p>
-			<button type="submit" class="btn authorization__btn">Отправить</button>
+			<button type="submit" class="btn authorization__btn form-reference-visits__submit">Отправить</button>
 		</form>
 		<?php endif; ?>
 	</div>

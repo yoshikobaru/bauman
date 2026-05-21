@@ -87,10 +87,34 @@ define('IBLOCK_FUNDS_ID',        6);
 define('PO_ADMIN_EMAIL', 'info@bauman-polytech.ru');
 
 /**
- * Пути к уставным документам (публичный URL).
+ * Публичные URL устава и политики ПДн (раздача через local/tools/document.php).
  */
-define('DOC_USTAV_URL',    '/local/templates/my_template/assets/USTAV.pdf');
-define('DOC_POLITIKA_URL', '/local/templates/my_template/assets/POLITIKA.pdf');
+define('DOC_USTAV_URL',    '/local/tools/document.php?doc=ustav');
+define('DOC_POLITIKA_URL', '/local/tools/document.php?doc=politika');
+
+/**
+ * Атрибуты ссылки на документ: новая вкладка, просмотр в браузере.
+ */
+function po_document_link_attrs(): string
+{
+    return ' target="_blank" rel="noopener noreferrer"';
+}
+
+/**
+ * URL документа по ключу (ustav|politika).
+ */
+function po_document_url(string $docKey): string
+{
+    $docKey = strtolower(trim($docKey));
+    if ($docKey === 'ustav') {
+        return DOC_USTAV_URL;
+    }
+    if ($docKey === 'politika') {
+        return DOC_POLITIKA_URL;
+    }
+
+    return '#';
+}
 
 /**
  * Отправить уведомление администратору о новой заявке.
@@ -642,6 +666,79 @@ function po_paykeeper_normalize_project_name(string $name): string
     $name = preg_replace('/^для\s+/u', '', $name);
     $name = preg_replace('/^поддержка\s+/u', 'поддержку ', $name);
     return trim((string)$name);
+}
+
+/**
+ * Текст блока «Проекту необходима финансовая поддержка» — зависит от страницы проекта.
+ */
+function po_get_project_help_sponsor_text(string $elementCode = '', string $detailUrl = '', string $elementName = ''): string
+{
+    $trusteesText = 'Для компаний желающих стать спонсорами попечительских советов кафедр или факультетов - просим связаться с нами.';
+    $projectText  = 'Для компаний желающих стать спонсорами либо участниками данного проекта - просим связаться с нами.';
+
+    $urlMap = [
+        '/projects/trustees/'      => $trusteesText,
+        '/projects/restoration/'   => $projectText,
+        '/projects/politech-expo/' => $projectText,
+        '/projects/polytechexpo/'  => $projectText,
+        '/projects/conference/'    => $projectText,
+    ];
+
+    $code = strtolower(trim($elementCode));
+    $detailUrl = po_normalize_project_detail_url($detailUrl);
+    if ($detailUrl !== '' && isset($urlMap[$detailUrl])) {
+        return $urlMap[$detailUrl];
+    }
+
+    if (in_array($code, ['trustees', 'popechitelskiy-sovet', 'popechitelskiy-sovet-mt4'], true)) {
+        return $trusteesText;
+    }
+    if (in_array($code, ['restoration', 'restavratsiya-rotondy', 'rotonda'], true)) {
+        return $projectText;
+    }
+
+    $norm = po_paykeeper_normalize_project_name($elementName);
+    if ($norm !== '' && mb_strpos($norm, 'попечитель', 0, 'UTF-8') !== false) {
+        return $trusteesText;
+    }
+    if ($norm !== '' && mb_strpos($norm, 'ротонд', 0, 'UTF-8') !== false) {
+        return $projectText;
+    }
+
+    return $projectText;
+}
+
+/**
+ * Блок «Проекту необходима финансовая поддержка» на странице проекта.
+ */
+function po_render_project_help_section(string $elementCode = '', string $detailUrl = '', string $elementName = ''): void
+{
+    $sponsorText = po_get_project_help_sponsor_text($elementCode, $detailUrl, $elementName);
+    ?>
+    <section class="project-help">
+        <div class="container">
+            <h2 class="main-title project-help__title">Проекту необходима финансовая поддержка</h2>
+            <p class="project-help__text main-text">
+                Мы рады любой помощи вне зависимости от её размера. <?= htmlspecialchars($sponsorText, ENT_QUOTES, 'UTF-8') ?>
+            </p>
+            <button type="button" class="btn project-help__btn" data-fancybox data-src="#form-finance-help">Связаться с организаторами</button>
+        </div>
+    </section>
+    <?php
+}
+
+/**
+ * Заменить устаревший текст про спонсорский пакет в HTML (CMS / старые шаблоны).
+ */
+function po_replace_legacy_project_help_html(string $html): string
+{
+    $legacy = [
+        'Для компаний желающими стать спонсорами данного мероприятия - готовы направить спонсорский пакет.',
+        'Для компаний желающих стать спонсорами либо участниками данного проекта - просим связаться с нами.',
+        'Для компаний желающих стать спонсорами попечительских советов кафедр или факультетов - просим связаться с нами.',
+    ];
+
+    return str_replace($legacy, '', $html);
 }
 
 /**
