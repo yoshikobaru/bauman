@@ -10,7 +10,12 @@ $projectRow = function_exists('po_get_iblock_project_by_detail_url')
     ? po_get_iblock_project_by_detail_url('/projects/restoration/')
     : null;
 if (!$projectRow) {
-    $projectRow = ['detail_url' => '/projects/restoration/'];
+    $projectRow = [
+        'detail_url' => '/projects/restoration/',
+        'donation_name' => 'Реставрация Ротонды',
+    ];
+} else {
+    $projectRow['donation_name'] = $projectRow['donation_name'] ?? 'Реставрация Ротонды';
 }
 if ($projectRow) {
     $dbEl = CIBlockElement::GetByID((int)$projectRow['id']);

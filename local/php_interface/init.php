@@ -690,6 +690,8 @@ function po_get_project_name_donation_aliases(): array
         'политех экспо'             => 'Конференция PolytechExpo',
         'встреча выпускников'       => 'Конференция Встреча выпускников',
         'реставрация ротонды'       => 'Реставрация Ротонды',
+        'реставрации ротонды'       => 'Реставрация Ротонды',
+        'попечительский совет'      => 'Попечительский совет МТ4',
         'попечительский совет мт4'  => 'Попечительский совет МТ4',
         'попечительский совет фн'   => 'Попечительский совет ФН',
         'скб'                       => 'Студенческие конструкторские бюро',
@@ -700,6 +702,102 @@ function po_get_project_name_donation_aliases(): array
     }
 
     return $map;
+}
+
+/**
+ * Канонический путь страницы проекта (/projects/foo/).
+ */
+function po_normalize_project_detail_url(string $url): string
+{
+    $url = trim($url);
+    if ($url === '') {
+        return '';
+    }
+    $path = parse_url($url, PHP_URL_PATH);
+    if (!is_string($path) || $path === '') {
+        $path = $url;
+    }
+    if ($path[0] !== '/') {
+        $path = '/' . $path;
+    }
+
+    return rtrim($path, '/') . '/';
+}
+
+/**
+ * Нечёткое сопоставление названия с пунктом списка пожертвований.
+ */
+function po_fuzzy_match_donation_project_name(string $name): string
+{
+    $norm = po_paykeeper_normalize_project_name($name);
+    if ($norm === '') {
+        return '';
+    }
+
+    $aliases = po_get_project_name_donation_aliases();
+    if (isset($aliases[$norm])) {
+        return $aliases[$norm];
+    }
+
+    if (mb_strpos($norm, 'ротонд', 0, 'UTF-8') !== false) {
+        return 'Реставрация Ротонды';
+    }
+    if (mb_strpos($norm, 'polytech', 0, 'UTF-8') !== false
+        || mb_strpos($norm, 'политех', 0, 'UTF-8') !== false
+        || mb_strpos($norm, 'экспо', 0, 'UTF-8') !== false) {
+        return 'Конференция PolytechExpo';
+    }
+    if (mb_strpos($norm, 'встреча', 0, 'UTF-8') !== false
+        && mb_strpos($norm, 'выпуск', 0, 'UTF-8') !== false) {
+        return 'Конференция Встреча выпускников';
+    }
+    if (mb_strpos($norm, 'попечитель', 0, 'UTF-8') !== false) {
+        if (mb_strpos($norm, 'фн', 0, 'UTF-8') !== false) {
+            return 'Попечительский совет ФН';
+        }
+
+        return 'Попечительский совет МТ4';
+    }
+    if (mb_strpos($norm, 'скб', 0, 'UTF-8') !== false
+        || mb_strpos($norm, 'конструкторск', 0, 'UTF-8') !== false) {
+        return 'Студенческие конструкторские бюро';
+    }
+
+    foreach (po_get_donation_project_names() as $donationName) {
+        $dn = po_paykeeper_normalize_project_name($donationName);
+        if ($dn === '') {
+            continue;
+        }
+        if (mb_strpos($norm, $dn, 0, 'UTF-8') !== false || mb_strpos($dn, $norm, 0, 'UTF-8') !== false) {
+            return $donationName;
+        }
+    }
+
+    return '';
+}
+
+/**
+ * Пункт списка пожертвований по URL страницы проекта.
+ */
+function po_donation_project_name_by_detail_url(string $detailUrl): string
+{
+    $url = po_normalize_project_detail_url($detailUrl);
+    if ($url === '') {
+        return '';
+    }
+
+    $map = po_get_project_detail_url_donation_map();
+    if (isset($map[$url])) {
+        return $map[$url];
+    }
+
+    foreach ($map as $mapUrl => $donationName) {
+        if (po_normalize_project_detail_url((string)$mapUrl) === $url) {
+            return $donationName;
+        }
+    }
+
+    return '';
 }
 
 /**
@@ -801,19 +899,16 @@ function po_map_to_donation_project_name(
     };
 
     $tryResolve = static function (string $name, string $code, string $url) use ($matchInList): string {
+        if ($url !== '' && ($byUrl = po_donation_project_name_by_detail_url($url)) !== '') {
+            return $byUrl;
+        }
         if ($hit = $matchInList($name)) {
             return $hit;
         }
         if ($code !== '' && ($hit = $matchInList($code))) {
             return $hit;
         }
-        $url = trim($url);
-        if ($url !== '') {
-            $byUrl = po_get_project_detail_url_donation_map()[$url] ?? '';
-            if ($byUrl !== '' && $matchInList($byUrl) !== '') {
-                return $byUrl;
-            }
-        }
+
         $norm = po_paykeeper_normalize_project_name($name);
         if ($norm !== '' && isset(po_get_project_name_donation_aliases()[$norm])) {
             return po_get_project_name_donation_aliases()[$norm];
@@ -836,20 +931,36 @@ function po_map_to_donation_project_name(
             }
         }
 
+        if ($name !== '' && ($fuzzy = po_fuzzy_match_donation_project_name($name)) !== '') {
+            return $fuzzy;
+        }
+        if ($code !== '' && ($fuzzy = po_fuzzy_match_donation_project_name($code)) !== '') {
+            return $fuzzy;
+        }
+
         return '';
     };
+
+    $name = $elementName;
+    $code = $elementCode;
+    $url  = $detailUrl;
 
     if ($elementId > 0) {
         $fromIblock = po_get_iblock_project_by_id($elementId);
         if ($fromIblock) {
-            $hit = $tryResolve($fromIblock['name'], $fromIblock['code'], $fromIblock['detail_url']);
-            if ($hit !== '') {
-                return $hit;
+            if ($fromIblock['name'] !== '') {
+                $name = $fromIblock['name'];
+            }
+            if ($fromIblock['code'] !== '') {
+                $code = $fromIblock['code'];
+            }
+            if ($fromIblock['detail_url'] !== '') {
+                $url = $fromIblock['detail_url'];
             }
         }
     }
 
-    return $tryResolve($elementName, $elementCode, $detailUrl);
+    return $tryResolve($name, $code, $url);
 }
 
 /**
@@ -871,12 +982,15 @@ function po_support_page_url_for_project(?array $projectRow): string
         return '/support/';
     }
 
-    $donationName = po_map_to_donation_project_name(
-        (int)($projectRow['id'] ?? 0),
-        (string)($projectRow['name'] ?? ''),
-        (string)($projectRow['code'] ?? ''),
-        (string)($projectRow['detail_url'] ?? '')
-    );
+    $donationName = trim((string)($projectRow['donation_name'] ?? ''));
+    if ($donationName === '') {
+        $donationName = po_map_to_donation_project_name(
+            (int)($projectRow['id'] ?? 0),
+            (string)($projectRow['name'] ?? ''),
+            (string)($projectRow['code'] ?? ''),
+            (string)($projectRow['detail_url'] ?? '')
+        );
+    }
 
     return $donationName !== ''
         ? '/support/?project=' . rawurlencode($donationName)

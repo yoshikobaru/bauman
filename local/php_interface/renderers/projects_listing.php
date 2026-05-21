@@ -49,13 +49,17 @@ if (!function_exists('po_render_projects_listing')) {
         $staticProjects = [
             ['name' => 'PolytechExpo',             'text' => 'Ежегодная конференция выпускников и партнёров МГТУ им. Н.Э. Баумана', 'url' => '/projects/politech-expo/',  'detail_url' => '/projects/politech-expo/',  'img' => '/assets/img/projects-page/current-project-img-1.png'],
             ['name' => 'Встреча выпускников',      'text' => 'Традиционная встреча выпускников всех поколений Бауманки',            'url' => '/projects/conference/',    'detail_url' => '/projects/conference/',    'img' => '/assets/img/projects-page/current-project-img-2.png'],
-            ['name' => 'Попечительский совет МТ4', 'text' => 'Поддержка развития кафедры МТ4 МГТУ им. Н.Э. Баумана',              'url' => '/projects/trustees/',      'detail_url' => '/projects/trustees/',      'img' => '/assets/img/projects-page/current-project-img-3.png'],
-            ['name' => 'Реставрация ротонды',      'text' => 'Проект по восстановлению исторической ротонды МГТУ',                  'url' => '/projects/restoration/',   'detail_url' => '/projects/restoration/',   'img' => '/assets/img/projects-page/current-project-img-4.png'],
+            ['name' => 'Попечительский совет МТ4', 'text' => 'Поддержка развития кафедры МТ4 МГТУ им. Н.Э. Баумана',              'url' => '/projects/trustees/',      'detail_url' => '/projects/trustees/',      'donation_name' => 'Попечительский совет МТ4', 'img' => '/assets/img/projects-page/current-project-img-3.png'],
+            ['name' => 'Реставрация ротонды',      'text' => 'Проект по восстановлению исторической ротонды МГТУ',                  'url' => '/projects/restoration/',   'detail_url' => '/projects/restoration/',   'donation_name' => 'Реставрация Ротонды',      'img' => '/assets/img/projects-page/current-project-img-4.png'],
         ];
         foreach ($staticProjects as &$sp) {
             $sp['support_link'] = function_exists('po_support_page_url_for_project')
-                ? po_support_page_url_for_project(['name' => $sp['name'], 'detail_url' => $sp['detail_url'] ?? ''])
-                : '/support/?project=' . rawurlencode($sp['name']);
+                ? po_support_page_url_for_project([
+                    'name' => $sp['name'],
+                    'detail_url' => $sp['detail_url'] ?? '',
+                    'donation_name' => $sp['donation_name'] ?? '',
+                ])
+                : '/support/?project=' . rawurlencode($sp['donation_name'] ?? $sp['name']);
         }
         unset($sp);
 
@@ -97,7 +101,7 @@ if (!function_exists('po_render_projects_listing')) {
                         'id' => (int)$row['ID'],
                         'name' => (string)$row['NAME'],
                         'code' => (string)($row['CODE'] ?? ''),
-                        'detail_url' => $detailUrl,
+                        'detail_url' => $detailUrl !== '' ? $detailUrl : $link,
                     ])
                     : '/support/?project=' . rawurlencode((string)$row['NAME']);
 
