@@ -7,13 +7,14 @@ $APPLICATION->SetTitle('Конференция PolytechExpo');
 
 // Пытаемся получить CMS-фото из инфоблока проектов
 $cmsImage = '';
-if (defined('IBLOCK_PROJECTS_ID') && IBLOCK_PROJECTS_ID > 0) {
-    $dbEl = CIBlockElement::GetList(
-        [],
-        ['IBLOCK_ID' => IBLOCK_PROJECTS_ID, 'ACTIVE' => 'Y', 'PROPERTY_DETAIL_URL' => '/projects/politech-expo/'],
-        false, false,
-        ['ID', 'PREVIEW_PICTURE', 'DETAIL_PICTURE']
-    );
+$projectRow = function_exists('po_get_iblock_project_by_detail_url')
+    ? po_get_iblock_project_by_detail_url('/projects/politech-expo/')
+    : null;
+if (!$projectRow) {
+    $projectRow = ['detail_url' => '/projects/politech-expo/'];
+}
+if ($projectRow) {
+    $dbEl = CIBlockElement::GetByID((int)$projectRow['id']);
     if ($arEl = $dbEl->GetNext()) {
         $picId = $arEl['DETAIL_PICTURE'] ?: $arEl['PREVIEW_PICTURE'];
         if ($picId) $cmsImage = CFile::GetPath($picId);
@@ -27,8 +28,12 @@ if (preg_match('/<main>(.*?)<\/main>/si', $html, $m)) {
     // Исправляем пути: шаблон использует img/, в Bitrix это assets/img/
     $content = str_replace('src="img/',  'src="/local/templates/my_template/assets/img/', $content);
     $content = str_replace("src='img/",  "src='/local/templates/my_template/assets/img/", $content);
-    $content = str_replace('href="support.html"',  'href="/support/"',  $content);
     $content = str_replace('href="projects.html"', 'href="/projects/"', $content);
+    if (function_exists('po_replace_support_links_in_html')) {
+        $content = po_replace_support_links_in_html($content, $projectRow);
+    } else {
+        $content = str_replace('href="support.html"', 'href="/support/"', $content);
+    }
     // Заменяем статичную правую фотку на CMS-изображение, если оно задано в инфоблоке
     if ($cmsImage) {
         $content = str_replace(

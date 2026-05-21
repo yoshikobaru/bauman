@@ -47,11 +47,17 @@ if (!function_exists('po_render_projects_listing')) {
 
         // Fallback статичные проекты
         $staticProjects = [
-            ['name' => 'PolytechExpo',             'text' => 'Ежегодная конференция выпускников и партнёров МГТУ им. Н.Э. Баумана', 'url' => '/projects/politech-expo/',  'img' => '/assets/img/projects-page/current-project-img-1.png'],
-            ['name' => 'Встреча выпускников',      'text' => 'Традиционная встреча выпускников всех поколений Бауманки',            'url' => '/projects/conference/',    'img' => '/assets/img/projects-page/current-project-img-2.png'],
-            ['name' => 'Попечительский совет МТ4', 'text' => 'Поддержка развития кафедры МТ4 МГТУ им. Н.Э. Баумана',              'url' => '/projects/trustees/',      'img' => '/assets/img/projects-page/current-project-img-3.png'],
-            ['name' => 'Реставрация ротонды',      'text' => 'Проект по восстановлению исторической ротонды МГТУ',                  'url' => '/projects/restoration/',   'img' => '/assets/img/projects-page/current-project-img-4.png'],
+            ['name' => 'PolytechExpo',             'text' => 'Ежегодная конференция выпускников и партнёров МГТУ им. Н.Э. Баумана', 'url' => '/projects/politech-expo/',  'detail_url' => '/projects/politech-expo/',  'img' => '/assets/img/projects-page/current-project-img-1.png'],
+            ['name' => 'Встреча выпускников',      'text' => 'Традиционная встреча выпускников всех поколений Бауманки',            'url' => '/projects/conference/',    'detail_url' => '/projects/conference/',    'img' => '/assets/img/projects-page/current-project-img-2.png'],
+            ['name' => 'Попечительский совет МТ4', 'text' => 'Поддержка развития кафедры МТ4 МГТУ им. Н.Э. Баумана',              'url' => '/projects/trustees/',      'detail_url' => '/projects/trustees/',      'img' => '/assets/img/projects-page/current-project-img-3.png'],
+            ['name' => 'Реставрация ротонды',      'text' => 'Проект по восстановлению исторической ротонды МГТУ',                  'url' => '/projects/restoration/',   'detail_url' => '/projects/restoration/',   'img' => '/assets/img/projects-page/current-project-img-4.png'],
         ];
+        foreach ($staticProjects as &$sp) {
+            $sp['support_link'] = function_exists('po_support_page_url_for_project')
+                ? po_support_page_url_for_project(['name' => $sp['name'], 'detail_url' => $sp['detail_url'] ?? ''])
+                : '/support/?project=' . rawurlencode($sp['name']);
+        }
+        unset($sp);
 
         $projects = [];
         $hasItems = false;
@@ -78,11 +84,22 @@ if (!function_exists('po_render_projects_listing')) {
                     $img = CFile::GetPath($row['PREVIEW_PICTURE']);
                     if ($img) $imgSrc = $img;
                 }
-                $link = !empty($row['PROPERTY_DETAIL_URL_VALUE'])
-                    ? $row['PROPERTY_DETAIL_URL_VALUE']
+                $detailUrl = !empty($row['PROPERTY_DETAIL_URL_VALUE'])
+                    ? (string)$row['PROPERTY_DETAIL_URL_VALUE']
+                    : '';
+                $link = $detailUrl !== ''
+                    ? $detailUrl
                     : (!empty($row['CODE']) ? '/projects/' . rawurlencode($row['CODE']) . '/' : '/projects/detail/?id=' . (int)$row['ID']);
-                
+
                 $formattedDate = po_format_project_date($row['DATE_ACTIVE_FROM'] ?? '');
+                $supportLink = function_exists('po_support_page_url_for_project')
+                    ? po_support_page_url_for_project([
+                        'id' => (int)$row['ID'],
+                        'name' => (string)$row['NAME'],
+                        'code' => (string)($row['CODE'] ?? ''),
+                        'detail_url' => $detailUrl,
+                    ])
+                    : '/support/?project=' . rawurlencode((string)$row['NAME']);
 
                 $projects[] = [
                     'img' => $imgSrc,
@@ -90,6 +107,7 @@ if (!function_exists('po_render_projects_listing')) {
                     'name' => $row['NAME'],
                     'text' => $row['PREVIEW_TEXT'] ?? '',
                     'link' => $link,
+                    'support_link' => $supportLink,
                 ];
             }
         }
@@ -126,7 +144,7 @@ if (!function_exists('po_render_projects_listing')) {
                                 <?php endif; ?>
                                 <div class="visits__buttons">
                                     <a href="<?= htmlspecialchars($proj['link']) ?>" class="btn visits__btn btn-transparent">Подробнее</a>
-                                    <a href="/support/?project=<?= urlencode($proj['name']) ?>" class="btn visits__btn visits__btn--help">Поддержать</a>
+                                    <a href="<?= htmlspecialchars($proj['support_link'] ?? '/support/') ?>" class="btn visits__btn visits__btn--help">Поддержать</a>
                                 </div>
                             </div>
                         </div>
@@ -140,7 +158,7 @@ if (!function_exists('po_render_projects_listing')) {
                                 <p class="visits__text"><?= htmlspecialchars($sp['text']) ?></p>
                                 <div class="visits__buttons">
                                     <a href="<?= htmlspecialchars($sp['url']) ?>" class="btn visits__btn btn-transparent">Подробнее</a>
-                                    <a href="/support/?project=<?= urlencode($sp['name']) ?>" class="btn visits__btn visits__btn--help">Поддержать</a>
+                                    <a href="<?= htmlspecialchars($sp['support_link'] ?? '/support/') ?>" class="btn visits__btn visits__btn--help">Поддержать</a>
                                 </div>
                             </div>
                         </div>

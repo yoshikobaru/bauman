@@ -104,7 +104,11 @@ if (!empty($arElement['DETAIL_PICTURE'])) {
                         <p class="banner-other__text main-text" style="margin-top:16px;white-space:pre-line;line-height:1.25;"><?= htmlspecialchars($projectSubtitle) ?></p>
                         <?php endif; ?>
                         <?php if ($projectStatusNorm === '' || in_array($projectStatusNorm, ['active', 'активный', 'в работе', 'активен'])): ?>
-                        <a href="/support/?project=<?= urlencode($arElement['NAME']) ?>" class="btn" style="margin-top:24px;">Поддержать</a>
+                        <a href="<?= htmlspecialchars(po_support_page_url_for_project([
+                            'id' => $elementId,
+                            'name' => (string)$arElement['NAME'],
+                            'code' => (string)($arElement['CODE'] ?? ''),
+                        ]), ENT_QUOTES, 'UTF-8') ?>" class="btn" style="margin-top:24px;">Поддержать</a>
                         <?php endif; ?>
                     </div>
                     <img src="<?=SITE_TEMPLATE_PATH?>/assets/img/reference-page/banner-other-pattern.png" alt="" class="banner-other__pattern">
@@ -139,17 +143,36 @@ if (!empty($arElement['DETAIL_PICTURE'])) {
     <?php
     $detailHtml = (string)($arElement['DETAIL_TEXT'] ?? '');
     if ($detailHtml !== '') {
+        $projectSupportRow = [
+            'id' => $elementId,
+            'name' => (string)$arElement['NAME'],
+            'code' => (string)($arElement['CODE'] ?? ''),
+        ];
+        $detailSupportUrl = htmlspecialchars(po_support_page_url_for_project($projectSupportRow), ENT_QUOTES, 'UTF-8');
         // Legacy static markup may contain links like support.html or absolute .../support.html.
         $detailHtml = preg_replace(
             '#href=(["\'])(?:https?://[^"\']+)?(?:/projects/[^"\']+)?/support\.html(?:\?[^"\']*)?\1#iu',
-            'href="/support/"',
+            'href="' . $detailSupportUrl . '"',
             $detailHtml
         );
-        $detailHtml = preg_replace('#https?://[^"\']+/support\.html(?:\?[^"\']*)?#iu', '/support/', $detailHtml);
-        $detailHtml = preg_replace('#(^|[/"\'])support\.html(?:\?[^"\']*)?([/"\']|$)#iu', '$1/support/$2', $detailHtml);
+        $detailHtml = preg_replace(
+            '#https?://[^"\']+/support\.html(?:\?[^"\']*)?#iu',
+            po_support_page_url_for_project($projectSupportRow),
+            $detailHtml
+        );
+        $detailHtml = preg_replace(
+            '#(^|[/"\'])support\.html(?:\?[^"\']*)?([/"\']|$)#iu',
+            '$1' . po_support_page_url_for_project($projectSupportRow) . '$2',
+            $detailHtml
+        );
         $detailHtml = str_ireplace(
             ['href="support.html"', "href='support.html'"],
-            ['href="/support/"', "href='/support/'"],
+            ['href="' . $detailSupportUrl . '"', "href='" . $detailSupportUrl . "'"],
+            $detailHtml
+        );
+        $detailHtml = preg_replace(
+            '#href=(["\'])/support/?\1#iu',
+            'href=$1' . $detailSupportUrl . '$1',
             $detailHtml
         );
 
@@ -181,7 +204,11 @@ if (!empty($arElement['DETAIL_PICTURE'])) {
                 $isActiveProject = in_array($projectStatus, ['active', 'активный', 'в работе', 'активен']);
                 ?>
                 <?php if ($isActiveProject || empty($projectStatus)): ?>
-                <a href="/support/?project=<?= urlencode($arElement['NAME']) ?>" class="btn">
+                <a href="<?= htmlspecialchars(po_support_page_url_for_project([
+                    'id' => $elementId,
+                    'name' => (string)$arElement['NAME'],
+                    'code' => (string)($arElement['CODE'] ?? ''),
+                ]), ENT_QUOTES, 'UTF-8') ?>" class="btn">
                     Поддержать проект
                 </a>
                 <?php endif; ?>

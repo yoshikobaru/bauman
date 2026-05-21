@@ -201,6 +201,13 @@ $prefill = [
     'last_name'  => $USER->IsAuthorized() ? $USER->GetParam('LAST_NAME') : '',
     'email'      => $USER->IsAuthorized() ? $USER->GetParam('EMAIL')     : '',
 ];
+
+$urlDonationProject = function_exists('po_resolve_donation_project_from_request')
+    ? po_resolve_donation_project_from_request(
+        (int)($_GET['id'] ?? 0),
+        (string)($_GET['project'] ?? '')
+    )
+    : trim((string)($_GET['project'] ?? ''));
 ?><main>
     <!-- D2: Форма поддержки проекта -->
     <section class="project-programm" style="padding-top:140px;">
@@ -323,13 +330,13 @@ $prefill = [
                                     <p style="margin-bottom:10px;color:#666;">Просим выбрать проект</p>
                                     <select id="d2_project_select" name="project">
                                         <option value="">— Выберите проект —</option>
-                                        <option value="Пожертвование на ведение уставной деятельности">Пожертвование на ведение уставной деятельности</option>
-                                        <option value="Реставрация Ротонды">Реставрация Ротонды</option>
-                                        <option value="Конференция PolytechExpo">Конференция PolytechExpo</option>
-                                        <option value="Конференция Встреча выпускников">Конференция Встреча выпускников</option>
-                                        <option value="Попечительский совет МТ4">Попечительский совет МТ4</option>
-                                        <option value="Попечительский совет ФН">Попечительский совет ФН</option>
-                                        <option value="Студенческие конструкторские бюро">Студенческие конструкторские бюро</option>
+                                        <option value="Пожертвование на ведение уставной деятельности"<?= $urlDonationProject === 'Пожертвование на ведение уставной деятельности' ? ' selected' : '' ?>>Пожертвование на ведение уставной деятельности</option>
+                                        <option value="Реставрация Ротонды"<?= $urlDonationProject === 'Реставрация Ротонды' ? ' selected' : '' ?>>Реставрация Ротонды</option>
+                                        <option value="Конференция PolytechExpo"<?= $urlDonationProject === 'Конференция PolytechExpo' ? ' selected' : '' ?>>Конференция PolytechExpo</option>
+                                        <option value="Конференция Встреча выпускников"<?= $urlDonationProject === 'Конференция Встреча выпускников' ? ' selected' : '' ?>>Конференция Встреча выпускников</option>
+                                        <option value="Попечительский совет МТ4"<?= $urlDonationProject === 'Попечительский совет МТ4' ? ' selected' : '' ?>>Попечительский совет МТ4</option>
+                                        <option value="Попечительский совет ФН"<?= $urlDonationProject === 'Попечительский совет ФН' ? ' selected' : '' ?>>Попечительский совет ФН</option>
+                                        <option value="Студенческие конструкторские бюро"<?= $urlDonationProject === 'Студенческие конструкторские бюро' ? ' selected' : '' ?>>Студенческие конструкторские бюро</option>
                                     </select>
                                 </div>
                                 <div class="project-programm__buttons">
@@ -454,25 +461,24 @@ $prefill = [
 </main>
 
 <script>
-// Авто-выбор проекта/фонда из URL (?project=...)
+// Авто-выбор проекта из URL (?project=... или ?id=..., сопоставление на сервере)
 (function() {
-    var urlProject = new URLSearchParams(location.search).get('project');
-    if (urlProject) {
-        var pf = document.getElementById('d2_project');
-        if (pf) pf.value = urlProject;
-        var sel = document.getElementById('d2_project_select');
-        if (sel) {
-            for (var i = 0; i < sel.options.length; i++) {
-                if (sel.options[i].text === urlProject || sel.options[i].value === urlProject) {
-                    sel.selectedIndex = i;
-                    break;
-                }
+    var urlProject = <?= json_encode($urlDonationProject, JSON_UNESCAPED_UNICODE) ?>;
+    if (!urlProject) return;
+
+    var pf = document.getElementById('d2_project');
+    var sel = document.getElementById('d2_project_select');
+    if (pf) pf.value = urlProject;
+    if (sel) {
+        for (var i = 0; i < sel.options.length; i++) {
+            if (sel.options[i].value === urlProject) {
+                sel.selectedIndex = i;
+                break;
             }
         }
-        // Сразу переключаем на шаг «Проекты»
-        var prog = document.querySelector('.main-tabs-click[data-tab="programm"]');
-        if (prog) prog.click();
     }
+    var prog = document.querySelector('.main-tabs-click[data-tab="programm"]');
+    if (prog) prog.click();
 })();
 
 // D2 multi-step form logic

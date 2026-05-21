@@ -645,6 +645,267 @@ function po_paykeeper_normalize_project_name(string $name): string
 }
 
 /**
+ * Список проектов на /support/ — совпадает с привязкой PayKeeper (не подтягивать из инфоблока).
+ *
+ * @return list<string>
+ */
+function po_get_donation_project_names(): array
+{
+    return [
+        'Пожертвование на ведение уставной деятельности',
+        'Реставрация Ротонды',
+        'Конференция PolytechExpo',
+        'Конференция Встреча выпускников',
+        'Попечительский совет МТ4',
+        'Попечительский совет ФН',
+        'Студенческие конструкторские бюро',
+    ];
+}
+
+/**
+ * Сопоставление URL страницы проекта → название в форме пожертвований.
+ *
+ * @return array<string, string>
+ */
+function po_get_project_detail_url_donation_map(): array
+{
+    return [
+        '/projects/politech-expo/'  => 'Конференция PolytechExpo',
+        '/projects/polytechexpo/'   => 'Конференция PolytechExpo',
+        '/projects/conference/'     => 'Конференция Встреча выпускников',
+        '/projects/restoration/'    => 'Реставрация Ротонды',
+        '/projects/trustees/'       => 'Попечительский совет МТ4',
+    ];
+}
+
+/**
+ * Доп. синонимы названия проекта (инфоблок/карточка) → пункт списка пожертвований.
+ *
+ * @return array<string, string> normalized alias => canonical donation name
+ */
+function po_get_project_name_donation_aliases(): array
+{
+    $map = [
+        'polytechexpo'              => 'Конференция PolytechExpo',
+        'политех экспо'             => 'Конференция PolytechExpo',
+        'встреча выпускников'       => 'Конференция Встреча выпускников',
+        'реставрация ротонды'       => 'Реставрация Ротонды',
+        'попечительский совет мт4'  => 'Попечительский совет МТ4',
+        'попечительский совет фн'   => 'Попечительский совет ФН',
+        'скб'                       => 'Студенческие конструкторские бюро',
+        'студенческие конструкторские бюро' => 'Студенческие конструкторские бюро',
+    ];
+    foreach (po_get_project_detail_url_donation_map() as $donationName) {
+        $map[po_paykeeper_normalize_project_name($donationName)] = $donationName;
+    }
+
+    return $map;
+}
+
+/**
+ * @return array{id:int,name:string,code:string,detail_url:string}|null
+ */
+function po_get_iblock_project_by_id(int $elementId): ?array
+{
+    if ($elementId <= 0 || !\Bitrix\Main\Loader::includeModule('iblock')
+        || !defined('IBLOCK_PROJECTS_ID') || IBLOCK_PROJECTS_ID <= 0) {
+        return null;
+    }
+
+    $row = CIBlockElement::GetList(
+        [],
+        ['IBLOCK_ID' => IBLOCK_PROJECTS_ID, 'ID' => $elementId, 'ACTIVE' => 'Y'],
+        false,
+        ['nTopCount' => 1],
+        ['ID', 'NAME', 'CODE', 'PROPERTY_DETAIL_URL']
+    )->GetNext();
+
+    if (!$row) {
+        return null;
+    }
+
+    $name = trim((string)($row['NAME'] ?? ''));
+    if ($name === '') {
+        return null;
+    }
+
+    return [
+        'id'         => (int)$row['ID'],
+        'name'       => $name,
+        'code'       => trim((string)($row['CODE'] ?? '')),
+        'detail_url' => trim((string)($row['PROPERTY_DETAIL_URL_VALUE'] ?? '')),
+    ];
+}
+
+/**
+ * @return array{id:int,name:string,code:string,detail_url:string}|null
+ */
+function po_get_iblock_project_by_detail_url(string $detailUrl): ?array
+{
+    $detailUrl = trim($detailUrl);
+    if ($detailUrl === '' || !\Bitrix\Main\Loader::includeModule('iblock')
+        || !defined('IBLOCK_PROJECTS_ID') || IBLOCK_PROJECTS_ID <= 0) {
+        return null;
+    }
+
+    $row = CIBlockElement::GetList(
+        [],
+        ['IBLOCK_ID' => IBLOCK_PROJECTS_ID, 'ACTIVE' => 'Y', 'PROPERTY_DETAIL_URL' => $detailUrl],
+        false,
+        ['nTopCount' => 1],
+        ['ID', 'NAME', 'CODE', 'PROPERTY_DETAIL_URL']
+    )->GetNext();
+
+    if (!$row) {
+        return null;
+    }
+
+    $name = trim((string)($row['NAME'] ?? ''));
+    if ($name === '') {
+        return null;
+    }
+
+    return [
+        'id'         => (int)$row['ID'],
+        'name'       => $name,
+        'code'       => trim((string)($row['CODE'] ?? '')),
+        'detail_url' => trim((string)($row['PROPERTY_DETAIL_URL_VALUE'] ?? $detailUrl)),
+    ];
+}
+
+/**
+ * Название проекта на /support/ по данным инфоблока (только из захардкоженного списка).
+ */
+function po_map_to_donation_project_name(
+    int $elementId = 0,
+    string $elementName = '',
+    string $elementCode = '',
+    string $detailUrl = ''
+): string {
+    $donationNames = po_get_donation_project_names();
+    $matchInList = static function (string $candidate) use ($donationNames): string {
+        $candidate = trim($candidate);
+        if ($candidate === '') {
+            return '';
+        }
+        foreach ($donationNames as $donationName) {
+            if ($candidate === $donationName) {
+                return $donationName;
+            }
+            if (po_paykeeper_normalize_project_name($candidate) === po_paykeeper_normalize_project_name($donationName)) {
+                return $donationName;
+            }
+        }
+
+        return '';
+    };
+
+    $tryResolve = static function (string $name, string $code, string $url) use ($matchInList): string {
+        if ($hit = $matchInList($name)) {
+            return $hit;
+        }
+        if ($code !== '' && ($hit = $matchInList($code))) {
+            return $hit;
+        }
+        $url = trim($url);
+        if ($url !== '') {
+            $byUrl = po_get_project_detail_url_donation_map()[$url] ?? '';
+            if ($byUrl !== '' && $matchInList($byUrl) !== '') {
+                return $byUrl;
+            }
+        }
+        $norm = po_paykeeper_normalize_project_name($name);
+        if ($norm !== '' && isset(po_get_project_name_donation_aliases()[$norm])) {
+            return po_get_project_name_donation_aliases()[$norm];
+        }
+        if ($code !== '') {
+            $normCode = po_paykeeper_normalize_project_name($code);
+            if ($normCode !== '' && isset(po_get_project_name_donation_aliases()[$normCode])) {
+                return po_get_project_name_donation_aliases()[$normCode];
+            }
+        }
+
+        $cfg = po_get_paykeeper_config();
+        $aliases = isset($cfg['project_aliases']) && is_array($cfg['project_aliases']) ? $cfg['project_aliases'] : [];
+        if ($name !== '' && isset($aliases[$name])) {
+            return $matchInList((string)$aliases[$name]);
+        }
+        foreach ($aliases as $alias => $canonical) {
+            if (po_paykeeper_normalize_project_name((string)$alias) === $norm) {
+                return $matchInList((string)$canonical);
+            }
+        }
+
+        return '';
+    };
+
+    if ($elementId > 0) {
+        $fromIblock = po_get_iblock_project_by_id($elementId);
+        if ($fromIblock) {
+            $hit = $tryResolve($fromIblock['name'], $fromIblock['code'], $fromIblock['detail_url']);
+            if ($hit !== '') {
+                return $hit;
+            }
+        }
+    }
+
+    return $tryResolve($elementName, $elementCode, $detailUrl);
+}
+
+/**
+ * Сопоставить ?id= / ?project= с пунктом захардкоженного списка пожертвований.
+ */
+function po_resolve_donation_project_from_request(int $projectId = 0, string $projectName = ''): string
+{
+    return po_map_to_donation_project_name($projectId, $projectName);
+}
+
+/**
+ * Ссылка на /support/ с предвыбором (только имена из списка пожертвований).
+ *
+ * @param array{id?:int,name?:string,code?:string,detail_url?:string}|null $projectRow
+ */
+function po_support_page_url_for_project(?array $projectRow): string
+{
+    if (!$projectRow) {
+        return '/support/';
+    }
+
+    $donationName = po_map_to_donation_project_name(
+        (int)($projectRow['id'] ?? 0),
+        (string)($projectRow['name'] ?? ''),
+        (string)($projectRow['code'] ?? ''),
+        (string)($projectRow['detail_url'] ?? '')
+    );
+
+    return $donationName !== ''
+        ? '/support/?project=' . rawurlencode($donationName)
+        : '/support/';
+}
+
+/**
+ * Подставить ссылку на /support/ с предвыбором проекта в HTML шаблона страницы проекта.
+ */
+function po_replace_support_links_in_html(string $html, ?array $projectRow): string
+{
+    $supportUrl = htmlspecialchars(po_support_page_url_for_project($projectRow), ENT_QUOTES, 'UTF-8');
+    $html = str_replace(
+        ['href="support.html"', "href='support.html'"],
+        ['href="' . $supportUrl . '"', "href='" . $supportUrl . "'"],
+        $html
+    );
+    if ($projectRow) {
+        $html = preg_replace(
+            '#href=(["\'])/support/?\1#iu',
+            'href=$1' . $supportUrl . '$1',
+            $html
+        );
+    }
+
+    return $html;
+}
+
+/**
  * Список аккаунтов PayKeeper (single + multi-account режимы).
  * На выходе каждый аккаунт содержит base_url, username, password, secret_word и account_key.
  */
