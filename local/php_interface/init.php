@@ -117,6 +117,34 @@ function po_document_url(string $docKey): string
 }
 
 /**
+ * Главная страница сайта (для LCP-preload и пр.).
+ */
+function po_is_home_page(): bool
+{
+    global $APPLICATION;
+    if (!is_object($APPLICATION) || !method_exists($APPLICATION, 'GetCurPage')) {
+        return false;
+    }
+    $page = (string)$APPLICATION->GetCurPage(false);
+    return $page === '/' || $page === '/index.php' || $page === '';
+}
+
+/**
+ * Preload баннера главной: один файл по breakpoint, не грузим desktop + mobile сразу.
+ */
+function po_render_home_lcp_preload(): void
+{
+    if (!po_is_home_page()) {
+        return;
+    }
+    $base = (defined('SITE_TEMPLATE_PATH') ? SITE_TEMPLATE_PATH : '/local/templates/my_template') . '/assets/img/';
+    $desktop = htmlspecialchars($base . 'banner-main.jpg', ENT_QUOTES, 'UTF-8');
+    $mobile  = htmlspecialchars($base . 'banner-main-mob.jpg', ENT_QUOTES, 'UTF-8');
+    echo '<link rel="preload" as="image" href="' . $desktop . '" media="(min-width: 769px)" fetchpriority="high">' . "\n";
+    echo '<link rel="preload" as="image" href="' . $mobile . '" media="(max-width: 768px)" fetchpriority="high">' . "\n";
+}
+
+/**
  * Отправить уведомление администратору о новой заявке.
  *
  * @param string $type  Тип заявки (project_support, event_reg, reference_visit, …)

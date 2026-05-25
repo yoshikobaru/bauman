@@ -12,7 +12,16 @@ $APPLICATION->SetPageProperty('description', 'Политехническое о�
 			 МВТУ (МГТУ) им. Н.Э. Баумана
 		</p>
 	</div>
-	 <!-- /.banner-main__content --> <img src="/local/templates/my_template/assets/img/banner-main.jpg" alt="" class="banner-main__image desk-block"> <img src="/local/templates/my_template/assets/img/banner-main-mob.jpg" alt="" class="banner-main__image desk-none">
+	 <!-- /.banner-main__content -->
+	<?php
+	$homeBannerBase = (defined('SITE_TEMPLATE_PATH') ? SITE_TEMPLATE_PATH : '/local/templates/my_template') . '/assets/img/';
+	$homeBannerDesktop = htmlspecialchars($homeBannerBase . 'banner-main.jpg', ENT_QUOTES, 'UTF-8');
+	$homeBannerMobile  = htmlspecialchars($homeBannerBase . 'banner-main-mob.jpg', ENT_QUOTES, 'UTF-8');
+	?>
+	<picture>
+		<source media="(max-width: 768px)" srcset="<?= $homeBannerMobile ?>">
+		<img src="<?= $homeBannerDesktop ?>" alt="" class="banner-main__image" fetchpriority="high" loading="eager" decoding="async">
+	</picture>
 	<p class="banner-main__text">
 		 Сохраняем связь выпускников способствуем успехам технических наук и промышленности.
 	</p>

@@ -10,6 +10,7 @@
 	$_metaDesc = $APPLICATION->GetProperty('description');
 	if ($_metaDesc):
 	?><meta name="description" content="<?= htmlspecialchars($_metaDesc) ?>"><?php endif; ?>
+	<?php if (function_exists('po_render_home_lcp_preload')) { po_render_home_lcp_preload(); } ?>
 	<?$APPLICATION->ShowHead();?>
 	<link rel="stylesheet" href="<?=SITE_TEMPLATE_PATH?>/assets/css/swiper-bundle.min.css">
 	<link rel="stylesheet" href="<?=SITE_TEMPLATE_PATH?>/assets/css/fancybox.css">

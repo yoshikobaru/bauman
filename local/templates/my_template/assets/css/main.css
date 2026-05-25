@@ -485,6 +485,9 @@ strong {
 .banner-main__image {
     grid-column: -1 / 1;
     grid-row: -1 / 1;
+    width: 100%;
+    height: auto;
+    display: block;
 }
 
 .banner-main__text {
