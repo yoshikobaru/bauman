@@ -25,7 +25,7 @@
 			<div class="footer-bottom">
 				<ul class="footer-social">
 					<li class="footer-social__item">					
-						<a href="#" target="_blank" aria-label="ВКонтакте">
+						<a href="https://vk.com/alumnibmstu" target="_blank" aria-label="ВКонтакте">
 							<svg width="52" height="52" viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg">
 								<rect width="52" height="52" fill="white"/>
 								<path fill-rule="evenodd" clip-rule="evenodd" d="M0 10C0.422184 29.988 10.5558 42 28.3222 42H29.3293V30.5645C35.8577 31.2052 40.7943 35.9139 42.7755 42H52C49.4666 32.9029 42.8079 27.8738 38.6505 25.9519C42.8079 23.5816 48.6543 17.8158 50.0509 10H41.6709C39.8521 16.3424 34.461 22.1081 29.3293 22.6526V10H20.9492V32.1661C15.7525 30.8849 9.19171 24.6707 8.89939 10H0Z" fill="black"/>
@@ -33,7 +33,7 @@
 						</a>
 					</li>
 					<li class="footer-social__item">					
-						<a href="#" target="_blank" aria-label="Telegram">
+						<a href="https://t.me/alumnibmstu" target="_blank" aria-label="Telegram">
 							<svg width="52" height="52" viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg">
 								<g clip-path="url(#clip0_545_277)">
 								<rect width="52" height="52" fill="white"/>

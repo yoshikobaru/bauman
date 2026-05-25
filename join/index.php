@@ -222,7 +222,7 @@ if ($isAuthorized) {
 					<li class="membership-slider__item">Участие в активностях, выставках и мероприятиях Политехнического общества;</li>
 					<li class="membership-slider__item">Доступ в закрытый карьерный канал с вакансиями от профильных компаний;</li>
 					<li class="membership-slider__item">Возможность получить пластиковый пропуск члена Политехнического общества для посещения МВТУ (МГТУ) им. Н.Э. Баумана;</li>
-					<li class="membership-slider__item">Доступ в электронную библиотеку МВТУ (МГТУ) (в разработке).</li>
+					<li class="membership-slider__item">Доступ в электронную библиотеку МГТУ им Н.Э. Баумана.</li>
 				</ul>
  <button class="membership-slider__join btn btn-empty" onclick="window.location='/registration/'">Вступить</button>
 			</div>
