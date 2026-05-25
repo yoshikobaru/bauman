@@ -3644,6 +3644,27 @@ strong {
     font-weight: 500;
 }
 
+.documents__link {
+    color: inherit;
+    text-decoration: none;
+}
+
+.documents__link:hover {
+    color: #CE2029;
+}
+
+.documents__download {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #002F49;
+    text-decoration: none;
+}
+
+.documents__download:hover {
+    color: #CE2029;
+}
+
 .documents__date {
     width: 12%;
 }
