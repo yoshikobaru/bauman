@@ -482,12 +482,19 @@ strong {
     color: #fff;
 }
 
+.banner-main__media {
+    grid-column: 1 / -1;
+    grid-row: 1 / -1;
+    display: block;
+    width: 100%;
+    z-index: 0;
+}
+
 .banner-main__image {
-    grid-column: -1 / 1;
-    grid-row: -1 / 1;
     width: 100%;
     height: auto;
     display: block;
+    vertical-align: top;
 }
 
 .banner-main__text {
@@ -515,7 +522,7 @@ strong {
     .banner-main__subtitle {
         font-size: 18px;
     }
-    .banner-main__image {
+    .banner-main__media {
         margin-bottom: 24px;
     }
     .banner-main__text {

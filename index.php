@@ -18,7 +18,7 @@ $APPLICATION->SetPageProperty('description', 'Политехническое о�
 	$homeBannerDesktop = htmlspecialchars($homeBannerBase . 'banner-main.jpg', ENT_QUOTES, 'UTF-8');
 	$homeBannerMobile  = htmlspecialchars($homeBannerBase . 'banner-main-mob.jpg', ENT_QUOTES, 'UTF-8');
 	?>
-	<picture>
+	<picture class="banner-main__media">
 		<source media="(max-width: 768px)" srcset="<?= $homeBannerMobile ?>">
 		<img src="<?= $homeBannerDesktop ?>" alt="" class="banner-main__image" fetchpriority="high" loading="eager" decoding="async">
 	</picture>
