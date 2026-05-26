@@ -144,6 +144,37 @@ function po_render_home_lcp_preload(): void
     echo '<link rel="preload" as="image" href="' . $mobile . '" media="(max-width: 768px)" fetchpriority="high">' . "\n";
 }
 
+function po_escape_iblock_text(?string $text): string
+{
+    if ($text === null || $text === '') {
+        return '';
+    }
+    $text = html_entity_decode($text, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+    return htmlspecialchars($text, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+}
+
+function po_h(?string $text): string
+{
+    return po_escape_iblock_text($text);
+}
+
+
+function po_fix_double_html_entities(string $html): string
+{
+    if ($html === ''
+        || (strpos($html, '&amp;#') === false
+            && strpos($html, '&amp;lt;') === false
+            && strpos($html, '&amp;gt;') === false
+            && strpos($html, '&amp;quot;') === false)) {
+        return $html;
+    }
+    return (string)preg_replace(
+        '/&amp;((?:#\d+|#x[0-9a-fA-F]+|[a-zA-Z][a-zA-Z0-9]*);)/',
+        '&$1',
+        $html
+    );
+}
+
 /**
  * Отправить уведомление администратору о новой заявке.
  *
@@ -1946,4 +1977,18 @@ AddEventHandler('main', 'OnUserLogout', function () {
     global $USER;
     $userId = ($USER instanceof CUser && $USER->IsAuthorized()) ? (int)$USER->GetID() : 0;
     po_logAction('logout', 'user', $userId, 'Выход из системы');
+});
+
+// Двойное экранирование Bitrix + htmlspecialchars по всему публичному сайту (один раз в init, без правок каждого шаблона)
+AddEventHandler('main', 'OnEndBufferContent', function (&$content) {
+    if (!is_string($content) || $content === '') {
+        return;
+    }
+    if (defined('ADMIN_SECTION') && ADMIN_SECTION) {
+        return;
+    }
+    if (strpos($content, '<html') === false && strpos($content, '<!DOCTYPE') === false) {
+        return;
+    }
+    $content = po_fix_double_html_entities($content);
 });

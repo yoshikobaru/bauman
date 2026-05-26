@@ -26,10 +26,13 @@ if (!function_exists('po_render_board_modals')) {
                 ['SORT' => 'ASC'],
                 ['IBLOCK_ID' => IBLOCK_BOARD_ID, 'ACTIVE' => 'Y'],
                 false, false,
-                ['ID', 'NAME', 'PREVIEW_PICTURE', 'PREVIEW_TEXT', 'DETAIL_TEXT']
+                ['ID', 'NAME', 'PREVIEW_PICTURE', 'PREVIEW_TEXT', '~PREVIEW_TEXT', 'DETAIL_TEXT']
             );
 
             while ($bm = $dbBoard->GetNext()) {
+                if (isset($bm['~PREVIEW_TEXT'])) {
+                    $bm['PREVIEW_TEXT'] = $bm['~PREVIEW_TEXT'];
+                }
                 $members[] = $bm;
             }
         }
@@ -45,15 +48,15 @@ if (!function_exists('po_render_board_modals')) {
         ?>
         <div class="form-boards" id="board-modal-<?= (int)$bm['ID'] ?>" style="display:none;max-width:1100px;">
             <div class="form-boards__wrapper">
-                <img alt="<?= htmlspecialchars($bm['NAME']) ?>" 
+                <img alt="<?= function_exists('po_escape_iblock_text') ? po_escape_iblock_text($bm['NAME']) : htmlspecialchars($bm['NAME']) ?>" 
                      src="<?= htmlspecialchars($photoSrc) ?>" 
                      class="form-boards__image">
                 <div class="form-boards__content">
-                    <h2><?= htmlspecialchars($bm['NAME']) ?></h2>
+                    <h2><?= function_exists('po_escape_iblock_text') ? po_escape_iblock_text($bm['NAME']) : htmlspecialchars($bm['NAME']) ?></h2>
                     <?php if (!empty($bm['DETAIL_TEXT'])): ?>
                     <div><?= $bm['DETAIL_TEXT'] ?></div>
                     <?php else: ?>
-                    <p><?= htmlspecialchars($bm['PREVIEW_TEXT']) ?></p>
+                    <p><?= function_exists('po_escape_iblock_text') ? po_escape_iblock_text($bm['PREVIEW_TEXT']) : htmlspecialchars($bm['PREVIEW_TEXT']) ?></p>
                     <?php endif; ?>
                 </div>
             </div>

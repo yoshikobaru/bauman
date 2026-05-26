@@ -38,14 +38,15 @@ if (!function_exists('po_render_board_section')) {
                 ['IBLOCK_ID' => IBLOCK_BOARD_ID, 'ACTIVE' => 'Y'],
                 false,
                 ['nTopCount' => $limit],
-                ['ID', 'NAME', 'PREVIEW_PICTURE', 'PREVIEW_TEXT']
+                ['ID', 'NAME', 'PREVIEW_PICTURE', 'PREVIEW_TEXT', '~PREVIEW_TEXT']
             );
 
             while ($board = $dbBoard->GetNext()) {
+                $previewText = (string)($board['~PREVIEW_TEXT'] ?? $board['PREVIEW_TEXT'] ?? '');
                 $items[] = [
                     'id' => (int)$board['ID'],
                     'name' => (string)$board['NAME'],
-                    'pos' => (string)$board['PREVIEW_TEXT'],
+                    'pos' => $previewText,
                     'photo' => !empty($board['PREVIEW_PICTURE'])
                         ? CFile::GetPath($board['PREVIEW_PICTURE'])
                         : '',
@@ -69,12 +70,12 @@ if (!function_exists('po_render_board_section')) {
                     <?php foreach ($items as $item): ?>
                     <div class="boards__item"<?= $useFancybox ? ' data-fancybox data-src="#board-modal-' . $item['id'] . '"' : '' ?>>
                         <?php if (!empty($item['photo'])): ?>
-                        <img alt="<?= htmlspecialchars($item['name']) ?>"
+                        <img alt="<?= function_exists('po_escape_iblock_text') ? po_escape_iblock_text($item['name']) : htmlspecialchars($item['name']) ?>"
                              src="<?= htmlspecialchars($item['photo']) ?>"
                              class="boards__item-image">
                         <?php endif; ?>
-                        <h3 class="boards__item-title"><?= htmlspecialchars($item['name']) ?></h3>
-                        <p class="boards__item-text"><?= htmlspecialchars($item['pos']) ?></p>
+                        <h3 class="boards__item-title"><?= function_exists('po_escape_iblock_text') ? po_escape_iblock_text($item['name']) : htmlspecialchars($item['name']) ?></h3>
+                        <p class="boards__item-text"><?= function_exists('po_escape_iblock_text') ? po_escape_iblock_text($item['pos']) : htmlspecialchars($item['pos']) ?></p>
                     </div>
                     <?php endforeach; ?>
                 </div>
