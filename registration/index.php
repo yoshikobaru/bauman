@@ -2,6 +2,10 @@
 require($_SERVER["DOCUMENT_ROOT"]."/bitrix/header.php");
 $APPLICATION->SetTitle("Регистрация");
 
+if ($USER->IsAuthorized()) {
+    LocalRedirect('/profile/');
+}
+
 use Bitrix\Main\Loader;
 $hlOk = Loader::includeModule('highloadblock');
 

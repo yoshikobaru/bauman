@@ -461,6 +461,134 @@ function po_flash_get(string $key): ?array
     return $payload;
 }
 
+/** ID групп членства (базовое, премиум, партнёр). */
+function po_membership_group_ids(): array
+{
+    return array_values(array_filter([
+        defined('PO_MEMBER_BASIC_ID') ? (int)PO_MEMBER_BASIC_ID : 0,
+        defined('PO_MEMBER_PREMIUM_ID') ? (int)PO_MEMBER_PREMIUM_ID : 0,
+        defined('PO_PARTNER_ID') ? (int)PO_PARTNER_ID : 0,
+    ]));
+}
+
+/** Нормализовать значение UF_MEMBERSHIP_EXPIRES из Битрикса в строку дд.мм.гггг. */
+function po_membership_expires_raw($value): string
+{
+    if ($value instanceof \Bitrix\Main\Type\Date || $value instanceof \Bitrix\Main\Type\DateTime) {
+        return $value->format('d.m.Y');
+    }
+    if (is_numeric($value) && (int)$value > 0) {
+        return date('d.m.Y', (int)$value);
+    }
+    $raw = trim((string)$value);
+    if (preg_match('/^(\d{4}-\d{2}-\d{2})/', $raw, $m)) {
+        $ts = strtotime($m[1]);
+        return $ts ? date('d.m.Y', $ts) : $raw;
+    }
+    return $raw;
+}
+
+/** Конец дня по дате окончания (timestamp) или null, если дату не разобрать. */
+function po_membership_expires_end_ts(string $raw): ?int
+{
+    $raw = po_membership_expires_raw($raw);
+    if ($raw === '') {
+        return null;
+    }
+    if (preg_match('/^(\d{1,2})\.(\d{1,2})\.(\d{4})$/', $raw, $m)) {
+        return mktime(23, 59, 59, (int)$m[2], (int)$m[1], (int)$m[3]);
+    }
+    if (preg_match('/^(\d{4})-(\d{2})-(\d{2})/', $raw, $m)) {
+        return mktime(23, 59, 59, (int)$m[2], (int)$m[3], (int)$m[1]);
+    }
+    $ts = strtotime($raw);
+    return $ts ? mktime(23, 59, 59, (int)date('n', $ts), (int)date('j', $ts), (int)date('Y', $ts)) : null;
+}
+
+function po_membership_is_expired($expiresValue): bool
+{
+    $endTs = po_membership_expires_end_ts(po_membership_expires_raw($expiresValue));
+    return $endTs !== null && time() > $endTs;
+}
+
+/** «до 11 Апреля 2027» для плашки тарифа. */
+function po_membership_format_expires($expiresValue): string
+{
+    $raw = po_membership_expires_raw($expiresValue);
+    if ($raw === '') {
+        return '';
+    }
+    $months = [
+        1 => 'Января', 2 => 'Февраля', 3 => 'Марта', 4 => 'Апреля',
+        5 => 'Мая', 6 => 'Июня', 7 => 'Июля', 8 => 'Августа',
+        9 => 'Сентября', 10 => 'Октября', 11 => 'Ноября', 12 => 'Декабря',
+    ];
+    if (preg_match('/^(\d{1,2})\.(\d{1,2})\.(\d{4})$/', $raw, $m)) {
+        $day = (int)$m[1];
+        $month = (int)$m[2];
+        $year = $m[3];
+    } elseif (preg_match('/^(\d{4})-(\d{2})-(\d{2})/', $raw, $m)) {
+        $day = (int)$m[3];
+        $month = (int)$m[2];
+        $year = $m[1];
+    } else {
+        return 'до ' . $raw;
+    }
+    $monthName = $months[$month] ?? '';
+    return 'до ' . $day . ' ' . $monthName . ' ' . $year;
+}
+
+/**
+ * Снять членство: убрать группы, статус expired, вернуть в «Зарегистрированный».
+ */
+function po_membership_expire_user(int $userId): bool
+{
+    if ($userId <= 0) {
+        return false;
+    }
+    $memberGroups = po_membership_group_ids();
+    $currentGroups = CUser::GetUserGroup($userId);
+    $newGroups = array_values(array_filter(
+        $currentGroups,
+        static fn($g) => !in_array((int)$g, $memberGroups, true)
+    ));
+    if (defined('PO_REGISTERED_ID') && PO_REGISTERED_ID > 0 && !in_array(PO_REGISTERED_ID, $newGroups, true)) {
+        $newGroups[] = PO_REGISTERED_ID;
+    }
+    CUser::SetUserGroup($userId, $newGroups);
+
+    $oUser = new CUser();
+    $ok = (bool)$oUser->Update($userId, ['UF_MEMBERSHIP_STATUS' => 'expired']);
+    if ($ok && function_exists('po_logAction')) {
+        po_logAction('membership_expired', 'user', $userId, 'Членство истекло по UF_MEMBERSHIP_EXPIRES');
+    }
+    return $ok;
+}
+
+/**
+ * Если срок UF_MEMBERSHIP_EXPIRES прошёл — снять группы и выставить expired.
+ */
+function po_membership_sync_user(int $userId): void
+{
+    if ($userId <= 0) {
+        return;
+    }
+    $arUser = CUser::GetByID($userId)->Fetch();
+    if (!$arUser) {
+        return;
+    }
+    $expiresRaw = po_membership_expires_raw($arUser['UF_MEMBERSHIP_EXPIRES'] ?? '');
+    if ($expiresRaw === '' || !po_membership_is_expired($expiresRaw)) {
+        return;
+    }
+    $status = (string)($arUser['UF_MEMBERSHIP_STATUS'] ?? '');
+    $inMemberGroup = (bool)array_intersect(CUser::GetUserGroup($userId), po_membership_group_ids());
+    if ($status === 'expired' && !$inMemberGroup) {
+        return;
+    }
+    po_membership_expire_user($userId);
+}
+
 /**
  * Добавить раздел «Политех» в левое меню административной панели.
  */
@@ -1970,6 +2098,22 @@ if (is_dir($renderersDir)) {
 AddEventHandler('main', 'OnAfterUserLogin', function (&$arFields) {
     $login = $arFields['LOGIN'] ?? '';
     po_logAction('login', 'user', 0, 'Вход: ' . $login);
+    $userId = (int)($arFields['USER_ID'] ?? 0);
+    if ($userId > 0) {
+        po_membership_sync_user($userId);
+    }
+});
+
+// Проверка срока членства на каждом хите (для авторизованных)
+AddEventHandler('main', 'OnProlog', function () {
+    if (defined('ADMIN_SECTION') && ADMIN_SECTION) {
+        return;
+    }
+    global $USER;
+    if (!is_object($USER) || !$USER->IsAuthorized()) {
+        return;
+    }
+    po_membership_sync_user((int)$USER->GetID());
 });
 
 // Логирование выхода пользователя

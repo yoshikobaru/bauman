@@ -124,7 +124,6 @@
 								<div class="header-user-menu" style="display:none;position:absolute;right:0;top:calc(100% + 8px);min-width:200px;background:#fff;border:1px solid #e0e0e0;border-radius:4px;box-shadow:0 4px 16px rgba(0,0,0,.12);z-index:1000;padding:8px 0">
 									<a href="/profile/" style="display:block;padding:10px 16px;color:#333;text-decoration:none;font-size:14px" class="header-user-menu__item">Настройки профиля</a>
 									<a href="/profile/security/" style="display:block;padding:10px 16px;color:#333;text-decoration:none;font-size:14px" class="header-user-menu__item">Безопасность</a>
-									<a href="/profile/?tab=membership" style="display:block;padding:10px 16px;color:#333;text-decoration:none;font-size:14px" class="header-user-menu__item">Моё членство</a>
 									<a href="/profile/?tab=activities" style="display:block;padding:10px 16px;color:#333;text-decoration:none;font-size:14px" class="header-user-menu__item">Мои активности</a>
 									<a href="/profile/?tab=applications" style="display:block;padding:10px 16px;color:#333;text-decoration:none;font-size:14px" class="header-user-menu__item">Мои заявки</a>
 									<?php

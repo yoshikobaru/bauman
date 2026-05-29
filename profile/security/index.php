@@ -95,7 +95,6 @@ $sessid = bitrix_sessid();
                         <?php $secTab = $_GET['tab'] ?? 'security'; ?>
                         <a href="/profile/" class="account__menu-item <?= $secTab === 'profile' ? 'account__menu-item--active' : '' ?>">Мой профиль</a>
                         <a href="/profile/security/" class="account__menu-item account__menu-item--active">Безопасность</a>
-                        <a href="/profile/?tab=membership" class="account__menu-item <?= $secTab === 'membership' ? 'account__menu-item--active' : '' ?>">Моё членство</a>
                         <a href="/profile/?tab=activities" class="account__menu-item <?= $secTab === 'activities' ? 'account__menu-item--active' : '' ?>">Мои активности</a>
                         <a href="/profile/?tab=applications" class="account__menu-item <?= $secTab === 'applications' ? 'account__menu-item--active' : '' ?>">Мои заявки</a>
                         <?php if (defined('PO_PARTNER_ID') && in_array(PO_PARTNER_ID, $USER->GetUserGroupArray())): ?>

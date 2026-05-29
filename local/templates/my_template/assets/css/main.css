@@ -4562,42 +4562,48 @@ select,
 /* account__rate */
 
 .account__rate {
-    padding: 2vw;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 40px;
+    gap: 24px;
     position: relative;
     margin-bottom: 40px;
-    background: linear-gradient(135deg, #0f2f4a 0%, #022032 100%) !important;
-    background-color: #0f2f4a !important;
-    border-radius: 12px;
     overflow: hidden;
     color: #fff;
-}
-
-.account__rate-conus {
-    position: absolute;
-    right: -1px;
-    top: -1px;
+    border-radius: 0;
+    font-family: 'Geologica', var(--text-geologica);
+    background-color: #022032;
 }
 
 .account__rate--proff {
-    background: url(../img/my_profile/rate-bg-proff.png) no-repeat center/cover;
+    background: #022032 url(../img/my_profile/rate-bg-proff.png) no-repeat center/cover;
 }
 
 .account__rate--basic {
-    background: linear-gradient(135deg, #0f2f4a 0%, #022032 100%);
+    background: #022032 linear-gradient(135deg, #0f2f4a 0%, #022032 100%);
 }
 
-.account__rate-info {
+.account__rate-head {
     display: flex;
+    flex-direction: row;
     align-items: center;
+    flex-wrap: wrap;
     gap: 24px;
+    width: 100%;
 }
 
 .account__rate-status {
-    background: rgba(255, 255, 255, 0.10);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     padding: 8px 12px;
     color: #fff;
-    font-size: var(--text-size);
-    border-radius: 8px;
+    font-size: 22px;
+    font-weight: 300;
+    line-height: 150%;
+    border-radius: 0;
+    background: rgba(255, 255, 255, 0.1);
 }
 
 .account__rate-status--pending {
@@ -4611,8 +4617,8 @@ select,
 }
 
 .account__rate-status--active {
-    background: rgba(39, 174, 96, 0.25);
-    color: #d4f8e3;
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
 }
 
 .account__rate-status--expired,
@@ -4622,65 +4628,133 @@ select,
 }
 
 .account__rate-date {
-    font-size: var(--text-size);
+    font-size: 22px;
     color: #fff;
     font-weight: 300;
+    line-height: 150%;
 }
 
-.account__rate-date span {
-    opacity: .3;
+.account__rate-body {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    width: 100%;
 }
 
 .account__rate-plan {
-    font-size: var(--text-32);
+    margin: 0;
+    width: 100%;
+    font-size: 32px;
     color: #fff !important;
     font-weight: 500;
-    margin-bottom: 8px;
+    line-height: 130%;
+    letter-spacing: -0.02em;
 }
 
 .account__rate-price {
+    margin: 0;
     font-size: 50px;
     color: #fff !important;
     font-weight: 600;
-    margin-bottom: 8px;
+    line-height: 120%;
+    letter-spacing: -0.02em;
 }
 
 .account__rate-when {
+    margin: 0;
     font-size: 18px;
     color: #B2B2B2;
-    margin-bottom: 16px;
+    font-weight: 300;
+    line-height: 150%;
 }
 
 .account__rate-advantages {
+    margin: 0;
     font-size: 18px;
-    color: #fff;
-    opacity: .3;
-    margin-bottom: 16px;
+    font-weight: 300;
+    line-height: 150%;
+    color: rgba(255, 255, 255, 0.3);
 }
 
 .account__rate-list {
-    margin-bottom: 24px;
-    padding-left: 20px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    width: 100%;
 }
 
 .account__rate-item {
+    position: relative;
+    padding-left: 16px;
     font-size: 18px;
-    line-height: 1.5em;
+    line-height: 150%;
     color: #fff;
     font-weight: 300;
-    margin-bottom: 10px;
+    margin-bottom: 0;
+}
+
+.account__rate-item::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.65em;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: #fff;
+}
+
+.account__rate-item + .account__rate-item {
+    margin-top: 0;
+}
+
+.account__rate-buttons {
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    gap: 24px;
+    width: 100%;
 }
 
 .account__rate-btn {
-    max-width: none;
-    background-color: #022032;
-    border: transparent;
+    flex: 1;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    box-sizing: border-box;
+    min-height: 50px;
     padding: 16px;
+    background-color: #022032;
+    border: 2px solid rgba(2, 32, 50, 0.1);
+    border-radius: 0;
+    color: #fff !important;
+    font-family: 'Space Grotesk', var(--font-space);
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 100%;
+    letter-spacing: -0.02em;
+    text-decoration: none;
+    text-align: center;
+    transition: opacity 0.2s ease;
+}
+
+.account__rate-btn:hover {
+    opacity: 0.85;
+    color: #fff !important;
 }
 
 .account__rate-btn--changes {
     background-color: transparent;
-    border: 2px solid rgba(255, 255, 255, 0.10);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+.account__rate-notice {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 300;
+    line-height: 150%;
+    color: rgba(255, 255, 255, 0.7);
 }
 
 /* account__ready */
@@ -5215,10 +5289,22 @@ select,
     .join__wrapper {
         padding: 24px 16px;
     }
-    .account__rate-info {
+    .account__rate-head {
         flex-direction: column;
         align-items: flex-start;
-        margin-bottom: 16px;
+    }
+    .account__rate-buttons {
+        flex-direction: column;
+    }
+    .account__rate-plan {
+        font-size: 26px;
+    }
+    .account__rate-price {
+        font-size: 36px;
+    }
+    .account__rate-status,
+    .account__rate-date {
+        font-size: 18px;
     }
     .account__rate-item {
         font-size: 16px;

@@ -68,7 +68,9 @@
 		</div>
 		<div class="form-login__buttons">
 			<button class="btn form-login__btn form-login__btn--sign" id="modal-login-btn">Войти</button>
+			<?php if (!$USER->IsAuthorized()): ?>
 			<a href="/registration/" class="btn form-login__btn form-login__btn--register btn-empty">Зарегистрироваться</a>
+			<?php endif; ?>
 		</div>
 	</div>
 	<script>

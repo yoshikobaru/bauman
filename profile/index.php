@@ -17,6 +17,10 @@ $joinedOk  = !empty($_GET['joined']);
 // — Загрузка данных пользователя —
 $dbUser = CUser::GetByID($userId);
 $arUser = $dbUser->Fetch() ?: [];
+if (function_exists('po_membership_sync_user')) {
+    po_membership_sync_user((int)$userId);
+    $arUser = CUser::GetByID($userId)->Fetch() ?: $arUser;
+}
 
 // — Обработчик сохранения профиля —
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['update_action'])) {
@@ -86,7 +90,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['update_action'])) {
 // Вспомогательные переменные
 $membershipType   = (string)($arUser['UF_MEMBERSHIP_TYPE']   ?? '');
 $membershipStatus = (string)($arUser['UF_MEMBERSHIP_STATUS'] ?? '');
-$membershipExpires = (string)($arUser['UF_MEMBERSHIP_EXPIRES'] ?? '');
+$membershipExpires = function_exists('po_membership_expires_raw')
+    ? po_membership_expires_raw($arUser['UF_MEMBERSHIP_EXPIRES'] ?? '')
+    : trim((string)($arUser['UF_MEMBERSHIP_EXPIRES'] ?? ''));
 $_ug      = $USER->GetUserGroupArray();
 $isMember = defined('PO_MEMBER_BASIC_ID') && (
     in_array(PO_MEMBER_BASIC_ID,   $_ug) ||
@@ -111,33 +117,76 @@ if ($membershipStatus === 'approved') {
 if ($membershipStatus === 'new') {
     $membershipStatus = 'pending';
 }
-if ($membershipStatus === '' && $isMember) {
+if ($membershipStatus === '' && $isMember && !po_membership_is_expired($membershipExpires)) {
     $membershipStatus = 'active';
 }
+if ($membershipExpires !== '' && po_membership_is_expired($membershipExpires)) {
+    $membershipStatus = 'expired';
+}
 
-$typeLabels = [
-    'basic'   => ['label' => 'Базовое',         'price' => '1 000 Р',          'class' => 'account__rate--basic'],
-    'premium' => ['label' => 'Профессиональное', 'price' => '50 000 Р',         'class' => 'account__rate--proff'],
-    'partner' => ['label' => 'Партнёрское',      'price' => 'Инд. условия',     'class' => 'account__rate--proff'],
-    'honorary'=> ['label' => 'Почётное',         'price' => 'Безвозмездно',     'class' => 'account__rate--basic'],
+$membershipPlans = [
+    'basic' => [
+        'label'      => 'Базовое',
+        'price'      => '1 000 ₽',
+        'period'     => 'ежегодно',
+        'class'      => 'account__rate--basic',
+        'advantages' => '',
+        'features'   => [
+            'Участие в активностях, выставках и мероприятиях Политехнического общества;',
+            'Доступ в закрытый карьерный канал с вакансиями от профильных компаний;',
+            'Возможность получить пластиковый пропуск члена Политехнического общества для посещения МВТУ (МГТУ) им. Н.Э. Баумана;',
+            'Доступ в электронную библиотеку МГТУ им Н.Э. Баумана.',
+        ],
+    ],
+    'premium' => [
+        'label'      => 'Профессиональное',
+        'price'      => '50 000 ₽',
+        'period'     => 'ежегодно',
+        'class'      => 'account__rate--proff',
+        'advantages' => '+ Возможности Базового',
+        'features'   => [
+            'Участие в закрытом чате членов общества уровня «Бизнес»;',
+            'Размещение информации и новостей о компании на площадках Политехнического общества;',
+            'Возможность предложить собственный проект для поиска спонсоров и поддержки Политехнического общества;',
+            'Участие в бизнес-мероприятиях Политехнического общества в онлайн и очном форматах;',
+            'Доступ к базе резюме выпускников на карьерной платформе Политехнического общества.',
+        ],
+    ],
+    'partner' => [
+        'label'      => 'Партнёрское',
+        'price'      => 'Персональные условия',
+        'period'     => 'обсуждается индивидуально',
+        'class'      => 'account__rate--proff',
+        'advantages' => '+ Возможности профессионального',
+        'features'   => [
+            'Участие в закрытых мероприятиях Политехнического общества;',
+            'Право стать членом Совета Политехнического общества выпускников МВТУ (МГТУ) им. Н.Э. Баумана;',
+            'Участие в закрытом чате партнёров Политехнического общества.',
+        ],
+    ],
+    'honorary' => [
+        'label'      => 'Почётное',
+        'price'      => 'Бесценно',
+        'period'     => 'по результатам заполненной анкеты',
+        'class'      => 'account__rate--basic',
+        'advantages' => '+ Возможности Базового',
+        'features'   => [
+            'Для тех, кто внёс значительный вклад в развитие технической науки, образования, технологий и деятельности Политехнического общества.',
+        ],
+    ],
 ];
 $statusLabels = [
     'pending'  => ['label' => 'На рассмотрении', 'class' => 'account__rate-status--pending'],
     'in_review'=> ['label' => 'На модерации',    'class' => 'account__rate-status--in-review'],
-    'active'   => ['label' => 'Активен',         'class' => 'account__rate-status--active'],
+    'active'   => ['label' => 'Активный',        'class' => 'account__rate-status--active'],
     'expired'  => ['label' => 'Истёк',           'class' => 'account__rate-status--expired'],
-    'rejected' => ['label' => 'Отклонено',        'class' => 'account__rate-status--error'],
+    'rejected' => ['label' => 'Отклонено',       'class' => 'account__rate-status--error'],
 ];
-$currentType   = $typeLabels[$membershipType]   ?? null;
+$membershipExpiresFormatted = function_exists('po_membership_format_expires')
+    ? po_membership_format_expires($membershipExpires)
+    : ($membershipExpires !== '' ? 'до ' . $membershipExpires : '');
+$currentPlan   = $membershipPlans[$membershipType] ?? null;
 $currentStatus = $statusLabels[$membershipStatus] ?? null;
-$verificationColors = [
-    'basic' => '#7f8c8d',
-    'premium' => '#f0a500',
-    'partner' => '#2980b9',
-    'honorary' => '#8e44ad',
-];
-$verificationBadgeColor = $verificationColors[$membershipType] ?? '#7f8c8d';
-$showVerificationBadge = $membershipStatus === 'active';
 $avatarSrc = 'data:image/svg+xml;utf8,' . rawurlencode('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160"><rect width="160" height="160" fill="#f1f1f1"/><circle cx="80" cy="58" r="26" fill="#c7c7c7"/><path d="M24 142c8-28 30-44 56-44s48 16 56 44" fill="#c7c7c7"/></svg>');
 if (!empty($arUser['PERSONAL_PHOTO'])) {
     $avatarPath = CFile::GetPath((int)$arUser['PERSONAL_PHOTO']);
@@ -209,18 +258,6 @@ if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $profileDiplomaDateInputValue)) {
 .profile-section.is-view .po-date-field__btn,
 .profile-section.is-view .po-date-field__native {
     display: none;
-}
-.profile-verification-badge {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 16px;
-    height: 16px;
-    border-radius: 50%;
-    color: #fff;
-    font-size: 11px;
-    font-weight: 700;
-    margin-left: 8px;
 }
 #profile-photo-save {
     margin-top: 12px;
@@ -769,41 +806,46 @@ if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $profileDiplomaDateInputValue)) {
                             <h3 class="account__subtitle">Ваш тариф</h3>
                             </div>
                             
-                        <?php if ($currentType && $membershipStatus): ?>
-                        <div class="account__rate <?= $currentType['class'] ?>">
-                                <img src="<?=SITE_TEMPLATE_PATH?>/assets/img/my_profile/rate-conus.png" alt="" class="account__rate-conus">
-                                <div class="account__rate-info">
-                                <span class="account__rate-status <?= $currentStatus['class'] ?? '' ?>">
+                        <?php if ($currentPlan && $membershipStatus): ?>
+                        <div class="account__rate <?= htmlspecialchars($currentPlan['class']) ?>">
+                            <div class="account__rate-head">
+                                <span class="account__rate-status <?= htmlspecialchars($currentStatus['class'] ?? '') ?>">
                                     <?= htmlspecialchars($currentStatus['label'] ?? $membershipStatus) ?>
                                 </span>
-                                <?php if ($membershipExpires && $membershipStatus === 'active'): ?>
-                                    <div class="account__rate-date">
-                                    <span>Срок действия</span> до <?= htmlspecialchars($membershipExpires) ?>
-                                </div>
+                                <?php if ($membershipExpiresFormatted && in_array($membershipStatus, ['active', 'expired'], true)): ?>
+                                <span class="account__rate-date"><?= htmlspecialchars($membershipExpiresFormatted) ?></span>
                                 <?php endif; ?>
                             </div>
-                            <h4 class="account__rate-plan">
-                                <?= htmlspecialchars($currentType['label']) ?>
-                                <?php if ($showVerificationBadge): ?>
-                                <span class="profile-verification-badge" style="background:<?= htmlspecialchars($verificationBadgeColor) ?>">✓</span>
-                                <?php endif; ?>
-                            </h4>
-                            <p class="account__rate-price"><?= htmlspecialchars($currentType['price']) ?></p>
-                            <p class="account__rate-when">ежегодно</p>
+                            <div class="account__rate-body">
+                                <h4 class="account__rate-plan"><?= htmlspecialchars($currentPlan['label']) ?></h4>
+                                <p class="account__rate-price"><?= htmlspecialchars($currentPlan['price']) ?></p>
+                                <p class="account__rate-when"><?= htmlspecialchars($currentPlan['period']) ?></p>
+                            </div>
+                            <?php if (!empty($currentPlan['advantages'])): ?>
+                            <p class="account__rate-advantages"><?= htmlspecialchars($currentPlan['advantages']) ?></p>
+                            <?php endif; ?>
+                            <?php if (!empty($currentPlan['features'])): ?>
+                            <ul class="account__rate-list">
+                                <?php foreach ($currentPlan['features'] as $feature): ?>
+                                <li class="account__rate-item"><?= htmlspecialchars($feature) ?></li>
+                                <?php endforeach; ?>
+                            </ul>
+                            <?php endif; ?>
                             <?php if ($membershipStatus === 'active'): ?>
-                                <div class="account__rate-buttons account__grid">
-                                    <?php if ($membershipType === 'basic'): ?>
-                                    <a href="/join/" class="account__rate-btn btn">Продлить или изменить тип членства</a>
-                                    <?php else: ?>
-                                    <a href="/join/" class="account__rate-btn account__rate-btn--changes btn">Изменить тариф</a>
-                                    <?php endif; ?>
+                            <div class="account__rate-buttons">
+                                <a href="/join/" class="account__rate-btn">Продлить</a>
+                                <a href="/join/" class="account__rate-btn account__rate-btn--changes">Изменить тариф</a>
+                            </div>
+                            <?php elseif ($membershipStatus === 'expired'): ?>
+                            <p class="account__rate-notice">Срок членства истёк. Продлите членство, чтобы восстановить доступ.</p>
+                            <div class="account__rate-buttons">
+                                <a href="/join/" class="account__rate-btn">Продлить</a>
+                                <a href="/join/" class="account__rate-btn account__rate-btn--changes">Изменить тариф</a>
                             </div>
                             <?php elseif ($membershipStatus === 'pending'): ?>
-                            <p style="margin-top:12px;color:#666">
-                                Заявка принята. После проверки модератором членство будет активировано.
-                            </p>
+                            <p class="account__rate-notice">Заявка принята. После проверки модератором членство будет активировано.</p>
                             <?php endif; ?>
-                                </div>
+                        </div>
                         <?php else: ?>
                         <div class="account__rate">
                             <p>У вас пока нет активного членства.</p>
