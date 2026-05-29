@@ -20,6 +20,7 @@ define('PO_REGISTERED_ID',     5); // Зарегистрированный (бе
 define('PO_MEMBER_BASIC_ID',   6); // Член общества — Базовое
 define('PO_MEMBER_PREMIUM_ID', 7); // Член общества — Привилегированное
 define('PO_PARTNER_ID',        8); // Партнёр (юр. лицо)
+define('PO_MEMBER_HONORARY_ID', 0); // Член общества — Почётное (ID: запустить /local/tools/po_setup_honorary_group.php)
 define('PO_MODERATOR_ID',      9); // Модератор / Сотрудник
 
 /**
@@ -467,6 +468,7 @@ function po_membership_group_ids(): array
     return array_values(array_filter([
         defined('PO_MEMBER_BASIC_ID') ? (int)PO_MEMBER_BASIC_ID : 0,
         defined('PO_MEMBER_PREMIUM_ID') ? (int)PO_MEMBER_PREMIUM_ID : 0,
+        defined('PO_MEMBER_HONORARY_ID') ? (int)PO_MEMBER_HONORARY_ID : 0,
         defined('PO_PARTNER_ID') ? (int)PO_PARTNER_ID : 0,
     ]));
 }

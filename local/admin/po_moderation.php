@@ -52,9 +52,10 @@ $statusColors = [
 
 // Тип членства → группа Битрикс
 $membershipGroups = [
-    'basic'   => defined('PO_MEMBER_BASIC_ID')   ? PO_MEMBER_BASIC_ID   : 0,
-    'premium' => defined('PO_MEMBER_PREMIUM_ID') ? PO_MEMBER_PREMIUM_ID : 0,
-    'partner' => defined('PO_PARTNER_ID')         ? PO_PARTNER_ID        : 0,
+    'basic'    => defined('PO_MEMBER_BASIC_ID')    ? PO_MEMBER_BASIC_ID    : 0,
+    'premium'  => defined('PO_MEMBER_PREMIUM_ID')  ? PO_MEMBER_PREMIUM_ID  : 0,
+    'partner'  => defined('PO_PARTNER_ID')          ? PO_PARTNER_ID         : 0,
+    'honorary' => (defined('PO_MEMBER_HONORARY_ID') && PO_MEMBER_HONORARY_ID > 0) ? PO_MEMBER_HONORARY_ID : 0,
 ];
 
 // --- HL-блок ---
@@ -111,10 +112,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && check_bitrix_sessid() && $hlClass) 
                         $currentGroups = CUser::GetUserGroup($app['UF_USER_ID']);
                         // Убираем все членские группы и регистрированных
                         $removeGroups = array_filter([
-                            defined('PO_REGISTERED_ID')     ? PO_REGISTERED_ID     : 0,
-                            defined('PO_MEMBER_BASIC_ID')   ? PO_MEMBER_BASIC_ID   : 0,
-                            defined('PO_MEMBER_PREMIUM_ID') ? PO_MEMBER_PREMIUM_ID : 0,
-                            defined('PO_PARTNER_ID')        ? PO_PARTNER_ID        : 0,
+                            defined('PO_REGISTERED_ID')       ? PO_REGISTERED_ID       : 0,
+                            defined('PO_MEMBER_BASIC_ID')     ? PO_MEMBER_BASIC_ID     : 0,
+                            defined('PO_MEMBER_PREMIUM_ID')   ? PO_MEMBER_PREMIUM_ID   : 0,
+                            defined('PO_MEMBER_HONORARY_ID')    ? PO_MEMBER_HONORARY_ID  : 0,
+                            defined('PO_PARTNER_ID')          ? PO_PARTNER_ID          : 0,
                         ]);
                         $newGroups = array_values(array_filter($currentGroups, fn($g) => !in_array((int)$g, $removeGroups)));
                         $newGroups[] = $targetGroup;

@@ -166,10 +166,49 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['resume_action'])) {
     exit;
 }
 
-$resDobInputValue = trim($_POST['res_dob'] ?? '');
+$isAuthorized = $USER->IsAuthorized();
+$careerUser = [];
+if ($isAuthorized) {
+    $careerUser = CUser::GetByID((int)$USER->GetID())->Fetch() ?: [];
+}
+
+$requestForm = (string)($_GET['form'] ?? '');
+if (in_array($requestForm, ['vacancy', 'resume'], true) && $activeForm === '') {
+    $activeForm = $requestForm;
+}
+
+if (!function_exists('po_resume_form_value')) {
+    /**
+     * Значение поля формы: POST (после ошибки) → профиль → пусто.
+     */
+    function po_resume_form_value(string $postKey, array $careerUser, string $profileKey = ''): string
+    {
+        if (array_key_exists($postKey, $_POST)) {
+            return trim((string)$_POST[$postKey]);
+        }
+        if ($profileKey !== '' && !empty($careerUser[$profileKey])) {
+            return trim((string)$careerUser[$profileKey]);
+        }
+        return '';
+    }
+}
+
+$resDobInputValue = po_resume_form_value('res_dob', $careerUser, 'UF_DOB');
 if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $resDobInputValue)) {
     [$yy, $mm, $dd] = explode('-', $resDobInputValue);
     $resDobInputValue = $dd . '.' . $mm . '.' . $yy;
+} elseif ($resDobInputValue !== '' && preg_match('/^(\d{4})-(\d{2})-(\d{2})/', $resDobInputValue, $m)) {
+    $resDobInputValue = $m[3] . '.' . $m[2] . '.' . $m[1];
+}
+
+$resYearValue = po_resume_form_value('res_year', $careerUser, 'UF_GRADUATE_YEAR');
+$vacCompanyValue = po_resume_form_value('vac_company', $careerUser, 'UF_COMPANY_NAME');
+if ($vacCompanyValue === '' && !empty($careerUser['WORK_COMPANY'])) {
+    $vacCompanyValue = trim((string)$careerUser['WORK_COMPANY']);
+}
+$vacSiteValue = po_resume_form_value('vac_site', $careerUser, 'WORK_WWW');
+if ($vacSiteValue === '' && !empty($careerUser['PERSONAL_WWW'])) {
+    $vacSiteValue = trim((string)$careerUser['PERSONAL_WWW']);
 }
 ?>
 
@@ -275,6 +314,7 @@ if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $resDobInputValue)) {
                 </div>
                 <?php else: ?>
 
+                <?php if (!$isAuthorized): ?>
                 <div class="join-have-acc">
                     <h3>Есть аккаунт?</h3>
                     <p>Войти или Зарегистрироваться, чтобы заполнить форму быстрее</p>
@@ -283,6 +323,7 @@ if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $resDobInputValue)) {
                         <a href="#" class="btn join-have-acc__btn join-have-acc__btn-sign" data-fancybox data-src="#form-login">Войти</a>
                     </div>
                 </div>
+                <?php endif; ?>
 
                 <h2 class="account__title main-title">Резюме выпускника</h2>
 
@@ -301,11 +342,11 @@ if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $resDobInputValue)) {
                         <div class="account__chapter"><h3 class="account__subtitle">Личные данные</h3></div>
                         <div class="account__personal-list account__grid">
                             <input type="text" name="res_lname"  placeholder="Фамилия *" required
-                                   value="<?= htmlspecialchars($_POST['res_lname'] ?? ($USER->IsAuthorized() ? $USER->GetParam('LAST_NAME') : '')) ?>">
+                                   value="<?= htmlspecialchars(po_resume_form_value('res_lname', $careerUser, 'LAST_NAME')) ?>">
                             <input type="text" name="res_fname"  placeholder="Имя *" required
-                                   value="<?= htmlspecialchars($_POST['res_fname'] ?? ($USER->IsAuthorized() ? $USER->GetParam('NAME') : '')) ?>">
+                                   value="<?= htmlspecialchars(po_resume_form_value('res_fname', $careerUser, 'NAME')) ?>">
                             <input type="text" name="res_sname"  placeholder="Отчество *"
-                                   value="<?= htmlspecialchars($_POST['res_sname'] ?? ($USER->IsAuthorized() ? $USER->GetParam('SECOND_NAME') : '')) ?>">
+                                   value="<?= htmlspecialchars(po_resume_form_value('res_sname', $careerUser, 'SECOND_NAME')) ?>">
                             <div class="po-date-field">
                                 <input type="text" name="res_dob" id="res_dob"
                                        placeholder="Дата рождения * (ДД.ММ.ГГГГ)"
@@ -328,12 +369,12 @@ if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $resDobInputValue)) {
                         <div class="account__chapter"><h3 class="account__subtitle">Образование</h3></div>
                         <div class="account__personal-list account__grid">
                             <input type="text" name="res_dept" placeholder="Выпускающая кафедра"
-                                   value="<?= htmlspecialchars($_POST['res_dept'] ?? '') ?>">
+                                   value="<?= htmlspecialchars(po_resume_form_value('res_dept', $careerUser, 'UF_GRADUATE_DEPT')) ?>">
                             <div>
                                 <select name="res_year" id="res_year" required>
                                     <option value="">Год выпуска *</option>
                                     <?php for ($y = date('Y'); $y >= 1950; $y--): ?>
-                                    <option value="<?=$y?>" <?= ($_POST['res_year'] ?? '') == $y ? 'selected' : '' ?>><?=$y?></option>
+                                    <option value="<?=$y?>" <?= (string)$resYearValue === (string)$y ? 'selected' : '' ?>><?=$y?></option>
                                     <?php endfor; ?>
                                 </select>
                                 <span class="po-field-error" id="res-year-err">Укажите год выпуска</span>
@@ -400,6 +441,7 @@ if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $resDobInputValue)) {
                 </div>
                 <?php else: ?>
 
+                <?php if (!$isAuthorized): ?>
                 <div class="join-have-acc">
                     <h3>Есть аккаунт?</h3>
                     <p>Войти или Зарегистрироваться, чтобы заполнить форму быстрее</p>
@@ -408,6 +450,7 @@ if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $resDobInputValue)) {
                         <a href="#" class="btn join-have-acc__btn join-have-acc__btn-sign" data-fancybox data-src="#form-login">Войти</a>
                     </div>
                 </div>
+                <?php endif; ?>
 
                 <h2 class="account__title main-title">Вакансия от компании</h2>
 
@@ -425,9 +468,9 @@ if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $resDobInputValue)) {
                         <div class="account__chapter"><h3 class="account__subtitle">Данные о компании</h3></div>
                         <div class="account__personal-list account__grid">
                             <input type="text" name="vac_company" placeholder="Компания *" required
-                                   value="<?= htmlspecialchars($_POST['vac_company'] ?? '') ?>">
+                                   value="<?= htmlspecialchars($vacCompanyValue) ?>">
                             <input type="text" name="vac_site"    placeholder="Сайт"
-                                   value="<?= htmlspecialchars($_POST['vac_site'] ?? '') ?>">
+                                   value="<?= htmlspecialchars($vacSiteValue) ?>">
                         </div>
                     </div>
 
@@ -441,15 +484,15 @@ if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $resDobInputValue)) {
                         <div class="account__chapter"><h3 class="account__subtitle">Контакты для отклика</h3></div>
                         <div class="account__personal-list account__grid--tripl">
                             <input type="text"  name="vac_lname" placeholder="Фамилия"
-                                   value="<?= htmlspecialchars($_POST['vac_lname'] ?? ($USER->IsAuthorized() ? $USER->GetParam('LAST_NAME') : '')) ?>">
+                                   value="<?= htmlspecialchars(po_resume_form_value('vac_lname', $careerUser, 'LAST_NAME')) ?>">
                             <input type="text"  name="vac_fname" placeholder="Имя"
-                                   value="<?= htmlspecialchars($_POST['vac_fname'] ?? ($USER->IsAuthorized() ? $USER->GetParam('NAME') : '')) ?>">
+                                   value="<?= htmlspecialchars(po_resume_form_value('vac_fname', $careerUser, 'NAME')) ?>">
                             <input type="text"  name="vac_sname" placeholder="Отчество"
-                                   value="<?= htmlspecialchars($_POST['vac_sname'] ?? ($USER->IsAuthorized() ? $USER->GetParam('SECOND_NAME') : '')) ?>">
+                                   value="<?= htmlspecialchars(po_resume_form_value('vac_sname', $careerUser, 'SECOND_NAME')) ?>">
                             <input type="tel" name="vac_phone" id="vac_phone" placeholder="Номер телефона"
-                                   value="<?= htmlspecialchars($_POST['vac_phone'] ?? '') ?>">
+                                   value="<?= htmlspecialchars(po_resume_form_value('vac_phone', $careerUser, 'PERSONAL_PHONE')) ?>">
                             <input type="email" name="vac_email" placeholder="e-mail"
-                                   value="<?= htmlspecialchars($_POST['vac_email'] ?? ($USER->IsAuthorized() ? $USER->GetParam('EMAIL') : '')) ?>">
+                                   value="<?= htmlspecialchars(po_resume_form_value('vac_email', $careerUser, 'EMAIL')) ?>">
                         </div>
                     </div>
 
@@ -503,6 +546,14 @@ if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $resDobInputValue)) {
     var btnR = document.getElementById('btn-open-resume');
     if (btnV) btnV.addEventListener('click', function() { showForm('section-vacancy'); });
     if (btnR) btnR.addEventListener('click', function() { showForm('section-resume'); });
+
+    var urlParams = new URLSearchParams(window.location.search);
+    var formFromUrl = urlParams.get('form');
+    if (formFromUrl === 'vacancy') {
+        showForm('section-vacancy');
+    } else if (formFromUrl === 'resume') {
+        showForm('section-resume');
+    }
 
     // ── Отображение имени выбранного файла ─────────────────────────────────────
     var allowedExts = ['pdf', 'doc', 'docx'];

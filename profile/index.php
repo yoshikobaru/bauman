@@ -97,6 +97,7 @@ $_ug      = $USER->GetUserGroupArray();
 $isMember = defined('PO_MEMBER_BASIC_ID') && (
     in_array(PO_MEMBER_BASIC_ID,   $_ug) ||
     in_array(PO_MEMBER_PREMIUM_ID, $_ug) ||
+    (defined('PO_MEMBER_HONORARY_ID') && PO_MEMBER_HONORARY_ID > 0 && in_array(PO_MEMBER_HONORARY_ID, $_ug)) ||
     in_array(PO_PARTNER_ID,        $_ug)
 );
 
@@ -105,6 +106,8 @@ if (defined('PO_PARTNER_ID') && in_array(PO_PARTNER_ID, $_ug, true)) {
     $groupMembershipType = 'partner';
 } elseif (defined('PO_MEMBER_PREMIUM_ID') && in_array(PO_MEMBER_PREMIUM_ID, $_ug, true)) {
     $groupMembershipType = 'premium';
+} elseif (defined('PO_MEMBER_HONORARY_ID') && PO_MEMBER_HONORARY_ID > 0 && in_array(PO_MEMBER_HONORARY_ID, $_ug, true)) {
+    $groupMembershipType = 'honorary';
 } elseif (defined('PO_MEMBER_BASIC_ID') && in_array(PO_MEMBER_BASIC_ID, $_ug, true)) {
     $groupMembershipType = 'basic';
 }
