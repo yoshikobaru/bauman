@@ -94,21 +94,16 @@ $membershipExpires = function_exists('po_membership_expires_raw')
     ? po_membership_expires_raw($arUser['UF_MEMBERSHIP_EXPIRES'] ?? '')
     : trim((string)($arUser['UF_MEMBERSHIP_EXPIRES'] ?? ''));
 $_ug      = $USER->GetUserGroupArray();
-$isMember = defined('PO_MEMBER_BASIC_ID') && (
-    in_array(PO_MEMBER_BASIC_ID,   $_ug) ||
-    in_array(PO_MEMBER_PREMIUM_ID, $_ug) ||
-    (defined('PO_MEMBER_HONORARY_ID') && PO_MEMBER_HONORARY_ID > 0 && in_array(PO_MEMBER_HONORARY_ID, $_ug)) ||
-    in_array(PO_PARTNER_ID,        $_ug)
-);
+$honoraryGroupId = function_exists('po_member_group_id') ? po_member_group_id('honorary') : 0;
 
 $groupMembershipType = '';
-if (defined('PO_PARTNER_ID') && in_array(PO_PARTNER_ID, $_ug, true)) {
+if (po_member_group_id('partner') > 0 && in_array(po_member_group_id('partner'), $_ug, true)) {
     $groupMembershipType = 'partner';
-} elseif (defined('PO_MEMBER_PREMIUM_ID') && in_array(PO_MEMBER_PREMIUM_ID, $_ug, true)) {
+} elseif (po_member_group_id('premium') > 0 && in_array(po_member_group_id('premium'), $_ug, true)) {
     $groupMembershipType = 'premium';
-} elseif (defined('PO_MEMBER_HONORARY_ID') && PO_MEMBER_HONORARY_ID > 0 && in_array(PO_MEMBER_HONORARY_ID, $_ug, true)) {
+} elseif ($honoraryGroupId > 0 && in_array($honoraryGroupId, $_ug, true)) {
     $groupMembershipType = 'honorary';
-} elseif (defined('PO_MEMBER_BASIC_ID') && in_array(PO_MEMBER_BASIC_ID, $_ug, true)) {
+} elseif (po_member_group_id('basic') > 0 && in_array(po_member_group_id('basic'), $_ug, true)) {
     $groupMembershipType = 'basic';
 }
 if ($groupMembershipType !== '') {
@@ -120,7 +115,8 @@ if ($membershipStatus === 'approved') {
 if ($membershipStatus === 'new') {
     $membershipStatus = 'pending';
 }
-if ($membershipStatus === '' && $isMember && !po_membership_is_expired($membershipExpires)) {
+$hasMembershipPlan = ($groupMembershipType !== '' || in_array($membershipType, ['basic', 'premium', 'partner', 'honorary'], true));
+if ($hasMembershipPlan && $membershipStatus === '' && !po_membership_is_expired($membershipExpires)) {
     $membershipStatus = 'active';
 }
 if ($membershipExpires !== '' && po_membership_is_expired($membershipExpires)) {

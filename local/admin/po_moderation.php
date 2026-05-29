@@ -55,7 +55,7 @@ $membershipGroups = [
     'basic'    => defined('PO_MEMBER_BASIC_ID')    ? PO_MEMBER_BASIC_ID    : 0,
     'premium'  => defined('PO_MEMBER_PREMIUM_ID')  ? PO_MEMBER_PREMIUM_ID  : 0,
     'partner'  => defined('PO_PARTNER_ID')          ? PO_PARTNER_ID         : 0,
-    'honorary' => (defined('PO_MEMBER_HONORARY_ID') && PO_MEMBER_HONORARY_ID > 0) ? PO_MEMBER_HONORARY_ID : 0,
+    'honorary' => function_exists('po_member_group_id') ? po_member_group_id('honorary') : 0,
 ];
 
 // --- HL-блок ---
@@ -115,7 +115,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && check_bitrix_sessid() && $hlClass) 
                             defined('PO_REGISTERED_ID')       ? PO_REGISTERED_ID       : 0,
                             defined('PO_MEMBER_BASIC_ID')     ? PO_MEMBER_BASIC_ID     : 0,
                             defined('PO_MEMBER_PREMIUM_ID')   ? PO_MEMBER_PREMIUM_ID   : 0,
-                            defined('PO_MEMBER_HONORARY_ID')    ? PO_MEMBER_HONORARY_ID  : 0,
+                            function_exists('po_member_group_id') ? po_member_group_id('honorary') : 0,
                             defined('PO_PARTNER_ID')          ? PO_PARTNER_ID          : 0,
                         ]);
                         $newGroups = array_values(array_filter($currentGroups, fn($g) => !in_array((int)$g, $removeGroups)));

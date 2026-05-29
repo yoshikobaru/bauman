@@ -462,14 +462,62 @@ function po_flash_get(string $key): ?array
     return $payload;
 }
 
-/** ID групп членства (базовое, премиум, партнёр). */
+/**
+ * ID группы пользователя по ключу (с подстановкой из Битрикса, если константа = 0).
+ * Ключи: registered, basic, premium, honorary, partner, moderator.
+ */
+function po_member_group_id(string $key): int
+{
+    static $cache = [];
+    if (isset($cache[$key])) {
+        return $cache[$key];
+    }
+
+    $constants = [
+        'registered' => 'PO_REGISTERED_ID',
+        'basic'      => 'PO_MEMBER_BASIC_ID',
+        'premium'    => 'PO_MEMBER_PREMIUM_ID',
+        'honorary'   => 'PO_MEMBER_HONORARY_ID',
+        'partner'    => 'PO_PARTNER_ID',
+        'moderator'  => 'PO_MODERATOR_ID',
+    ];
+    if (!isset($constants[$key])) {
+        return $cache[$key] = 0;
+    }
+
+    $constName = $constants[$key];
+    if (defined($constName) && (int)constant($constName) > 0) {
+        return $cache[$key] = (int)constant($constName);
+    }
+
+    if ($key !== 'honorary') {
+        return $cache[$key] = 0;
+    }
+
+    if (class_exists('CGroup')) {
+        $rs = CGroup::GetList('id', 'asc', ['STRING_ID' => 'PO_MEMBER_HONORARY']);
+        if ($row = $rs->Fetch()) {
+            return $cache[$key] = (int)$row['ID'];
+        }
+        foreach (['Член общества — Почётное', 'Почётное', 'Почетное'] as $groupName) {
+            $rs = CGroup::GetList('id', 'asc', ['NAME' => $groupName]);
+            if ($row = $rs->Fetch()) {
+                return $cache[$key] = (int)$row['ID'];
+            }
+        }
+    }
+
+    return $cache[$key] = 0;
+}
+
+/** ID групп членства (базовое, премиум, почётное, партнёр). */
 function po_membership_group_ids(): array
 {
     return array_values(array_filter([
-        defined('PO_MEMBER_BASIC_ID') ? (int)PO_MEMBER_BASIC_ID : 0,
-        defined('PO_MEMBER_PREMIUM_ID') ? (int)PO_MEMBER_PREMIUM_ID : 0,
-        defined('PO_MEMBER_HONORARY_ID') ? (int)PO_MEMBER_HONORARY_ID : 0,
-        defined('PO_PARTNER_ID') ? (int)PO_PARTNER_ID : 0,
+        po_member_group_id('basic'),
+        po_member_group_id('premium'),
+        po_member_group_id('honorary'),
+        po_member_group_id('partner'),
     ]));
 }
 
