@@ -426,6 +426,74 @@ function po_sendMembershipConfirmationEmail(string $email): bool
     return $sent;
 }
 
+/**
+ * Восстановление пароля: записать CHECKWORD в профиль и отправить ссылку через mail().
+ * Не использует почтовые события Bitrix (USER_PASS_REQUEST) — тот же канал, что заявки на сайте.
+ */
+function po_sendPasswordResetEmail(int $userId, string $email, string $login): bool
+{
+    $userId = (int)$userId;
+    $email  = trim($email);
+    $login  = trim($login);
+
+    if ($userId <= 0 || $email === '' || $login === '') {
+        return false;
+    }
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        error_log('[po_sendPasswordResetEmail] invalid email: ' . $email);
+        return false;
+    }
+
+    $checkword = function_exists('randString') ? randString(8) : bin2hex(random_bytes(8));
+
+    $checkwordTime = function_exists('ConvertTimeStamp')
+        ? ConvertTimeStamp(time(), 'FULL')
+        : date('d.m.Y H:i:s');
+
+    $oUser = new CUser();
+    if (!$oUser->Update($userId, [
+        'CHECKWORD'      => $checkword,
+        'CHECKWORD_TIME' => $checkwordTime,
+    ])) {
+        error_log('[po_sendPasswordResetEmail] CHECKWORD update failed for user #' . $userId . ': ' . ($oUser->LAST_ERROR ?: 'unknown'));
+        return false;
+    }
+
+    $host = '';
+    if (defined('SITE_SERVER_NAME') && SITE_SERVER_NAME) {
+        $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+        $host = $scheme . '://' . SITE_SERVER_NAME;
+    } elseif (!empty($_SERVER['HTTP_HOST'])) {
+        $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+        $host = $scheme . '://' . $_SERVER['HTTP_HOST'];
+    }
+
+    $resetUrl = ($host !== '' ? $host : '') . '/authorization/?checkword=' . rawurlencode($checkword) . '&USER_ID=' . $userId;
+
+    $subject = '[ПОЛИТЕХ] Восстановление пароля';
+    $body = "Здравствуйте!\n\n"
+        . "Вы запросили восстановление пароля на сайте Политехнического общества выпускников МГТУ им. Н.Э. Баумана.\n\n"
+        . "Для установки нового пароля перейдите по ссылке (действует 24 часа):\n"
+        . $resetUrl . "\n\n"
+        . "Если вы не запрашивали восстановление пароля, просто проигнорируйте это письмо.\n\n"
+        . "С уважением,\n"
+        . "Политехническое общество выпускников МВТУ (МГТУ) им. Н.Э. Баумана";
+
+    $from = defined('PO_ADMIN_EMAIL') ? PO_ADMIN_EMAIL : 'info@bauman-polytech.ru';
+    $headers  = "MIME-Version: 1.0\r\n";
+    $headers .= "Content-Type: text/plain; charset=UTF-8\r\n";
+    $headers .= "Content-Transfer-Encoding: 8bit\r\n";
+    $headers .= "From: {$from}\r\n";
+    $headers .= "Reply-To: {$from}\r\n";
+
+    $sent = mail($email, po_mailEncodeSubject($subject), $body, $headers);
+    if (!$sent) {
+        $lastError = error_get_last();
+        error_log('[po_sendPasswordResetEmail] mail() failed for user #' . $userId . ' email=' . $email . '; error=' . ($lastError['message'] ?? 'unknown'));
+    }
+    return $sent;
+}
+
 function po_is_valid_phone_chars(string $phone): bool
 {
     $phone = trim($phone);

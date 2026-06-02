@@ -1,19 +1,37 @@
 <?php
-require($_SERVER["DOCUMENT_ROOT"]."/bitrix/header.php");
-$APPLICATION->SetTitle("Войти");
+require($_SERVER['DOCUMENT_ROOT'] . '/bitrix/modules/main/include/prolog_before.php');
 
-if ($USER->IsAuthorized()) {
-    LocalRedirect('/profile/');
+global $USER, $APPLICATION;
+
+$errors        = [];
+$messages      = [];
+$activeSection = 'login'; // login | forgot | reset | emergency
+$emergencyDone = false;
+
+// Ссылка из стандартного шаблона Bitrix USER_PASS_REQUEST → наш формат reset
+if (
+    empty($_GET['checkword'])
+    && !empty($_GET['change_password'])
+    && !empty($_GET['USER_CHECKWORD'])
+    && !empty($_GET['USER_LOGIN'])
+) {
+    $loginForReset = (string)$_GET['USER_LOGIN'];
+    if (function_exists('urldecode')) {
+        $loginForReset = urldecode($loginForReset);
+    }
+    $rsResetUser = CUser::GetByLogin($loginForReset);
+    if ($arResetUser = $rsResetUser->Fetch()) {
+        LocalRedirect(
+            '/authorization/?checkword=' . rawurlencode((string)$_GET['USER_CHECKWORD'])
+            . '&USER_ID=' . (int)$arResetUser['ID']
+        );
+    }
 }
-
-$errors      = [];
-$messages    = [];
-$activeSection = 'login'; // login | forgot | reset
 
 // — Сброс пароля по ссылке из письма —
 if (isset($_GET['checkword'], $_GET['USER_ID'])) {
     $activeSection = 'reset';
-    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'reset') {
+    if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'reset') {
         $newPass     = $_POST['new_password'] ?? '';
         $confirmPass = $_POST['confirm_password'] ?? '';
         if ($newPass !== $confirmPass) {
@@ -27,15 +45,22 @@ if (isset($_GET['checkword'], $_GET['USER_ID'])) {
                 $oUser = new CUser();
                 $res = $oUser->ChangePassword(
                     $arUser['LOGIN'],
-                    htmlspecialcharsEx($_GET['checkword']),
+                    (string)($_GET['checkword'] ?? ''),
                     $newPass,
                     $confirmPass
                 );
-                if ($res === true) {
-                    $messages[]    = 'Пароль успешно изменён. Войдите с новым паролем.';
-                    $activeSection = 'login';
+                global $APPLICATION;
+                $ex = is_object($APPLICATION) ? $APPLICATION->GetException() : null;
+                if ($ex) {
+                    $errors[] = $ex->GetString();
+                    if (is_object($APPLICATION)) {
+                        $APPLICATION->ResetException();
+                    }
+                } elseif ($res === false) {
+                    $errors[] = $oUser->LAST_ERROR ?: 'Не удалось сменить пароль. Запросите новую ссылку.';
                 } else {
-                    $errors[] = $res->GetMessage();
+                    LocalRedirect('/');
+                    exit;
                 }
             } else {
                 $errors[] = 'Пользователь не найден';
@@ -46,6 +71,7 @@ if (isset($_GET['checkword'], $_GET['USER_ID'])) {
 
 // — Вход —
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'login') {
+    $activeSection = 'login';
     $email    = trim($_POST['email'] ?? '');
     $password = $_POST['password'] ?? '';
     $remember = !empty($_POST['remember']) ? 'Y' : 'N';
@@ -57,38 +83,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'login
         if ($result === true) {
             $backUrl = !empty($_REQUEST['back_url']) ? (string)$_REQUEST['back_url'] : '/profile/';
             LocalRedirect($backUrl);
-        } else {
-            $errors[] = 'Неверный email или пароль';
+            exit;
         }
+        $errors[] = 'Неверный email или пароль';
     }
 }
 
 // — Экстренное восстановление (нет доступа к email) —
-$emergencyDone = false;
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'emergency_recovery') {
     $activeSection = 'emergency';
-    $emName   = trim($_POST['em_name']   ?? '');
-    $emEmail  = trim($_POST['em_email']  ?? '');
-    $emDesc   = trim($_POST['em_desc']   ?? '');
+    $emName    = trim($_POST['em_name'] ?? '');
+    $emEmail   = trim($_POST['em_email'] ?? '');
+    $emDesc    = trim($_POST['em_desc'] ?? '');
     $emAgreePd = ($_POST['em_agree_pd'] ?? '') === 'yes';
     if (!$emName || !$emEmail || !$emDesc) {
         $errors[] = 'Заполните все обязательные поля.';
     } elseif (!$emAgreePd) {
         $errors[] = 'Необходимо согласие с политикой ПДн.';
     } else {
-        $saved = false;
         $hlResult = po_application_add('access_recovery', 0, [
             'name'        => $emName,
             'old_email'   => $emEmail,
             'description' => $emDesc,
         ]);
-        $saved = $hlResult['ok'];
-        if ($saved) {
+        if ($hlResult['ok']) {
             po_sendAdminEmail('access_recovery', [
-                'name'                  => $emName,
-                'old_email'             => $emEmail,
-                'description'           => $emDesc,
-                'id_заявки_в_админке'   => (string)$hlResult['id'],
+                'name'                => $emName,
+                'old_email'           => $emEmail,
+                'description'         => $emDesc,
+                'id_заявки_в_админке' => (string)$hlResult['id'],
             ]);
             $emergencyDone = true;
         } else {
@@ -98,27 +121,50 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'emerg
     }
 }
 
-// — Восстановление пароля —
+// — Восстановление пароля (отправка ссылки) —
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'forgot') {
     $activeSection = 'forgot';
     $forgotEmail = trim($_POST['forgot_email'] ?? '');
     if (!$forgotEmail) {
         $errors[] = 'Введите email';
     } else {
+        $arUser = null;
         $dbUser = CUser::GetList('id', 'asc', ['=EMAIL' => $forgotEmail, 'ACTIVE' => 'Y']);
-        $arUser = $dbUser->Fetch();
+        if ($row = $dbUser->Fetch()) {
+            $arUser = $row;
+        }
+        if (!$arUser && function_exists('po_find_user_id_by_email')) {
+            $uid = po_find_user_id_by_email($forgotEmail);
+            if ($uid > 0) {
+                $dbUser = CUser::GetByID($uid);
+                $row = $dbUser->Fetch();
+                if ($row && ($row['ACTIVE'] ?? '') === 'Y') {
+                    $arUser = $row;
+                }
+            }
+        }
         if (!$arUser) {
             $errors[] = 'Пользователь с таким email не найден';
-        } else {
-            $res = CUser::SendPassword($arUser['LOGIN'], $forgotEmail, '/authorization/');
-            if ($res === true || (is_array($res) && $res['TYPE'] === 'OK')) {
-                $messages[] = 'Письмо с инструкциями отправлено на ' . htmlspecialchars($forgotEmail);
-            } else {
-                $errors[] = is_array($res) ? $res['MESSAGE'] : 'Ошибка отправки письма. Попробуйте позже.';
+        } elseif (function_exists('po_sendPasswordResetEmail')
+            && po_sendPasswordResetEmail((int)$arUser['ID'], (string)$arUser['EMAIL'], (string)$arUser['LOGIN'])
+        ) {
+            $messages[] = 'Письмо с инструкциями отправлено на ' . htmlspecialchars($forgotEmail);
+            if (function_exists('po_logAction')) {
+                po_logAction('form_submit', 'user', (int)$arUser['ID'], 'password reset email sent');
             }
+        } else {
+            $errors[] = 'Ошибка отправки письма. Попробуйте позже или обратитесь к администратору.';
         }
     }
 }
+
+if ($USER->IsAuthorized()) {
+    LocalRedirect('/profile/');
+    exit;
+}
+
+require($_SERVER['DOCUMENT_ROOT'] . '/bitrix/header.php');
+$APPLICATION->SetTitle('Войти');
 ?>
 
 <main>
@@ -250,4 +296,4 @@ document.querySelectorAll('[data-show]').forEach(function(el) {
 });
 </script>
 
-<?php require($_SERVER["DOCUMENT_ROOT"]."/bitrix/footer.php"); ?>
+<?php require($_SERVER['DOCUMENT_ROOT'] . '/bitrix/footer.php'); ?>
