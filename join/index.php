@@ -17,7 +17,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['honorary_action'])) 
         header('Content-Type: application/json; charset=utf-8');
         echo json_encode(['success' => false, 'message' => 'Телефон может содержать только цифры, пробел, + и -.']);
     } elseif ($hFio && $hEmail) {
-        po_sendAdminEmail('honorary', ['fio' => $hFio, 'email' => $hEmail, 'phone' => $hPhone, 'msg' => $hMsg]);
+        $hUserId = $USER->IsAuthorized() ? (int)$USER->GetID() : po_find_user_id_by_email($hEmail);
+        $fioParts = preg_split('/\s+/u', $hFio, -1, PREG_SPLIT_NO_EMPTY) ?: [];
+        $hlResult = po_application_add('membership', $hUserId, [
+            'membership_type' => 'honorary',
+            'fio'             => $hFio,
+            'last_name'       => $fioParts[0] ?? '',
+            'first_name'      => $fioParts[1] ?? '',
+            'second_name'     => implode(' ', array_slice($fioParts, 2)),
+            'email'           => $hEmail,
+            'phone'           => $hPhone,
+            'message'         => $hMsg,
+        ]);
+        if (!$hlResult['ok']) {
+            error_log('[join] HL honorary save failed: ' . implode('; ', $hlResult['errors']));
+        }
+        po_sendAdminEmail('honorary', [
+            'fio'               => $hFio,
+            'email'             => $hEmail,
+            'phone'             => $hPhone,
+            'msg'               => $hMsg,
+            'id_заявки_в_админке' => $hlResult['ok'] ? (string)$hlResult['id'] : ('ОШИБКА: ' . implode(', ', $hlResult['errors'])),
+        ]);
+        if ($hlResult['ok']) {
+            po_logAction('form_submit', 'application', $hUserId, 'D1 honorary membership');
+        }
         while (ob_get_level()) ob_end_clean();
         header('Content-Type: application/json; charset=utf-8');
         echo json_encode(['success' => true]);
@@ -52,22 +76,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['modal_membership_act
         exit;
     }
     $typeLabels = ['basic' => 'Базовое', 'premium' => 'Профессиональное', 'partner' => 'Партнёрское', 'honorary' => 'Почётное'];
-    if ($hlOk && defined('HL_APPLICATIONS_ID') && HL_APPLICATIONS_ID > 0) {
-        $hlData = \Bitrix\Highloadblock\HighloadBlockTable::getById(HL_APPLICATIONS_ID)->fetch();
-        if ($hlData) {
-            $hlClass = \Bitrix\Highloadblock\HighloadBlockTable::compileEntity($hlData)->getDataClass();
-            $hlClass::add([
-                'UF_USER_ID'     => $USER->IsAuthorized() ? (int)$USER->GetID() : 0,
-                'UF_TYPE'        => 'membership',
-                'UF_STATUS'      => 'new',
-                'UF_DATE_CREATE' => new \Bitrix\Main\Type\DateTime(),
-                'UF_DATA'        => json_encode([
-                    'membership_type' => $mType,
-                    'last_name'  => $mLname, 'first_name' => $mFname, 'second_name' => $mSname,
-                    'email' => $mEmail, 'phone' => $mPhone, 'dept' => $mDept, 'year' => $mYear,
-                ], JSON_UNESCAPED_UNICODE),
-            ]);
-        }
+    $mUserId = $USER->IsAuthorized() ? (int)$USER->GetID() : po_find_user_id_by_email($mEmail);
+    $hlResult = po_application_add('membership', $mUserId, [
+        'membership_type' => $mType,
+        'last_name'       => $mLname,
+        'first_name'      => $mFname,
+        'second_name'     => $mSname,
+        'email'           => $mEmail,
+        'phone'           => $mPhone,
+        'dept'            => $mDept,
+        'year'            => $mYear,
+    ]);
+    if (!$hlResult['ok']) {
+        error_log('[join] HL modal membership save failed: ' . implode('; ', $hlResult['errors']));
     }
     po_sendAdminEmail('membership', [
         'membership_type' => $mType,
@@ -79,8 +100,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['modal_membership_act
         'phone'           => $mPhone,
         'dept'            => $mDept,
         'year'            => $mYear,
+        'id_заявки_в_админке' => $hlResult['ok'] ? (string)$hlResult['id'] : ('ОШИБКА: ' . implode(', ', $hlResult['errors'])),
     ]);
-    po_logAction('form_submit', 'application', 0, 'D1 modal membership ' . $mType);
+    po_logAction('form_submit', 'application', $mUserId, 'D1 modal membership ' . $mType);
     while (ob_get_level()) ob_end_clean();
     header('Content-Type: application/json; charset=utf-8');
     echo json_encode(['success' => true]);

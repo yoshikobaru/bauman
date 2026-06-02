@@ -77,35 +77,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'emerg
         $errors[] = 'Необходимо согласие с политикой ПДн.';
     } else {
         $saved = false;
-        $hlOk = \Bitrix\Main\Loader::includeModule('highloadblock');
-        if ($hlOk && defined('HL_APPLICATIONS_ID') && HL_APPLICATIONS_ID > 0) {
-            $hlEntity = \Bitrix\Highloadblock\HighloadBlockTable::getById(HL_APPLICATIONS_ID)->fetch();
-            if ($hlEntity) {
-                $hlClass = \Bitrix\Highloadblock\HighloadBlockTable::compileEntity($hlEntity)->getDataClass();
-                $res = $hlClass::add([
-                    'UF_USER_ID'     => 0,
-                    'UF_TYPE'        => 'access_recovery',
-                    'UF_STATUS'      => 'new',
-                    'UF_DATE_CREATE' => new \Bitrix\Main\Type\DateTime(),
-                    'UF_DATA'        => json_encode([
-                        'name'        => $emName,
-                        'old_email'   => $emEmail,
-                        'description' => $emDesc,
-                    ], JSON_UNESCAPED_UNICODE),
-                ]);
-                $saved = $res->isSuccess();
-            }
-        } else {
-            $saved = true;
-        }
+        $hlResult = po_application_add('access_recovery', 0, [
+            'name'        => $emName,
+            'old_email'   => $emEmail,
+            'description' => $emDesc,
+        ]);
+        $saved = $hlResult['ok'];
         if ($saved) {
             po_sendAdminEmail('access_recovery', [
-                'name'        => $emName,
-                'old_email'   => $emEmail,
-                'description' => $emDesc,
+                'name'                  => $emName,
+                'old_email'             => $emEmail,
+                'description'           => $emDesc,
+                'id_заявки_в_админке'   => (string)$hlResult['id'],
             ]);
             $emergencyDone = true;
         } else {
+            error_log('[authorization] HL access_recovery save failed: ' . implode('; ', $hlResult['errors']));
             $errors[] = 'Ошибка сохранения. Попробуйте позже.';
         }
     }

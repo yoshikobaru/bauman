@@ -34,6 +34,14 @@ $typeLabels = [
     'reference_org'      => 'Организация визита (D5)',
     'competency_request' => 'Витрина компетенций (D6)',
     'partnership'        => 'Партнёрство (D7)',
+    'access_recovery'    => 'Восстановление доступа',
+];
+
+$membershipTypeLabels = [
+    'basic'    => 'Базовое',
+    'premium'  => 'Профессиональное',
+    'partner'  => 'Партнёрское',
+    'honorary' => 'Почётное',
 ];
 
 $statusLabels = [
@@ -103,13 +111,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && check_bitrix_sessid() && $hlClass) 
                 po_logAction('admin_status_change', 'application', $appId,
                     'Статус заявки #' . $appId . ' → ' . $newStatus . ($comment ? ' | ' . $comment : ''));
 
+                $resolvedUserId = function_exists('po_application_resolve_user_id')
+                    ? po_application_resolve_user_id($app, $appData)
+                    : (int)$app['UF_USER_ID'];
+
                 // --- При одобрении заявки на членство: переводим пользователя в группу ---
-                if ($newStatus === 'approved' && $app['UF_TYPE'] === 'membership' && $app['UF_USER_ID'] > 0) {
+                if ($newStatus === 'approved' && $app['UF_TYPE'] === 'membership' && $resolvedUserId > 0) {
                     $membershipType = $appData['membership_type'] ?? 'basic';
                     $targetGroup    = $membershipGroups[$membershipType] ?? $membershipGroups['basic'];
+                    $typeLabel      = $membershipTypeLabels[$membershipType] ?? $membershipType;
 
                     if ($targetGroup > 0) {
-                        $currentGroups = CUser::GetUserGroup($app['UF_USER_ID']);
+                        $currentGroups = CUser::GetUserGroup($resolvedUserId);
                         // Убираем все членские группы и регистрированных
                         $removeGroups = array_filter([
                             defined('PO_REGISTERED_ID')       ? PO_REGISTERED_ID       : 0,
@@ -120,29 +133,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && check_bitrix_sessid() && $hlClass) 
                         ]);
                         $newGroups = array_values(array_filter($currentGroups, fn($g) => !in_array((int)$g, $removeGroups)));
                         $newGroups[] = $targetGroup;
-                        CUser::SetUserGroup($app['UF_USER_ID'], $newGroups);
+                        CUser::SetUserGroup($resolvedUserId, $newGroups);
                         $oUserUpdate = new CUser();
-                        $oUserUpdate->Update((int)$app['UF_USER_ID'], [
+                        $oUserUpdate->Update($resolvedUserId, [
                             'UF_MEMBERSHIP_STATUS'  => 'active',
                             'UF_MEMBERSHIP_TYPE'    => $membershipType,
                             'UF_MEMBERSHIP_EXPIRES' => date('d.m.Y', strtotime('+1 year')),
                         ]);
-                        $actionResult['msg'] .= ' Пользователь переведён в группу «' . ($typeLabels['membership'] ?? '') . '».';
+                        if ((int)$app['UF_USER_ID'] <= 0) {
+                            $hlClass::update($appId, ['UF_USER_ID' => $resolvedUserId]);
+                        }
+                        $actionResult['msg'] .= ' Пользователь #' . $resolvedUserId . ' переведён в группу «' . $typeLabel . '».';
+                    } else {
+                        $actionResult['msg'] .= ' Внимание: группа для типа «' . $typeLabel . '» не настроена — назначьте группу вручную.';
                     }
+                } elseif ($newStatus === 'approved' && $app['UF_TYPE'] === 'membership' && $resolvedUserId <= 0) {
+                    $actionResult['msg'] .= ' Внимание: пользователь не найден по email — группу нужно назначить вручную.';
                 }
-                if (in_array($newStatus, ['in_review', 'rejected'], true) && $app['UF_TYPE'] === 'membership' && $app['UF_USER_ID'] > 0) {
+                if (in_array($newStatus, ['in_review', 'rejected'], true) && $app['UF_TYPE'] === 'membership' && $resolvedUserId > 0) {
                     $statusForUser = $newStatus === 'in_review' ? 'in_review' : 'rejected';
                     $membershipType = $appData['membership_type'] ?? '';
                     $oUserUpdate = new CUser();
-                    $oUserUpdate->Update((int)$app['UF_USER_ID'], [
+                    $oUserUpdate->Update($resolvedUserId, [
                         'UF_MEMBERSHIP_STATUS' => $statusForUser,
                         'UF_MEMBERSHIP_TYPE'   => $membershipType,
                     ]);
                 }
 
                 // --- Email-уведомление пользователю при смене статуса ---
-                if ($app['UF_USER_ID'] > 0) {
-                    $userRow = CUser::GetByID($app['UF_USER_ID'])->Fetch();
+                if ($resolvedUserId > 0) {
+                    $userRow = CUser::GetByID($resolvedUserId)->Fetch();
                     if ($userRow && $userRow['EMAIL']) {
                         $statusText  = $statusLabels[$newStatus] ?? $newStatus;
                         $typeText    = $typeLabels[$app['UF_TYPE']] ?? $app['UF_TYPE'];
@@ -195,7 +215,10 @@ if ($hlClass) {
             $haystack = mb_strtolower(
                 ($appData['first_name'] ?? '') . ' ' .
                 ($appData['last_name']  ?? '') . ' ' .
+                ($appData['name']       ?? '') . ' ' .
+                ($appData['fio']        ?? '') . ' ' .
                 ($appData['email']      ?? '') . ' ' .
+                ($appData['old_email']  ?? '') . ' ' .
                 ($appData['company']    ?? '')
             );
             if (strpos($haystack, $search) === false) continue;
@@ -488,7 +511,9 @@ while ($lr = $dbLogs->fetch()) $logRows[] = $lr;
         </div>
         <?php if ($detailApp['UF_TYPE'] === 'membership' && ($detailApp['UF_STATUS'] ?? '') !== 'approved'): ?>
         <p style="margin-top:8px;font-size:11px;color:#888;">
-            ⚠ При выборе статуса «Одобрено» для заявки на членство пользователь будет автоматически переведён в соответствующую группу и получит email-уведомление.
+            ⚠ При выборе статуса «Одобрено» пользователь будет автоматически переведён в группу по типу членства
+            (<?= htmlspecialchars($membershipTypeLabels[$detailAppData['membership_type'] ?? 'basic'] ?? 'Базовое') ?>)
+            и получит email-уведомление. Если в заявке нет привязки к аккаунту, поиск выполняется по email.
         </p>
         <?php endif; ?>
     </form>
@@ -517,8 +542,14 @@ while ($lr = $dbLogs->fetch()) $logRows[] = $lr;
 
         // Имя заявителя из данных формы
         $applicantName  = trim(($appData['first_name'] ?? '') . ' ' . ($appData['last_name'] ?? ''));
-        if (empty(trim($applicantName))) $applicantName = $appData['company'] ?? $appData['contact_name'] ?? '—';
-        $applicantEmail = $appData['email'] ?? '';
+        if (empty(trim($applicantName))) {
+            $applicantName = $appData['fio'] ?? $appData['name'] ?? $appData['company'] ?? $appData['contact_name'] ?? '—';
+        }
+        $applicantEmail = $appData['email'] ?? $appData['old_email'] ?? '';
+        $membershipTypeLabel = '';
+        if (($app['UF_TYPE'] ?? '') === 'membership' && !empty($appData['membership_type'])) {
+            $membershipTypeLabel = $membershipTypeLabels[$appData['membership_type']] ?? $appData['membership_type'];
+        }
 
         // Имя из профиля пользователя если есть
         $linkedUserName = '';
@@ -536,7 +567,7 @@ while ($lr = $dbLogs->fetch()) $logRows[] = $lr;
     ?>
     <tr>
         <td><?= (int)$app['ID'] ?></td>
-        <td><?= htmlspecialchars($typeLabels[$app['UF_TYPE']] ?? $app['UF_TYPE']) ?></td>
+        <td><?= htmlspecialchars($typeLabels[$app['UF_TYPE']] ?? $app['UF_TYPE']) ?><?php if ($membershipTypeLabel): ?><br><span class="po-user-info"><?= htmlspecialchars($membershipTypeLabel) ?></span><?php endif; ?></td>
         <td style="white-space:nowrap"><?= $dateStr ?></td>
         <td>
             <?= htmlspecialchars($applicantName) ?>

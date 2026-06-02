@@ -163,21 +163,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['reg_fiz_action'])) {
                 $avatarFileId = (int)$createdUser['PERSONAL_PHOTO'];
             }
             $USER->Login($email, $password, 'N');
-            if ($isGraduate && $hlOk && defined('HL_APPLICATIONS_ID') && HL_APPLICATIONS_ID > 0) {
-                $hlData = \Bitrix\Highloadblock\HighloadBlockTable::getById(HL_APPLICATIONS_ID)->fetch();
-                if ($hlData) {
-                    $hlClass = \Bitrix\Highloadblock\HighloadBlockTable::compileEntity($hlData)->getDataClass();
-                    $hlClass::add([
-                        'UF_USER_ID'     => (int)$userId,
-                        'UF_TYPE'        => 'membership',
-                        'UF_STATUS'      => 'new',
-                        'UF_DATE_CREATE' => new \Bitrix\Main\Type\DateTime(),
-                        'UF_DATA'        => json_encode([
-                            'membership_type' => $memberType,
-                            'last_name' => $lastName, 'first_name' => $firstName,
-                            'email' => $email, 'grad_year' => $gradYear, 'grad_dept' => $gradDept,
-                        ], JSON_UNESCAPED_UNICODE),
-                    ]);
+            $hlApplicationId = 0;
+            $hlSaveErrors = [];
+            if ($isGraduate) {
+                $hlResult = po_application_add('membership', (int)$userId, [
+                    'membership_type' => $memberType,
+                    'last_name'       => $lastName,
+                    'first_name'      => $firstName,
+                    'second_name'     => $secondName,
+                    'email'           => $email,
+                    'grad_year'       => $gradYear,
+                    'grad_dept'       => $gradDept,
+                    'is_graduate'     => 'yes',
+                    'telegram'        => $telegram,
+                    'was_member'      => $wasMember ? 'yes' : 'no',
+                ]);
+                if ($hlResult['ok']) {
+                    $hlApplicationId = $hlResult['id'];
+                } else {
+                    $hlSaveErrors = $hlResult['errors'];
+                    error_log('[registration] HL membership save failed for user #' . (int)$userId . ': ' . implode('; ', $hlSaveErrors));
                 }
             }
             $fileLinks = [];
@@ -220,6 +225,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['reg_fiz_action'])) {
                 'достижения'               => $achievements,
                 'согласие_с_уставом_и_пдн' => $agreeCharter ? 'да' : 'нет',
                 'id_пользователя'          => (string)$userId,
+                'id_заявки_в_админке'     => $hlApplicationId > 0
+                    ? (string)$hlApplicationId
+                    : ($isGraduate ? ('ОШИБКА: ' . implode(', ', $hlSaveErrors)) : 'не создаётся (невыпускник)'),
                 'загруженные_файлы'        => $filesMeta ? implode('; ', $filesMeta) : 'Нет',
                 'file_links'               => $fileLinks,
             ], [

@@ -20,7 +20,7 @@ define('PO_REGISTERED_ID',     5); // Зарегистрированный (бе
 define('PO_MEMBER_BASIC_ID',   6); // Член общества — Базовое
 define('PO_MEMBER_PREMIUM_ID', 7); // Член общества — Привилегированное
 define('PO_PARTNER_ID',        8); // Партнёр (юр. лицо)
-define('PO_MEMBER_HONORARY_ID', 0); // Член общества — Почётное (ID: запустить /local/tools/po_setup_honorary_group.php)
+define('PO_MEMBER_HONORARY_ID', 10); // Член общества — Почётное
 define('PO_MODERATOR_ID',      9); // Модератор / Сотрудник
 
 /**
@@ -460,6 +460,118 @@ function po_flash_get(string $key): ?array
     $payload = $_SESSION['PO_FLASH'][$key];
     unset($_SESSION['PO_FLASH'][$key]);
     return $payload;
+}
+
+/**
+ * Найти ID пользователя Bitrix по email (LOGIN или EMAIL).
+ */
+function po_find_user_id_by_email(string $email): int
+{
+    $email = trim(mb_strtolower($email));
+    if ($email === '' || !class_exists('CUser')) {
+        return 0;
+    }
+    $rs = CUser::GetList('id', 'asc', ['EMAIL' => $email]);
+    if ($row = $rs->Fetch()) {
+        return (int)$row['ID'];
+    }
+    $rs = CUser::GetList('id', 'asc', ['LOGIN' => $email]);
+    if ($row = $rs->Fetch()) {
+        return (int)$row['ID'];
+    }
+    return 0;
+}
+
+/**
+ * Сохранить заявку в HL-блок Applications.
+ *
+ * @return array{ok: bool, id: int, errors: string[]}
+ */
+function po_application_add(string $type, int $userId, array $data, int $elementId = 0): array
+{
+    $result = ['ok' => false, 'id' => 0, 'errors' => []];
+
+    if (!\Bitrix\Main\Loader::includeModule('highloadblock')) {
+        $result['errors'][] = 'Модуль highloadblock недоступен';
+        return $result;
+    }
+    if (!defined('HL_APPLICATIONS_ID') || HL_APPLICATIONS_ID <= 0) {
+        $result['errors'][] = 'HL_APPLICATIONS_ID не задан';
+        return $result;
+    }
+
+    try {
+        $hlEntity = \Bitrix\Highloadblock\HighloadBlockTable::getById(HL_APPLICATIONS_ID)->fetch();
+        if (!$hlEntity) {
+            $result['errors'][] = 'HL-блок Applications не найден';
+            return $result;
+        }
+        $hlClass = \Bitrix\Highloadblock\HighloadBlockTable::compileEntity($hlEntity)->getDataClass();
+
+        $jsonData = json_encode($data, JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE);
+        if ($jsonData === false) {
+            $result['errors'][] = 'Ошибка сериализации данных заявки';
+            return $result;
+        }
+
+        $attempts = [
+            [
+                'UF_USER_ID'     => $userId,
+                'UF_TYPE'        => $type,
+                'UF_STATUS'      => 'new',
+                'UF_DATE_CREATE' => new \Bitrix\Main\Type\DateTime(),
+                'UF_DATA'        => $jsonData,
+                'UF_ELEMENT_ID'  => $elementId,
+            ],
+            [
+                'UF_USER_ID'     => $userId,
+                'UF_TYPE'        => $type,
+                'UF_STATUS'      => 'new',
+                'UF_DATE_CREATE' => new \Bitrix\Main\Type\DateTime(),
+                'UF_DATA'        => $jsonData,
+            ],
+        ];
+
+        foreach ($attempts as $fields) {
+            $res = $hlClass::add($fields);
+            if ($res->isSuccess()) {
+                $result['ok'] = true;
+                $result['id'] = (int)$res->getId();
+                return $result;
+            }
+            $result['errors'] = $res->getErrorMessages();
+        }
+
+        $errorText = implode('; ', $result['errors']);
+        error_log('[po_application_add] FAILED type=' . $type . ' userId=' . $userId . ': ' . $errorText);
+        if (function_exists('po_logAction')) {
+            po_logAction('form_submit', 'application', $userId, 'HL save FAILED: ' . $type . ' — ' . $errorText);
+        }
+    } catch (\Throwable $e) {
+        $result['errors'][] = $e->getMessage();
+        error_log('[po_application_add] Exception type=' . $type . ': ' . $e->getMessage());
+        if (function_exists('po_logAction')) {
+            po_logAction('form_submit', 'application', $userId, 'HL save EXCEPTION: ' . $type . ' — ' . $e->getMessage());
+        }
+    }
+
+    return $result;
+}
+
+/**
+ * Определить ID пользователя для заявки: UF_USER_ID или поиск по email в UF_DATA.
+ */
+function po_application_resolve_user_id(array $app, array $appData = []): int
+{
+    $userId = (int)($app['UF_USER_ID'] ?? 0);
+    if ($userId > 0) {
+        return $userId;
+    }
+    if ($appData === []) {
+        $appData = json_decode($app['UF_DATA'] ?? '{}', true) ?: [];
+    }
+    $email = trim((string)($appData['email'] ?? $appData['old_email'] ?? ''));
+    return po_find_user_id_by_email($email);
 }
 
 /**
